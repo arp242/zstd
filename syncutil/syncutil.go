@@ -1,5 +1,5 @@
 // Package syncutil adds functions for synchronization.
-package syncutil // import "github.com/teamwork/utils/syncutil"
+package syncutil // import "zgo.at/utils/syncutil"
 
 import (
 	"context"

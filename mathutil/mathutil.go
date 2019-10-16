@@ -1,4 +1,4 @@
-package mathutil // import "github.com/teamwork/utils/mathutil"
+package mathutil // import "zgo.at/utils/mathutil"
 
 import (
 	"fmt"

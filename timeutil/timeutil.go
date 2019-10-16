@@ -1,4 +1,4 @@
-package timeutil // import "github.com/teamwork/utils/timeutil"
+package timeutil // import "zgo.at/utils/timeutil"
 
 import "time"
 

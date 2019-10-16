@@ -1,4 +1,4 @@
-package netutil // import "github.com/teamwork/utils/netutil"
+package netutil // import "zgo.at/utils/netutil"
 
 import "net"
 

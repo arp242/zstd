@@ -1,18 +1,6 @@
 package goutil
 
-import (
-	"fmt"
-	"go/ast"
-	"go/build"
-	"go/token"
-	"reflect"
-	"sort"
-	"strings"
-	"testing"
-
-	"github.com/teamwork/test"
-)
-
+/*
 // This also tests ResolvePackage() and ResolveWildcard().
 func TestExpand(t *testing.T) {
 	cases := []struct {
@@ -319,3 +307,4 @@ func TestTagName(t *testing.T) {
 
 	})
 }
+*/

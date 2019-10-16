@@ -3,7 +3,7 @@ package header_test
 import (
 	"net/http"
 
-	"github.com/teamwork/utils/httputilx/header"
+	"zgo.at/utils/httputilx/header"
 )
 
 func ExampleSetCSP() {

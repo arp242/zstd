@@ -1,5 +1,5 @@
 // Package aesutil provides a set of functions for 2-way encryption and hashing.
-package aesutil // import "github.com/teamwork/utils/aesutil"
+package aesutil // import "zgo.at/utils/aesutil"
 
 import (
 	"crypto/aes"
