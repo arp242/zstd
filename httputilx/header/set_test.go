@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/teamwork/test"
+	"zgo.at/ztest"
 )
 
 func TestSetContentDisposition(t *testing.T) {
@@ -38,7 +38,7 @@ func TestSetContentDisposition(t *testing.T) {
 		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
 			h := http.Header{}
 			err := SetContentDisposition(h, tc.args)
-			if !test.ErrorContains(err, tc.wantErr) {
+			if !ztest.ErrorContains(err, tc.wantErr) {
 				t.Errorf("wrong error\nout:  %s\nwant: %s\n", err, tc.wantErr)
 			}
 

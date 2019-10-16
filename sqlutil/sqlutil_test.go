@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/teamwork/test"
+	"zgo.at/ztest"
 )
 
 func TestIntListValue(t *testing.T) {
@@ -60,7 +60,7 @@ func TestIntListScan(t *testing.T) {
 		t.Run(fmt.Sprintf("%v", tc.in), func(t *testing.T) {
 			out := IntList{}
 			err := out.Scan(tc.in)
-			if !test.ErrorContains(err, tc.wantErr) {
+			if !ztest.ErrorContains(err, tc.wantErr) {
 				t.Errorf("\nout:  %#v\nwant: %#v\n", err, tc.wantErr)
 			}
 			if !reflect.DeepEqual(out, tc.want) {
@@ -118,7 +118,7 @@ func TestStringListScan(t *testing.T) {
 		t.Run(fmt.Sprintf("%v", tc.in), func(t *testing.T) {
 			out := StringList{}
 			err := out.Scan(tc.in)
-			if !test.ErrorContains(err, tc.wantErr) {
+			if !ztest.ErrorContains(err, tc.wantErr) {
 				t.Errorf("\nout:  %#v\nwant: %#v\n", err, tc.wantErr)
 			}
 			if !reflect.DeepEqual(out, tc.want) {
@@ -157,7 +157,7 @@ func TestBoolScan(t *testing.T) {
 		t.Run(fmt.Sprintf("%v", tc.in), func(t *testing.T) {
 			var out Bool
 			err := out.Scan(tc.in)
-			if !test.ErrorContains(err, tc.wantErr) {
+			if !ztest.ErrorContains(err, tc.wantErr) {
 				t.Errorf("\nout:  %#v\nwant: %#v\n", err, tc.wantErr)
 			}
 			if !reflect.DeepEqual(out, tc.want) {
@@ -202,7 +202,7 @@ func TestBoolMarshalText(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(fmt.Sprintf("%v", tc.in), func(t *testing.T) {
 			out, err := tc.in.MarshalText()
-			if !test.ErrorContains(err, tc.wantErr) {
+			if !ztest.ErrorContains(err, tc.wantErr) {
 				t.Errorf("\nout:  %#v\nwant: %#v\n", err, tc.wantErr)
 			}
 			if !reflect.DeepEqual(out, tc.want) {
@@ -231,7 +231,7 @@ func TestBoolUnmarshalText(t *testing.T) {
 		t.Run(fmt.Sprintf("%v", tc.in), func(t *testing.T) {
 			var out Bool
 			err := out.UnmarshalText(tc.in)
-			if !test.ErrorContains(err, tc.wantErr) {
+			if !ztest.ErrorContains(err, tc.wantErr) {
 				t.Errorf("\nout:  %#v\nwant: %#v\n", err, tc.wantErr)
 			}
 			if !reflect.DeepEqual(out, tc.want) {

@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/teamwork/test/image"
+	"zgo.at/ztest/image"
 )
 
 func TestDetectImage(t *testing.T) {

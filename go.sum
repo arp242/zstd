@@ -1,8 +1,6 @@
-github.com/Strum355/go-difflib v1.1.0 h1:+rR2X3UuvIbe1Jmhx8WA7gkgjMNRscFWbHchk2RB8I4=
-github.com/Strum355/go-difflib v1.1.0/go.mod h1:r1cVg1JkGsTWkaR7At56v7hfuMgiUL8meTLwxFzOmvE=
-github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
-github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
+github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/pkg/errors v0.8.0 h1:WdK/asTD0HN+q6hsWO3/vpuAkAr+tw6aNJNDFFf0+qw=
 github.com/pkg/errors v0.8.0/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
-github.com/teamwork/test v0.0.0-20190410143529-8897d82f8d46 h1:IWmLWZ3AylHoq1M8ca7H5Ns7oNsuzaCAqoFvKaDP2jA=
-github.com/teamwork/test v0.0.0-20190410143529-8897d82f8d46/go.mod h1:TIbx7tx6WHBjQeLRM4eWQZBL7kmBZ7/KI4x4v7Y5YmA=
+github.com/sqm/go-difflib v1.0.0/go.mod h1:mcpO+94qEPAFCmvxVOtQfBMpAeLUDpZSr4/0klyFK1E=
+zgo.at/ztest v0.0.0-20191016020008-4db9363c8356 h1:Cmd2p10/g42cSzX5PXKBD+jbkSMFRcGSFtnHdf4+m8E=
+zgo.at/ztest v0.0.0-20191016020008-4db9363c8356/go.mod h1:ZbSOMdTsSvYOhq8TPIlU54Z7w2bfjnSaHnmi4a5B7LQ=

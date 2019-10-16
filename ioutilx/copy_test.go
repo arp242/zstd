@@ -9,7 +9,7 @@ import (
 	"syscall"
 	"testing"
 
-	"github.com/teamwork/test"
+	"zgo.at/ztest"
 )
 
 func TestMain(m *testing.M) {
@@ -68,7 +68,7 @@ func TestIsSameFile(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.src+":"+tc.dst, func(t *testing.T) {
 			out := IsSameFile(tc.src, tc.dst)
-			if !test.ErrorContains(out, tc.want) {
+			if !ztest.ErrorContains(out, tc.want) {
 				t.Fatalf("\nwant: %s\nout:  %+v", tc.want, out)
 			}
 		})
@@ -95,7 +95,7 @@ func TestIsSpecialFile(t *testing.T) {
 			}
 
 			out := IsSpecialFile(st)
-			if !test.ErrorContains(out, tc.want) {
+			if !ztest.ErrorContains(out, tc.want) {
 				t.Fatalf("\nwant: %s\nout:  %+v", tc.want, out)
 			}
 		})
@@ -123,7 +123,7 @@ func TestCopyData(t *testing.T) {
 			}
 
 			out := CopyData(tc.src, tc.dst)
-			if !test.ErrorContains(out, tc.want) {
+			if !ztest.ErrorContains(out, tc.want) {
 				t.Fatalf("\nwant: %s\nout:  %+v", tc.want, out)
 			}
 
@@ -157,7 +157,7 @@ func TestCopyMode(t *testing.T) {
 			}
 
 			out := CopyMode(tc.src, tc.dst, tc.mode)
-			if !test.ErrorContains(out, tc.want) {
+			if !ztest.ErrorContains(out, tc.want) {
 				t.Fatalf("\nwant: %s\nout:  %+v", tc.want, out)
 			}
 
@@ -217,7 +217,7 @@ func TestCopy(t *testing.T) {
 			}
 
 			out := Copy(tc.src, tc.dst, tc.mode)
-			if !test.ErrorContains(out, tc.want) {
+			if !ztest.ErrorContains(out, tc.want) {
 				t.Fatalf("\nwant: %s\nout:  %+v", tc.want, out)
 			}
 
@@ -281,25 +281,25 @@ func touch(t *testing.T, n string) {
 func TestCopyTree(t *testing.T) {
 	t.Run("nonexistent", func(t *testing.T) {
 		err := CopyTree("nonexistent", "test_copytree", nil)
-		if !test.ErrorContains(err, "no such file or directory") {
+		if !ztest.ErrorContains(err, "no such file or directory") {
 			t.Error(err)
 		}
 	})
 	t.Run("dst-exists", func(t *testing.T) {
 		err := CopyTree("test", "test", nil)
-		if !test.ErrorContains(err, "already exists") {
+		if !ztest.ErrorContains(err, "already exists") {
 			t.Error(err)
 		}
 	})
 	t.Run("dst-nodir", func(t *testing.T) {
 		err := CopyTree("test/file1", "test", nil)
-		if !test.ErrorContains(err, "not a directory") {
+		if !ztest.ErrorContains(err, "not a directory") {
 			t.Error(err)
 		}
 	})
 	t.Run("permission", func(t *testing.T) {
 		err := CopyTree("test", "/cant/write/here", nil)
-		if !test.ErrorContains(err, "permission denied") {
+		if !ztest.ErrorContains(err, "permission denied") {
 			t.Error(err)
 		}
 	})

@@ -15,7 +15,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/teamwork/test"
+	"zgo.at/ztest"
 )
 
 func TestDumpBody(t *testing.T) {
@@ -214,7 +214,7 @@ func TestFetch(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(fmt.Sprintf("%v", tc.in), func(t *testing.T) {
 			out, err := Fetch(tc.in)
-			if !test.ErrorContains(err, tc.wantErr) {
+			if !ztest.ErrorContains(err, tc.wantErr) {
 				t.Errorf("wrong error\nout:  %#v\nwant: %#v\n", err, tc.wantErr)
 			}
 			if !strings.Contains(string(out), tc.want) {
