@@ -7,8 +7,6 @@ import (
 	"reflect"
 	"strconv"
 	"testing"
-
-	"github.com/teamwork/test/diff"
 )
 
 func TestIntsToString(t *testing.T) {
@@ -34,7 +32,7 @@ func TestIntsToString(t *testing.T) {
 		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
 			got := JoinInt(tc.in)
 			if got != tc.expected {
-				t.Errorf(diff.Cmp(tc.expected, got))
+				t.Errorf("want: %q\ngot:  %q", tc.expected, got)
 			}
 		})
 	}
@@ -71,7 +69,7 @@ func TestUniqInt64(t *testing.T) {
 		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
 			got := UniqInt64(tc.in)
 			if !reflect.DeepEqual(got, tc.expected) {
-				t.Errorf(diff.Cmp(tc.expected, got))
+				t.Errorf("want: %q\ngot:  %q", tc.expected, got)
 			}
 		})
 	}
@@ -96,7 +94,7 @@ func TestUniqueMergeSlices(t *testing.T) {
 		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
 			got := UniqueMergeSlices(tc.in)
 			if !int64slicesequal(got, tc.expected) {
-				t.Errorf(diff.Cmp(tc.expected, got))
+				t.Errorf("want: %q\ngot:  %q", tc.expected, got)
 			}
 		})
 	}
@@ -121,7 +119,7 @@ func TestUniqString(t *testing.T) {
 		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
 			got := UniqString(tc.in)
 			if !stringslicesequal(got, tc.expected) {
-				t.Errorf(diff.Cmp(tc.expected, got))
+				t.Errorf("want: %q\ngot:  %q", tc.expected, got)
 			}
 		})
 	}
@@ -227,11 +225,11 @@ func TestCSVtoInt64Slice(t *testing.T) {
 			}
 
 			if err != tc.expectedErr && err.Error() != tc.expectedErr.Error() {
-				t.Errorf(diff.Cmp(tc.expectedErr.Error(), err.Error()))
+				t.Errorf("want: %q\\ngot:  %q", tc.expectedErr.Error(), err.Error())
 			}
 
 			if !reflect.DeepEqual(got, tc.expected) {
-				t.Errorf(diff.Cmp(tc.expected, got))
+				t.Errorf("want: %q\ngot:  %q", tc.expected, got)
 			}
 		})
 	}
@@ -254,7 +252,7 @@ func TestInStringSlice(t *testing.T) {
 		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
 			got := InStringSlice(tc.list, tc.find)
 			if got != tc.expected {
-				t.Errorf(diff.Cmp(tc.expected, got))
+				t.Errorf("want: %#v\ngot:  %#v", tc.expected, got)
 			}
 		})
 	}
@@ -277,7 +275,7 @@ func TestInIntSlice(t *testing.T) {
 		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
 			got := InIntSlice(tc.list, tc.find)
 			if got != tc.expected {
-				t.Errorf(diff.Cmp(tc.expected, got))
+				t.Errorf("want: %#v\ngot:  %#v", tc.expected, got)
 			}
 		})
 	}
@@ -300,7 +298,7 @@ func TestInInt64Slice(t *testing.T) {
 		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
 			got := InInt64Slice(tc.list, tc.find)
 			if got != tc.expected {
-				t.Errorf(diff.Cmp(tc.expected, got))
+				t.Errorf("want: %#v\ngot:  %#v", tc.expected, got)
 			}
 		})
 	}

@@ -3,8 +3,6 @@ package aesutil
 import (
 	"fmt"
 	"testing"
-
-	"github.com/teamwork/test/diff"
 )
 
 const (
@@ -87,7 +85,7 @@ func TestEncryptAndDecrypt(t *testing.T) {
 				t.Fatal("Decrypt failed, plaintext result is nil")
 			}
 			if string(plain) != testData {
-				t.Fatalf(diff.Cmp(testData, string(plain)))
+				t.Fatalf("want: %q\ngot:  %q", testData, string(plain))
 			}
 		})
 	}

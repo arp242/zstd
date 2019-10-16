@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"reflect"
 	"testing"
-
-	"github.com/teamwork/test/diff"
 )
 
 func TestReverse(t *testing.T) {
@@ -21,7 +19,7 @@ func TestReverse(t *testing.T) {
 		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
 			got := Reverse(tc.in)
 			if !reflect.DeepEqual(got, tc.expected) {
-				t.Errorf(diff.Cmp(tc.expected, got))
+				t.Errorf("want: %q\ngot:  %q", tc.expected, got)
 			}
 		})
 	}
