@@ -13,7 +13,7 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	fifo := "test/fifo"
+	fifo := "testdata/fifo"
 	err := syscall.Mkfifo(fifo, 644)
 	if err != nil {
 		panic(err)
@@ -31,11 +31,11 @@ func TestIsSymLink(t *testing.T) {
 		in   string
 		want bool
 	}{
-		{"test/file1", false},
-		{"test/dir1", false},
-		// {"test/link1", true},
-		// {"test/link2", true},
-		// {"test/link3", true},
+		{"testdata/file1", false},
+		{"testdata/dir1", false},
+		// {"testdata/link1", true},
+		// {"testdata/link2", true},
+		// {"testdata/link3", true},
 	}
 
 	for _, tc := range cases {
@@ -57,11 +57,11 @@ func TestIsSameFile(t *testing.T) {
 		src, dst string
 		want     string
 	}{
-		// {"test/file1", "test/link1", "are the same file"},
-		// {"test/file1", "test/link2", "are the same file"},
-		{"test/file1", "test/dir1", ""},
-		{"test/file1", "nonexistent", ""},
-		{"nonexistent", "test/file1", ""},
+		// {"testdata/file1", "testdata/link1", "are the same file"},
+		// {"testdata/file1", "testdata/link2", "are the same file"},
+		{"testdata/file1", "testdata/dir1", ""},
+		{"testdata/file1", "nonexistent", ""},
+		{"nonexistent", "testdata/file1", ""},
 		{"nonexistent", "nonexistent", ""},
 	}
 
@@ -79,10 +79,10 @@ func TestIsSpecialFile(t *testing.T) {
 	cases := []struct {
 		in, want string
 	}{
-		{"test/file1", ""},
-		{"test/dir1", ""},
-		// {"test/link1", ""},
-		{"test/fifo", "named pipe"},
+		{"testdata/file1", ""},
+		{"testdata/dir1", ""},
+		// {"testdata/link1", ""},
+		{"testdata/fifo", "named pipe"},
 		{"/dev/null", "device file"},
 	}
 
@@ -106,14 +106,14 @@ func TestCopyData(t *testing.T) {
 	cases := []struct {
 		src, dst, want string
 	}{
-		{"test/file1", "test/file1", "same file"},
-		{"nonexistent", "test/copydst", "no such file"},
-		{"test/file1", "test/file2", "already exists"},
-		{"test/fifo", "test/newfile", "named pipe"},
-		// {"test/link1/asd", "test/dst1", "not a directory"},
-		{"test/file1", "/cantwritehere", "permission denied"},
-		{"test/file1", "test/dst1", ""},
-		// {"test/link1", "test/dst1", ""},
+		{"testdata/file1", "testdata/file1", "same file"},
+		{"nonexistent", "testdata/copydst", "no such file"},
+		{"testdata/file1", "testdata/file2", "already exists"},
+		{"testdata/fifo", "testdata/newfile", "named pipe"},
+		// {"testdata/link1/asd", "testdata/dst1", "not a directory"},
+		{"testdata/file1", "/cantwritehere", "permission denied"},
+		{"testdata/file1", "testdata/dst1", ""},
+		// {"testdata/link1", "testdata/dst1", ""},
 	}
 
 	for _, tc := range cases {
@@ -140,13 +140,13 @@ func TestCopyMode(t *testing.T) {
 		mode     Modes
 		want     string
 	}{
-		{"test/file1", "test/file1", Modes{}, "same file"},
-		{"nonexistent", "test/copydst", Modes{}, "no such file"},
-		{"test/fifo", "test/newfile", Modes{}, "named pipe"},
-		// {"test/link1/asd", "test/dst1", Modes{}, "not a directory"},
-		{"test/file1", "/cantwritehere", Modes{}, "no such file or directory"},
+		{"testdata/file1", "testdata/file1", Modes{}, "same file"},
+		{"nonexistent", "testdata/copydst", Modes{}, "no such file"},
+		{"testdata/fifo", "testdata/newfile", Modes{}, "named pipe"},
+		// {"testdata/link1/asd", "testdata/dst1", Modes{}, "not a directory"},
+		{"testdata/file1", "/cantwritehere", Modes{}, "no such file or directory"},
 
-		{"test/exec", "test/dst1", Modes{Permissions: true, Owner: true, Mtime: true}, ""},
+		{"testdata/exec", "testdata/dst1", Modes{Permissions: true, Owner: true, Mtime: true}, ""},
 	}
 
 	for _, tc := range cases {
@@ -164,14 +164,14 @@ func TestCopyMode(t *testing.T) {
 			// Seems to fail on Travis all of the sudden:
 			//
 			// --- FAIL: TestCopyMode (0.00s)
-			//     --- FAIL: TestCopyMode/test/exec:test/dst1 (0.00s)
+			//     --- FAIL: TestCopyMode/testdata/exec:testdata/dst1 (0.00s)
 			//     	copy_test.go:171: wrong mode: -rwxrwxr-x
 			// --- FAIL: TestCopy (0.01s)
-			//     --- FAIL: TestCopy/test/exec:test/dst1 (0.00s)
+			//     --- FAIL: TestCopy/testdata/exec:testdata/dst1 (0.00s)
 			//     	copy_test.go:218: wrong mode: -rwxrwxr-x
-			//     --- FAIL: TestCopy/test/exec:test/dir1 (0.00s)
+			//     --- FAIL: TestCopy/testdata/exec:testdata/dir1 (0.00s)
 			//     	copy_test.go:218: wrong mode: -rwxrwxr-x
-			//     --- FAIL: TestCopy/test/exec:test/dir1/ (0.00s)
+			//     --- FAIL: TestCopy/testdata/exec:testdata/dir1/ (0.00s)
 			//     	copy_test.go:218: wrong mode: -rwxrwxr-x
 			//
 			// if tc.want == "" {
@@ -194,21 +194,21 @@ func TestCopy(t *testing.T) {
 		mode     Modes
 		want     string
 	}{
-		{"test/file1", "test/file1", Modes{}, "same file"},
-		{"nonexistent", "test/copydst", Modes{}, "no such file"},
-		{"test/fifo", "test/newfile", Modes{}, "named pipe"},
-		// {"test/link1/asd", "test/dst1", Modes{}, "not a directory"},
-		{"test/file1", "/cantwritehere", Modes{}, "permission denied"},
+		{"testdata/file1", "testdata/file1", Modes{}, "same file"},
+		{"nonexistent", "testdata/copydst", Modes{}, "no such file"},
+		{"testdata/fifo", "testdata/newfile", Modes{}, "named pipe"},
+		// {"testdata/link1/asd", "testdata/dst1", Modes{}, "not a directory"},
+		{"testdata/file1", "/cantwritehere", Modes{}, "permission denied"},
 
-		{"test/exec", "test/dst1", Modes{Permissions: true, Owner: true, Mtime: true}, ""},
-		{"test/exec", "test/dir1", Modes{Permissions: true, Owner: true, Mtime: true}, ""},
-		{"test/exec", "test/dir1/", Modes{Permissions: true, Owner: true, Mtime: true}, ""},
+		{"testdata/exec", "testdata/dst1", Modes{Permissions: true, Owner: true, Mtime: true}, ""},
+		{"testdata/exec", "testdata/dir1", Modes{Permissions: true, Owner: true, Mtime: true}, ""},
+		{"testdata/exec", "testdata/dir1/", Modes{Permissions: true, Owner: true, Mtime: true}, ""},
 	}
 
 	for _, tc := range cases {
 		t.Run(tc.src+":"+tc.dst, func(t *testing.T) {
 			c := tc.dst
-			if strings.HasPrefix(c, "test/dir1") {
+			if strings.HasPrefix(c, "testdata/dir1") {
 				c = filepath.Join(c, "exec")
 			}
 
@@ -222,11 +222,11 @@ func TestCopy(t *testing.T) {
 			}
 
 			// --- FAIL: TestCopy (0.00s)
-			//     --- FAIL: TestCopy/test/exec:test/dst1 (0.00s)
+			//     --- FAIL: TestCopy/testdata/exec:testdata/dst1 (0.00s)
 			//     	copy_test.go:231: wrong mode: -rwxrwxr-x
-			//     --- FAIL: TestCopy/test/exec:test/dir1 (0.00s)
+			//     --- FAIL: TestCopy/testdata/exec:testdata/dir1 (0.00s)
 			//     	copy_test.go:231: wrong mode: -rwxrwxr-x
-			//     --- FAIL: TestCopy/test/exec:test/dir1/ (0.00s)
+			//     --- FAIL: TestCopy/testdata/exec:testdata/dir1/ (0.00s)
 			//     	copy_test.go:231: wrong mode: -rwxrwxr-x
 			//
 			// if tc.want == "" {
@@ -286,19 +286,19 @@ func TestCopyTree(t *testing.T) {
 		}
 	})
 	t.Run("dst-exists", func(t *testing.T) {
-		err := CopyTree("test", "test", nil)
+		err := CopyTree("testdata", "testdata", nil)
 		if !ztest.ErrorContains(err, "already exists") {
 			t.Error(err)
 		}
 	})
 	t.Run("dst-nodir", func(t *testing.T) {
-		err := CopyTree("test/file1", "test", nil)
+		err := CopyTree("testdata/file1", "test", nil)
 		if !ztest.ErrorContains(err, "not a directory") {
 			t.Error(err)
 		}
 	})
 	t.Run("permission", func(t *testing.T) {
-		err := CopyTree("test", "/cant/write/here", nil)
+		err := CopyTree("testdata", "/cant/write/here", nil)
 		if !ztest.ErrorContains(err, "permission denied") {
 			t.Error(err)
 		}
@@ -311,7 +311,7 @@ func TestCopyTree(t *testing.T) {
 		}
 	}()
 
-	err := CopyTree("test", "test_copytree", &CopyTreeOptions{
+	err := CopyTree("testdata", "test_copytree", &CopyTreeOptions{
 		Symlinks: false,
 		Ignore: func(path string, fi []os.FileInfo) []string {
 			return []string{"fifo"}
@@ -324,5 +324,5 @@ func TestCopyTree(t *testing.T) {
 		return
 	}
 
-	filesMatch(t, "test/file1", "test_copytree/file1")
+	filesMatch(t, "testdata/file1", "test_copytree/file1")
 }
