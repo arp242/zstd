@@ -6,11 +6,11 @@ import (
 	"testing"
 )
 
-func TestDifference(t *testing.T) {
-	cases := []struct {
+func TestDifferenceInt(t *testing.T) {
+	tests := []struct {
 		inSet    []int64
 		inOthers [][]int64
-		expected []int64
+		want     []int64
 	}{
 		{[]int64{}, [][]int64{}, []int64{}},
 		{nil, [][]int64{}, []int64{}},
@@ -24,74 +24,99 @@ func TestDifference(t *testing.T) {
 		{[]int64{1, 2, 3}, [][]int64{{}, {1}}, []int64{2, 3}},
 	}
 
-	for i, tc := range cases {
+	for i, tt := range tests {
 		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
-			out := Difference(tc.inSet, tc.inOthers...)
-			if !reflect.DeepEqual(tc.expected, out) {
-				t.Errorf("\nout:      %#v\nexpected: %#v\n", out, tc.expected)
+			out := DifferenceInt(tt.inSet, tt.inOthers...)
+			if !reflect.DeepEqual(tt.want, out) {
+				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tt.want)
 			}
 		})
 	}
 }
 
-func TestComplement(t *testing.T) {
-	type ciTest struct {
-		name      string
-		a         []int64
-		b         []int64
-		aExpected []int64
-		bExpected []int64
+func TestDifferenceString(t *testing.T) {
+	tests := []struct {
+		inSet    []string
+		inOthers [][]string
+		want     []string
+	}{
+		{[]string{}, [][]string{}, []string{}},
+		{nil, [][]string{}, []string{}},
+		{[]string{}, nil, []string{}},
+		{nil, nil, []string{}},
+		{[]string{"1"}, [][]string{{"1"}}, []string{}},
+		{[]string{"1", "2", "2", "3"}, [][]string{{"1", "2", "2", "3"}}, []string{}},
+		{[]string{"1", "2", "2", "3"}, [][]string{{"1", "2"}, {"3"}}, []string{}},
+		{[]string{"1", "2"}, [][]string{{"1"}}, []string{"2"}},
+		{[]string{"1", "2", "3"}, [][]string{{"1"}}, []string{"2", "3"}},
+		{[]string{"1", "2", "3"}, [][]string{{}, {"1"}}, []string{"2", "3"}},
 	}
-	tests := []ciTest{
+
+	for i, tt := range tests {
+		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
+			out := DifferenceString(tt.inSet, tt.inOthers...)
+			if !reflect.DeepEqual(tt.want, out) {
+				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tt.want)
+			}
+		})
+	}
+}
+
+func TestComplementInt(t *testing.T) {
+	tests := []struct {
+		name         string
+		inA, inB     []int64
+		wantA, wantB []int64
+	}{
 		{
 			name: "EmptyLists",
 		},
 		{
-			name:      "AOnly",
-			a:         []int64{1, 2, 3},
-			aExpected: []int64{1, 2, 3},
+			name:  "AOnly",
+			inA:   []int64{1, 2, 3},
+			wantA: []int64{1, 2, 3},
 		},
 		{
-			name:      "BOnly",
-			b:         []int64{1, 2, 3},
-			bExpected: []int64{1, 2, 3},
+			name:  "BOnly",
+			inB:   []int64{1, 2, 3},
+			wantB: []int64{1, 2, 3},
 		},
 		{
 			name: "Equal",
-			a:    []int64{1, 2, 3},
-			b:    []int64{1, 2, 3},
+			inA:  []int64{1, 2, 3},
+			inB:  []int64{1, 2, 3},
 		},
 		{
-			name:      "Disjoint",
-			a:         []int64{1, 2, 3},
-			b:         []int64{5, 6, 7},
-			aExpected: []int64{1, 2, 3},
-			bExpected: []int64{5, 6, 7},
+			name:  "Disjoint",
+			inA:   []int64{1, 2, 3},
+			inB:   []int64{5, 6, 7},
+			wantA: []int64{1, 2, 3},
+			wantB: []int64{5, 6, 7},
 		},
 		{
-			name:      "Overlap",
-			a:         []int64{1, 2, 3, 4},
-			b:         []int64{3, 4, 5, 6},
-			aExpected: []int64{1, 2},
-			bExpected: []int64{5, 6},
+			name:  "Overlap",
+			inA:   []int64{1, 2, 3, 4},
+			inB:   []int64{3, 4, 5, 6},
+			wantA: []int64{1, 2},
+			wantB: []int64{5, 6},
 		},
 		{
-			name:      "Overlap with repeated values",
-			a:         []int64{6, 4, 5, 3, 6},
-			b:         []int64{2, 1, 4, 3, 1},
-			aExpected: []int64{6, 5, 6},
-			bExpected: []int64{2, 1, 1},
+			name:  "Overlap with repeated values",
+			inA:   []int64{6, 4, 5, 3, 6},
+			inB:   []int64{2, 1, 4, 3, 1},
+			wantA: []int64{6, 5, 6},
+			wantB: []int64{2, 1, 1},
 		},
 	}
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			aOnly, bOnly := Complement(test.a, test.b)
 
-			if !reflect.DeepEqual(aOnly, test.aExpected) {
-				t.Errorf("aOnly wrong\ngot:  %#v\nwant: %#v\n", aOnly, test.aExpected)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			aOnly, bOnly := ComplementInt(tt.inA, tt.inB)
+			if !reflect.DeepEqual(aOnly, tt.wantA) {
+				t.Errorf("aOnly wrong\ngot:  %#v\nwant: %#v\n", aOnly, tt.wantA)
 			}
-			if !reflect.DeepEqual(bOnly, test.bExpected) {
-				t.Errorf("bOnly wrong\ngot:  %#v\nwant: %#v\n", bOnly, test.bExpected)
+			if !reflect.DeepEqual(bOnly, tt.wantB) {
+				t.Errorf("bOnly wrong\ngot:  %#v\nwant: %#v\n", bOnly, tt.wantB)
 			}
 		})
 	}
@@ -102,7 +127,7 @@ func BenchmarkComplement_equal(b *testing.B) {
 	listB := []int64{1, 2, 3}
 
 	for n := 0; n < b.N; n++ {
-		Complement(listA, listB)
+		ComplementInt(listA, listB)
 	}
 }
 
@@ -111,7 +136,7 @@ func BenchmarkComplement_disjoint(b *testing.B) {
 	listB := []int64{5, 6, 7}
 
 	for n := 0; n < b.N; n++ {
-		Complement(listA, listB)
+		ComplementInt(listA, listB)
 	}
 }
 
@@ -120,6 +145,6 @@ func BenchmarkComplement_overlap(b *testing.B) {
 	listB := []int64{3, 4, 5, 6}
 
 	for n := 0; n < b.N; n++ {
-		Complement(listA, listB)
+		ComplementInt(listA, listB)
 	}
 }
