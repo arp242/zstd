@@ -89,6 +89,12 @@ func (p Patterns) Match(pc uintptr) bool {
 	if len(p.pkgs) > 0 {
 		// Get package name.
 		pkg := fn.Name()
+
+		// Always include main package.
+		if pkg == "main.main" {
+			return p.ret
+		}
+
 		s := strings.LastIndex(pkg, "/")
 		if s < 0 {
 			s = 0
