@@ -6,6 +6,30 @@ import (
 	"strings"
 )
 
+// Fields slices s in to all substrings separated by sep. Leading/trailing
+// whitespace and empty elements will be removed.
+//
+// e.g. "a;b", "a; b", "  a  ; b", and "a; b;" will all result in {"a", "b"}.
+func Fields(s, sep string) []string {
+	s = strings.TrimSpace(s)
+	if s == "" {
+		return nil
+	}
+
+	f := strings.Split(s, sep)
+	var rm []int
+	for i := range f {
+		f[i] = strings.TrimSpace(f[i])
+		if f[i] == "" {
+			rm = append(rm, i)
+		}
+	}
+	for _, i := range rm {
+		f = append(f[:i], f[i+1:]...)
+	}
+	return f
+}
+
 // Left returns the "n" left characters of the string.
 //
 // If the string is shorter than "n" it will return the first "n" characters of

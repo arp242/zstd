@@ -2,9 +2,32 @@ package stringutil
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 	"testing"
 )
+
+func TestFields(t *testing.T) {
+	tests := []struct {
+		in   string
+		want []string
+	}{
+		{"", nil},
+		{"a", []string{"a"}},
+		{"a;b", []string{"a", "b"}},
+		{"  a  ;  b  ", []string{"a", "b"}},
+		{"  a  ;  b  ; ", []string{"a", "b"}},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.in, func(t *testing.T) {
+			out := Fields(tt.in, ";")
+			if !reflect.DeepEqual(out, tt.want) {
+				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tt.want)
+			}
+		})
+	}
+}
 
 func TestLeft(t *testing.T) {
 	cases := []struct {
