@@ -1,7 +1,30 @@
 // Package jsonutil provides functions for working with JSON.
 package jsonutil // import "zgo.at/utils/jsonutil"
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"fmt"
+	"strconv"
+	"time"
+)
+
+// Timestamp for APIs that return dates as a numeric Unix timestamp.
+type Timestamp struct{ time.Time }
+
+// Marshal in to JSON.
+func (t Timestamp) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%d", t.Unix())), nil
+}
+
+// Unmarshal a Unix timestamp as a date.
+func (t *Timestamp) UnmarshalJSON(v []byte) error {
+	n, err := strconv.ParseInt(string(v), 10, 64)
+	if err != nil {
+		return err
+	}
+	t.Time = time.Unix(n, 0).UTC()
+	return nil
+}
 
 // MustMarshal behaves like json.Marshal but will panic on errors.
 func MustMarshal(v interface{}) []byte {
