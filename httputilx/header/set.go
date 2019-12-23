@@ -136,6 +136,13 @@ const (
 	CSPSourceUnsafeInline = "'unsafe-inline'" // Inline <script>/<style>, onevent="", etc.
 	CSPSourceUnsaleEval   = "'unsafe-eval'"   // eval()
 	CSPSourceStar         = "*"               // Everything
+
+	CSPSourceHTTP        = "http:"
+	CSPSourceHTTPS       = "https:"
+	CSPSourceData        = "data:"
+	CSPSourceMediastream = "mediastream:"
+	CSPSourceBlob        = "blob:"
+	CSPSourceFilesystem  = "filesystem:"
 )
 
 // CSPArgs are arguments for SetCSP().
