@@ -6,78 +6,27 @@ import (
 	"time"
 )
 
-func TestStartOfMonth(t *testing.T) {
-	cases := []struct {
-		in   time.Time
-		want time.Time
+func TestFormatDuration(t *testing.T) {
+	tests := []struct {
+		in   time.Duration
+		want string
 	}{
-		{mustParse(t, "2016-01-13"), mustParse(t, "2016-01-01")},
-		{mustParse(t, "2016-01-01"), mustParse(t, "2016-01-01")},
-		{mustParse(t, "2016-12-30"), mustParse(t, "2016-12-01")},
+		{10 * time.Second, "10s"},
+		{130 * time.Second, "2m10s"},
+		{1606 * time.Second, "27m"},
+		{3664 * time.Second, "1h1m"},
+		{(86400 + 3664) * time.Second, "1d1h"},
+		{(86400*15 + 3664) * time.Second, "15d1h"},
+		{(86400*17 + 3664*10) * time.Second, "17d10h"},
+		{(86400 * 100) * time.Second, "100d"},
+		{(86400*204 + 3664*2) * time.Second, "204d"},
 	}
 
-	for _, c := range cases {
-		got := StartOfMonth(c.in)
-		if got != c.want {
-			t.Errorf("StartOfMonth(%s) => %s, want %s", c.in, got, c.want)
-		}
-	}
-}
-
-func TestEndOfMonth(t *testing.T) {
-	cases := []struct {
-		in   time.Time
-		want time.Time
-	}{
-		{mustParse(t, "2016-01-01"), mustParse(t, "2016-01-31")},
-		{mustParse(t, "2016-01-31"), mustParse(t, "2016-01-31")},
-		{mustParse(t, "2016-11-01"), mustParse(t, "2016-11-30")},
-		{mustParse(t, "2016-12-31"), mustParse(t, "2016-12-31")},
-		// leap test
-		{mustParse(t, "2012-02-01"), mustParse(t, "2012-02-29")},
-		{mustParse(t, "2013-02-01"), mustParse(t, "2013-02-28")},
-	}
-
-	for _, c := range cases {
-		got := EndOfMonth(c.in)
-		if got != c.want {
-			t.Errorf("EndOfMonth(%s) => %s, want %s", c.in, got, c.want)
-		}
-	}
-}
-
-// mustParse parses value in the format YYYY-MM-DD failing the test on error.
-func mustParse(t *testing.T, value string) time.Time {
-	const layout = "2006-01-02"
-	d, err := time.Parse(layout, value)
-	if err != nil {
-		t.Fatalf("time.Parse(%q, %q) unexpected error: %v", layout, value, err)
-	}
-	return d
-}
-
-func TestMonthsTo(t *testing.T) {
-	day := 24 * time.Hour
-	cases := []struct {
-		in   time.Time
-		want int
-	}{
-		{time.Now(), 1},
-		{time.Now().Add(day * 35), 1},
-		{time.Now().Add(day * 65), 2},
-		{time.Now().Add(day * 370), 12},
-
-		// Broken!
-		//{time.Now().Add(-day * 35), -1},
-		//{time.Now().Add(-day * 65), -2},
-		//{time.Now().Add(-day * 370), -12},
-	}
-
-	for i, tc := range cases {
-		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
-			out := MonthsTo(tc.in)
-			if out != tc.want {
-				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("%s", tt.in), func(t *testing.T) {
+			out := FormatDuration(tt.in)
+			if out != tt.want {
+				t.Errorf("\nout:  %q\nwant: %q", out, tt.want)
 			}
 		})
 	}
