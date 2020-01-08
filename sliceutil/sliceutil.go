@@ -82,24 +82,44 @@ func UniqueMergeSlices(s [][]int64) (result []int64) {
 	return result
 }
 
-// CSVtoInt64Slice converts a string of integers to a slice of int64.
-func CSVtoInt64Slice(csv string) ([]int64, error) {
-	csv = strings.TrimSpace(csv)
-	if len(csv) == 0 {
-		return []int64(nil), nil
+// SplitInt converts a string of integers to a slice of int64.
+func SplitInt(s string) ([]int64, error) {
+	s = strings.Trim(s, " \t\n,")
+	if len(s) == 0 {
+		return nil, nil
 	}
 
-	items := strings.Split(csv, ",")
-	ints := make([]int64, len(items))
-	for i, item := range items {
-		val, err := strconv.Atoi(strings.TrimSpace(item))
+	items := strings.Split(s, ",")
+	ret := make([]int64, len(items))
+	for i := range items {
+		val, err := strconv.ParseInt(strings.TrimSpace(items[i]), 10, 64)
 		if err != nil {
 			return nil, err
 		}
-		ints[i] = int64(val)
+		ret[i] = val
 	}
 
-	return ints, nil
+	return ret, nil
+}
+
+// SplitFloat converts a string of integers to a slice of float64.
+func SplitFloat(s string) ([]float64, error) {
+	s = strings.Trim(s, " \t\n,")
+	if len(s) == 0 {
+		return nil, nil
+	}
+
+	items := strings.Split(s, ",")
+	ret := make([]float64, len(items))
+	for i := range items {
+		val, err := strconv.ParseFloat(strings.TrimSpace(items[i]), 64)
+		if err != nil {
+			return nil, err
+		}
+		ret[i] = val
+	}
+
+	return ret, nil
 }
 
 // InStringSlice reports whether str is within list
@@ -132,7 +152,7 @@ func InInt64Slice(list []int64, i int64) bool {
 	return false
 }
 
-// RepeatString returns a slice with the string s reated n times.
+// RepeatString returns a slice with the string s repeated n times.
 func RepeatString(s string, n int) (r []string) {
 	for i := 0; i < n; i++ {
 		r = append(r, s)

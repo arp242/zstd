@@ -5,7 +5,6 @@ import (
 	"database/sql/driver"
 	"fmt"
 	"html/template"
-	"strconv"
 	"strings"
 
 	"zgo.at/utils/sliceutil"
@@ -27,20 +26,10 @@ func (l *IntList) Scan(v interface{}) error {
 	if v == nil {
 		return nil
 	}
-	ints := []int64{}
-	for _, i := range strings.Split(fmt.Sprintf("%s", v), ",") {
-		i = strings.TrimSpace(i)
-		if i == "" {
-			continue
-		}
-		in, err := strconv.ParseInt(i, 10, 64)
-		if err != nil {
-			return err
-		}
-		ints = append(ints, in)
-	}
-	*l = ints
-	return nil
+
+	var err error
+	*l, err = sliceutil.SplitInt(fmt.Sprintf("%s", v))
+	return err
 }
 
 // MarshalText converts the data to a human readable representation.
@@ -70,20 +59,10 @@ func (l *FloatList) Scan(v interface{}) error {
 	if v == nil {
 		return nil
 	}
-	nums := []float64{}
-	for _, i := range strings.Split(fmt.Sprintf("%s", v), ",") {
-		i = strings.TrimSpace(i)
-		if i == "" {
-			continue
-		}
-		in, err := strconv.ParseFloat(i, 64)
-		if err != nil {
-			return err
-		}
-		nums = append(nums, in)
-	}
-	*l = nums
-	return nil
+
+	var err error
+	*l, err = sliceutil.SplitFloat(fmt.Sprintf("%s", v))
+	return err
 }
 
 // MarshalText converts the data to a human readable representation.

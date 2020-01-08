@@ -42,7 +42,7 @@ func TestIntListScan(t *testing.T) {
 		want    IntList
 		wantErr string
 	}{
-		{"", IntList{}, ""},
+		{"", IntList(nil), ""},
 		{"1", IntList{1}, ""},
 		{"4, 5", IntList{4, 5}, ""},
 		{"4,   5", IntList{4, 5}, ""},
@@ -53,12 +53,72 @@ func TestIntListScan(t *testing.T) {
 		{"1,", IntList{1}, ""},
 		{"1,,,,", IntList{1}, ""},
 		{",,1,,", IntList{1}, ""},
-		{"1,NaN", IntList{}, "strconv.ParseInt"},
+		{"1,NaN", IntList(nil), "strconv.ParseInt"},
 	}
 
 	for _, tc := range cases {
 		t.Run(fmt.Sprintf("%v", tc.in), func(t *testing.T) {
 			out := IntList{}
+			err := out.Scan(tc.in)
+			if !ztest.ErrorContains(err, tc.wantErr) {
+				t.Errorf("\nout:  %#v\nwant: %#v\n", err, tc.wantErr)
+			}
+			if !reflect.DeepEqual(out, tc.want) {
+				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
+			}
+		})
+	}
+}
+
+func TestFloatListValue(t *testing.T) {
+	cases := []struct {
+		in   FloatList
+		want string
+	}{
+		{FloatList{}, ""},
+		{FloatList{}, ""},
+		{FloatList{4, 5}, "4, 5"},
+		{FloatList{1, 1}, "1, 1"},
+		{FloatList{1}, "1"},
+		{FloatList{1, 0, 2}, "1, 0, 2"},
+	}
+
+	for _, tc := range cases {
+		t.Run(fmt.Sprintf("%v", tc.in), func(t *testing.T) {
+			out, err := tc.in.Value()
+			if err != nil {
+				t.Fatal(err)
+			}
+			if out != tc.want {
+				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
+			}
+		})
+	}
+}
+
+func TestFloatListScan(t *testing.T) {
+	cases := []struct {
+		in      string
+		want    FloatList
+		wantErr string
+	}{
+		{"", FloatList(nil), ""},
+		{"1", FloatList{1}, ""},
+		{"4, 5", FloatList{4, 5}, ""},
+		{"4,   5", FloatList{4, 5}, ""},
+		{"1, 1", FloatList{1, 1}, ""},
+		{"1, 0, 2", FloatList{1, 0, 2}, ""},
+		{"1,0,2", FloatList{1, 0, 2}, ""},
+		{"1,    0,    2    ", FloatList{1, 0, 2}, ""},
+		{"1,", FloatList{1}, ""},
+		{"1,,,,", FloatList{1}, ""},
+		{",,1,,", FloatList{1}, ""},
+		{"1,zxc", FloatList(nil), "strconv.ParseFloat"},
+	}
+
+	for _, tc := range cases {
+		t.Run(fmt.Sprintf("%v", tc.in), func(t *testing.T) {
+			out := FloatList{}
 			err := out.Scan(tc.in)
 			if !ztest.ErrorContains(err, tc.wantErr) {
 				t.Errorf("\nout:  %#v\nwant: %#v\n", err, tc.wantErr)

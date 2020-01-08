@@ -1,11 +1,9 @@
 package sliceutil
 
 import (
-	"errors"
 	"fmt"
 	"math/rand"
 	"reflect"
-	"strconv"
 	"testing"
 )
 
@@ -184,55 +182,6 @@ func generate2dintslice(in []int64) [][]int64 {
 	}
 
 	return result
-}
-
-func TestCSVtoInt64Slice(t *testing.T) {
-	tests := []struct {
-		in          string
-		expected    []int64
-		expectedErr error
-	}{
-		{
-			"1,2,3",
-			[]int64{1, 2, 3},
-			nil,
-		},
-		{
-			"",
-			[]int64(nil),
-			nil,
-		},
-		{
-			"1,				2, \n3",
-			[]int64{1, 2, 3},
-			nil,
-		},
-		{
-			"1,				2,nope",
-			[]int64(nil),
-			errors.New("invalid syntax"),
-		},
-	}
-
-	for i, tc := range tests {
-		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
-			got, err := CSVtoInt64Slice(tc.in)
-
-			if err != nil {
-				if numErrorer, ok := err.(*strconv.NumError); ok {
-					err = numErrorer.Err
-				}
-			}
-
-			if err != tc.expectedErr && err.Error() != tc.expectedErr.Error() {
-				t.Errorf("want: %q\\ngot:  %q", tc.expectedErr.Error(), err.Error())
-			}
-
-			if !reflect.DeepEqual(got, tc.expected) {
-				t.Errorf("want: %q\ngot:  %q", tc.expected, got)
-			}
-		})
-	}
 }
 
 func TestInStringSlice(t *testing.T) {
