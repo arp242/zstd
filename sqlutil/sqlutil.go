@@ -16,6 +16,10 @@ import (
 // This is safe for NULL values, in which case it will scan in to IntList(nil).
 type IntList []int64
 
+func (l IntList) String() string {
+	return sliceutil.JoinInt(l)
+}
+
 // Value implements the SQL Value function to determine what to store in the DB.
 func (l IntList) Value() (driver.Value, error) {
 	return sliceutil.JoinInt(l), nil
@@ -48,6 +52,10 @@ func (l *IntList) UnmarshalText(v []byte) error {
 //
 // This is safe for NULL values, in which case it will scan in to FloatList(nil).
 type FloatList []float64
+
+func (l FloatList) String() string {
+	return sliceutil.JoinFloat(l)
+}
 
 // Value implements the SQL Value function to determine what to store in the DB.
 func (l FloatList) Value() (driver.Value, error) {
@@ -85,6 +93,10 @@ func (l *FloatList) UnmarshalText(v []byte) error {
 // This is safe for NULL values, in which case it will scan in to
 // StringList(nil).
 type StringList []string
+
+func (l StringList) String() string {
+	return strings.Join(l, ", ")
+}
 
 // Value implements the SQL Value function to determine what to store in the DB.
 func (l StringList) Value() (driver.Value, error) {
