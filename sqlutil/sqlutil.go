@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"html/template"
 	"strings"
-	"time"
 
 	"zgo.at/utils/sliceutil"
 )
@@ -253,49 +252,4 @@ func (h HTML) Value() (driver.Value, error) {
 func (h *HTML) Scan(v interface{}) error {
 	*h = HTML(v.([]byte))
 	return nil
-}
-
-// Timezone which can be serialized to the DB and forms.
-type Timezone struct{ *time.Location }
-
-// Loc gets the time.Location.
-func (t *Timezone) Loc() *time.Location {
-	if t == nil || t.Location == nil {
-		return time.UTC
-	}
-	return t.Location
-}
-
-func (t *Timezone) String() string {
-	if t == nil || t.Location == nil {
-		return ""
-	}
-	return t.Location.String()
-}
-
-// MarshalText converts the data to a human readable representation.
-func (t Timezone) MarshalText() ([]byte, error) {
-	if t.Location == nil {
-		return nil, nil
-	}
-	return []byte(t.String()), nil
-}
-
-// UnmarshalText parses text in to the Go data structure.
-func (t *Timezone) UnmarshalText(v []byte) error {
-	l, err := time.LoadLocation(string(v))
-	t.Location = l
-	return err
-}
-
-// Value implements the SQL Value function to determine what to store in the DB.
-func (t Timezone) Value() (driver.Value, error) {
-	return t.String(), nil
-}
-
-// Scan converts the data returned from the DB into the struct.
-func (t *Timezone) Scan(v interface{}) error {
-	l, err := time.LoadLocation(v.(string))
-	t.Location = l
-	return err
 }
