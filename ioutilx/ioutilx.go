@@ -6,6 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"os"
 )
 
 // DumpReader reads all of b to memory and then returns two equivalent
@@ -39,4 +40,10 @@ func DumpReader(b io.ReadCloser) (r1, r2 io.ReadCloser, err error) {
 	}
 
 	return ioutil.NopCloser(&buf), ioutil.NopCloser(bytes.NewReader(buf.Bytes())), nil
+}
+
+// Exists reports if a path exists.
+func Exists(path string) bool {
+	_, err := os.Stat(path)
+	return !os.IsNotExist(err)
 }

@@ -55,3 +55,28 @@ func mustRead(t *testing.T, r io.Reader) string {
 	}
 	return string(out)
 }
+
+func TestExists(t *testing.T) {
+	tests := []struct {
+		in   string
+		want bool
+	}{
+		{".", true},               // Dir
+		{"ioutilx_test.go", true}, // File
+		{"/dev/null", true},       // Device
+		{"/proc/1/environ", true}, // Not readable
+		{"/etc/localtime", true},  // Symlink
+
+		{"/nonexistent-path", false},
+		{"/nonexistent/path", false},
+	}
+
+	for i, tt := range tests {
+		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
+			out := Exists(tt.in)
+			if out != tt.want {
+				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tt.want)
+			}
+		})
+	}
+}
