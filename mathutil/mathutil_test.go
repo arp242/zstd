@@ -98,3 +98,28 @@ func TestByte(t *testing.T) {
 		})
 	}
 }
+
+func TestNonZero(t *testing.T) {
+	cases := []struct {
+		a, b int64
+		c    []int64
+		want int64
+	}{
+		{0, 0, nil, 0},
+		{0, 0, []int64{0, 0}, 0},
+
+		{42, 2, nil, 42},
+		{0, 43, nil, 43},
+		{0, 0, []int64{5, 0}, 5},
+		{0, 0, []int64{6, 6}, 6},
+	}
+
+	for i, tc := range cases {
+		t.Run(fmt.Sprintf("%b", i), func(t *testing.T) {
+			out := NonZero(tc.a, tc.b, tc.c...)
+			if out != tc.want {
+				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
+			}
+		})
+	}
+}

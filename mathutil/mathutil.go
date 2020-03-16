@@ -44,6 +44,23 @@ func Limit(v, lower, upper float64) float64 {
 	return math.Max(math.Min(v, upper), lower)
 }
 
+// NonZero returns the first argument that is not 0. It will return 0 if all
+// arguments are 0.
+func NonZero(a, b int64, c ...int64) int64 {
+	if a != 0 {
+		return a
+	}
+	if b != 0 {
+		return b
+	}
+	for i := range c {
+		if c[i] != 0 {
+			return c[i]
+		}
+	}
+	return 0
+}
+
 // DivideCeil divides two integers and rounds up, rather than down (which is
 // what happens when you do int64/int64).
 func DivideCeil(count int64, pageSize int64) int64 {
