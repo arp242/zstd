@@ -3,10 +3,10 @@
 package ioutilx
 
 import (
+	"errors"
+	"fmt"
 	"os"
 	"syscall"
-
-	"github.com/pkg/errors"
 )
 
 func setOwner(srcStat os.FileInfo, dst string) error {
@@ -16,7 +16,7 @@ func setOwner(srcStat os.FileInfo, dst string) error {
 	}
 	err := os.Chown(dst, int(statT.Uid), int(statT.Gid))
 	if err != nil {
-		return errors.Wrap(err, "could not chown")
+		return fmt.Errorf("chown: %w", err)
 	}
 
 	return nil

@@ -13,7 +13,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
 	"zgo.at/utils/ioutilx"
 )
 
@@ -82,7 +81,7 @@ func Fetch(url string) ([]byte, error) {
 	client := http.Client{Timeout: 60 * time.Second}
 	response, err := client.Get(url)
 	if err != nil {
-		return nil, errors.Wrapf(err, "cannot download %v", url)
+		return nil, fmt.Errorf("cannot download %q: %w", url, err)
 	}
 	defer response.Body.Close() // nolint: errcheck
 
@@ -90,7 +89,7 @@ func Fetch(url string) ([]byte, error) {
 	// large?
 	data, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return nil, errors.Wrapf(err, "cannot read body of %v", url)
+		return nil, fmt.Errorf("cannot read body of %q: %w", url, err)
 	}
 
 	if response.StatusCode != http.StatusOK {
@@ -122,19 +121,19 @@ func Save(url string, dir string, filename string) (string, error) {
 	client := http.Client{Timeout: 60 * time.Second}
 	response, err := client.Get(url)
 	if err != nil {
-		return "", errors.Wrapf(err, "cannot download %v", url)
+		return "", fmt.Errorf("cannot download %q: %w", url, err)
 	}
 	defer response.Body.Close() // nolint: errcheck
 
 	output, err := os.Create(path)
 	if err != nil {
-		return "", errors.Wrapf(err, "cannot create %v", path)
+		return "", fmt.Errorf("cannot create %q: %w", path, err)
 	}
 	defer output.Close() // nolint: errcheck
 
 	_, err = io.Copy(output, response.Body)
 	if err != nil {
-		return path, errors.Wrapf(err, "cannot read body of %v in to %v", url, path)
+		return path, fmt.Errorf("cannot read body of %q in to %q: %w", url, path, err)
 	}
 
 	if response.StatusCode != http.StatusOK {

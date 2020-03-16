@@ -13,7 +13,6 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/pkg/errors"
 	"zgo.at/utils/sliceutil"
 )
 
@@ -81,7 +80,7 @@ func IsSameFile(src string, dst string) error {
 		if os.IsNotExist(err) {
 			return nil
 		}
-		return errors.WithStack(err)
+		return fmt.Errorf("IsSameFile: %w", err)
 	}
 
 	dstInfo, err := os.Stat(dst)
@@ -89,7 +88,7 @@ func IsSameFile(src string, dst string) error {
 		if os.IsNotExist(err) {
 			return nil
 		}
-		return errors.WithStack(err)
+		return fmt.Errorf("IsSameFile: %w", err)
 	}
 
 	if os.SameFile(srcInfo, dstInfo) {
@@ -124,7 +123,8 @@ func IsSymlink(fi os.FileInfo) bool {
 func CopyData(src, dst string) error {
 	src, srcStat, err := copyCheck(src, dst)
 	if err != nil {
-		return errors.WithStack(err)
+		return err
+		return fmt.Errorf("CopyData: %w", err)
 	}
 
 	if _, exists := os.Stat(dst); exists == nil {
@@ -134,41 +134,41 @@ func CopyData(src, dst string) error {
 	// Do the actual copy.
 	fsrc, err := os.Open(src)
 	if err != nil {
-		return errors.WithStack(err)
+		return fmt.Errorf("CopyData: %w", err)
 	}
 	defer fsrc.Close() // nolint: errcheck
 
 	fdst, err := os.Create(dst)
 	if err != nil {
-		return errors.Wrap(err, "create failed")
+		return fmt.Errorf("CopyData: %w", err)
 	}
 	defer fdst.Close() // nolint: errcheck
 
 	size, err := io.Copy(fdst, fsrc)
 	if err != nil {
-		return errors.Wrap(err, "copy failed")
+		return fmt.Errorf("CopyData: copy failed: %w", err)
 	}
 
 	if size != srcStat.Size() {
-		return fmt.Errorf("%s: %d/%d copied", src, size, srcStat.Size())
+		return fmt.Errorf("CopyData: %s/%d copied: %w", src, size, err)
 	}
 
-	return errors.Wrap(fdst.Close(), "close failed")
+	return fdst.Close()
 }
 
 // Some sanity checks for CopyData() and CopyMode().
 func copyCheck(src, dst string) (string, os.FileInfo, error) {
 	if err := IsSameFile(src, dst); err != nil {
-		return "", nil, errors.WithStack(err)
+		return "", nil, err
 	}
 
 	// Make sure src exists and neither are special files.
 	srcStat, err := os.Lstat(src)
 	if err != nil {
-		return "", nil, errors.WithStack(err)
+		return "", nil, err
 	}
 	if err := IsSpecialFile(srcStat); err != nil {
-		return "", nil, errors.WithStack(err)
+		return "", nil, err
 	}
 
 	// Follow symlinks for the source file.
@@ -176,16 +176,16 @@ func copyCheck(src, dst string) (string, os.FileInfo, error) {
 		dir := filepath.Dir(src)
 		src, err = os.Readlink(src)
 		if err != nil {
-			return "", nil, errors.WithStack(err)
+			return "", nil, err
 		}
 		src, err = filepath.Abs(filepath.Join(dir, src))
 		if err != nil {
-			return "", nil, errors.WithStack(err)
+			return "", nil, err
 		}
 
 		srcStat, err = os.Stat(src)
 		if err != nil {
-			return "", nil, errors.WithStack(err)
+			return "", nil, err
 		}
 	}
 
@@ -203,18 +203,18 @@ type Modes struct {
 func CopyMode(src, dst string, modes Modes) error {
 	_, srcStat, err := copyCheck(src, dst)
 	if err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 
 	_, err = os.Stat(dst)
 	if err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 
 	if modes.Permissions {
 		err := os.Chmod(dst, srcStat.Mode())
 		if err != nil {
-			return errors.Wrap(err, "could not chmod")
+			return fmt.Errorf("CopyMode: %w", err)
 		}
 	}
 
@@ -228,7 +228,7 @@ func CopyMode(src, dst string, modes Modes) error {
 	if modes.Mtime {
 		err := os.Chtimes(dst, time.Now(), srcStat.ModTime())
 		if err != nil {
-			return errors.Wrap(err, "could not chown")
+			return fmt.Errorf("CopyMode: %w", err)
 		}
 	}
 
@@ -250,13 +250,13 @@ func Copy(src, dst string, modes Modes) error {
 	}
 
 	if err != nil && !os.IsNotExist(err) {
-		return errors.WithStack(err)
+		return err
 	}
 
 	if err = CopyData(src, dst); err != nil {
-		return errors.WithStack(err)
+		return err
 	}
-	return errors.WithStack(CopyMode(src, dst, modes))
+	return CopyMode(src, dst, modes)
 }
 
 // CopyTreeOptions are flags for the CopyTree function.
@@ -310,7 +310,7 @@ func CopyTree(src, dst string, options *CopyTreeOptions) error {
 	// Sanity checks.
 	srcFileInfo, err := os.Stat(src)
 	if err != nil {
-		return errors.WithStack(err)
+		return err
 	}
 	if !srcFileInfo.IsDir() {
 		return &ErrNotDir{src}
@@ -322,12 +322,12 @@ func CopyTree(src, dst string, options *CopyTreeOptions) error {
 
 	entries, err := ioutil.ReadDir(src)
 	if err != nil {
-		return errors.Wrapf(err, "could not read %v", src)
+		return fmt.Errorf("CopyTree: %w", err)
 	}
 
 	// Create dst.
 	if err = os.MkdirAll(dst, srcFileInfo.Mode()); err != nil {
-		return errors.Wrapf(err, "could not create %v", dst)
+		return fmt.Errorf("CopyTree: %w", err)
 	}
 
 	ignoredNames := []string{}
@@ -345,7 +345,7 @@ func CopyTree(src, dst string, options *CopyTreeOptions) error {
 
 		entryFileInfo, err := os.Lstat(srcPath)
 		if err != nil {
-			return errors.WithStack(err)
+			return err
 		}
 
 		switch {
@@ -354,18 +354,18 @@ func CopyTree(src, dst string, options *CopyTreeOptions) error {
 		case IsSymlink(entryFileInfo):
 			linkTo, err := os.Readlink(srcPath)
 			if err != nil {
-				return errors.WithStack(err)
+				return err
 			}
 			dir := filepath.Dir(srcPath)
 			linkTo, err = filepath.Abs(filepath.Join(dir, linkTo))
 			if err != nil {
-				return errors.WithStack(err)
+				return err
 			}
 
 			if options.Symlinks {
 				err = os.Symlink(linkTo, dstPath)
 				if err != nil {
-					return errors.WithStack(err)
+					return err
 				}
 				// CopyStat(srcPath, dstPath, false)
 			} else {
@@ -381,7 +381,7 @@ func CopyTree(src, dst string, options *CopyTreeOptions) error {
 					err = options.CopyFunction(srcPath, dstPath, Modes{})
 				}
 				if err != nil {
-					return errors.WithStack(err)
+					return err
 				}
 			}
 
@@ -389,14 +389,14 @@ func CopyTree(src, dst string, options *CopyTreeOptions) error {
 		case entryFileInfo.IsDir():
 			err = CopyTree(srcPath, dstPath, options)
 			if err != nil {
-				return errors.WithStack(err)
+				return err
 			}
 
 		// Anything else.
 		default:
 			err = options.CopyFunction(srcPath, dstPath, Modes{})
 			if err != nil {
-				return errors.WithStack(err)
+				return err
 			}
 		}
 	}
