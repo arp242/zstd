@@ -166,9 +166,9 @@ type CSPArgs map[string][]string
 //
 // Also see: https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP and
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy
-func SetCSP(header http.Header, args CSPArgs) error {
+func SetCSP(header http.Header, args CSPArgs) {
 	if header == nil {
-		return errors.New("header is nil map")
+		panic("SetCSP: header is nil map")
 	}
 
 	var b strings.Builder
@@ -191,5 +191,4 @@ func SetCSP(header http.Header, args CSPArgs) error {
 	}
 
 	header["Content-Security-Policy"] = []string{b.String()}
-	return nil
 }

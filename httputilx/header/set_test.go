@@ -76,10 +76,7 @@ func TestCSP(t *testing.T) {
 	for i, tt := range tests {
 		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
 			header := make(http.Header)
-			err := SetCSP(header, tt.in)
-			if err != nil {
-				t.Fatal(err)
-			}
+			SetCSP(header, tt.in)
 
 			out := header["Content-Security-Policy"][0]
 			if out != tt.want {
