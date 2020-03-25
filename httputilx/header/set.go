@@ -134,7 +134,7 @@ const (
 	CSPSourceSelf         = "'self'"          // Exact origin of the document
 	CSPSourceNone         = "'none'"          // Nothing matches
 	CSPSourceUnsafeInline = "'unsafe-inline'" // Inline <script>/<style>, onevent="", etc.
-	CSPSourceUnsaleEval   = "'unsafe-eval'"   // eval()
+	CSPSourceUnsafeEval   = "'unsafe-eval'"   // eval()
 	CSPSourceStar         = "*"               // Everything
 
 	CSPSourceHTTP        = "http:"
