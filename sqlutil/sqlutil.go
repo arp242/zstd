@@ -185,23 +185,18 @@ func (b *Bool) Scan(src interface{}) error {
 
 	case []byte, string:
 		var text string
-		if raw, ok := v.([]byte); !ok {
+		raw, ok := v.([]byte)
+		if !ok {
 			text = v.(string)
 		} else if len(raw) == 1 {
 			// Handle the bit(1) column type.
-			if raw[0] == 1 {
-				*b = true
-				return nil
-			} else if raw[0] == 0 {
-				*b = false
-				return nil
-			}
+			*b = raw[0] == 1
+			return nil
 		} else {
 			text = string(raw)
 		}
 
-		text = strings.TrimSpace(strings.ToLower(text))
-		switch text {
+		switch strings.TrimSpace(strings.ToLower(text)) {
 		case "true", "1":
 			*b = true
 		case "false", "0":
@@ -217,9 +212,9 @@ func (b *Bool) Scan(src interface{}) error {
 // Value converts a bool type into a number to persist it in the database.
 func (b Bool) Value() (driver.Value, error) {
 	if b {
-		return 1, nil
+		return int64(1), nil
 	}
-	return 0, nil
+	return int64(0), nil
 }
 
 // MarshalText converts the data to a JSON-compatible human readable
