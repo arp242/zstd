@@ -131,7 +131,10 @@ func (l *StringList) UnmarshalText(v []byte) error {
 	return l.Scan(v)
 }
 
-// Bool converts various column types to a boolean.
+// Bool converts various types to a boolean.
+//
+// It's always stored as an integer in the database (the only cross-platform way
+// in SQL).
 //
 // Supported types:
 //
@@ -213,7 +216,10 @@ func (b *Bool) Scan(src interface{}) error {
 
 // Value converts a bool type into a number to persist it in the database.
 func (b Bool) Value() (driver.Value, error) {
-	return bool(b), nil
+	if b {
+		return 1, nil
+	}
+	return 0, nil
 }
 
 // MarshalText converts the data to a JSON-compatible human readable
