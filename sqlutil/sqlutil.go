@@ -217,8 +217,26 @@ func (b Bool) Value() (driver.Value, error) {
 	return int64(0), nil
 }
 
-// MarshalText converts the data to a JSON-compatible human readable
-// representation.
+// MarshalJSON converts the data to JSON.
+func (b Bool) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf("%t", b)), nil
+}
+
+// UnmarshalJSON converts the data from JSON.
+func (b *Bool) UnmarshalJSON(text []byte) error {
+	switch string(text) {
+	case "true":
+		*b = true
+		return nil
+	case "false":
+		*b = false
+		return nil
+	default:
+		return fmt.Errorf("sqlutil.Bool: unknown value: %s", text)
+	}
+}
+
+// MarshalText converts the data to a human readable representation.
 func (b Bool) MarshalText() ([]byte, error) {
 	return []byte(fmt.Sprintf("%t", b)), nil
 }
