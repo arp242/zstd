@@ -1,5 +1,5 @@
 // Package syncutil adds functions for synchronization.
-package syncutil // import "zgo.at/utils/syncutil"
+package syncutil
 
 import (
 	"context"
