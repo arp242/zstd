@@ -20,12 +20,12 @@ func (l IntList) String() string {
 	return sliceutil.JoinInt(l)
 }
 
-// Value implements the SQL Value function to determine what to store in the DB.
+// Value determines what to store in the DB.
 func (l IntList) Value() (driver.Value, error) {
 	return sliceutil.JoinInt(l), nil
 }
 
-// Scan converts the data returned from the DB into the struct.
+// Scan converts the data from the DB.
 func (l *IntList) Scan(v interface{}) error {
 	if v == nil {
 		return nil
@@ -57,12 +57,12 @@ func (l FloatList) String() string {
 	return sliceutil.JoinFloat(l)
 }
 
-// Value implements the SQL Value function to determine what to store in the DB.
+// Value determines what to store in the DB.
 func (l FloatList) Value() (driver.Value, error) {
 	return sliceutil.JoinFloat(l), nil
 }
 
-// Scan converts the data returned from the DB into the struct.
+// Scan converts the data from the DB.
 func (l *FloatList) Scan(v interface{}) error {
 	if v == nil {
 		return nil
@@ -87,8 +87,8 @@ func (l *FloatList) UnmarshalText(v []byte) error {
 // StringList expands comma-separated values from a column to []string, and
 // stores []string as a comma-separated string.
 //
-// Note that this only works for simple strings (e.g. enums), we DO NOT escape
-// commas in strings and you will run in to problems.
+// Note this only works for simple strings (e.g. enums), it DOES NOT ESCAPE
+// COMMAS, and you will run in to problems if you use it for arbitrary text.
 //
 // This is safe for NULL values, in which case it will scan in to
 // StringList(nil).
@@ -98,12 +98,12 @@ func (l StringList) String() string {
 	return strings.Join(l, ", ")
 }
 
-// Value implements the SQL Value function to determine what to store in the DB.
+// Value determines what to store in the DB.
 func (l StringList) Value() (driver.Value, error) {
 	return strings.Join(sliceutil.FilterString(l, sliceutil.FilterStringEmpty), ","), nil
 }
 
-// Scan converts the data returned from the DB into the struct.
+// Scan converts the data from the DB.
 func (l *StringList) Scan(v interface{}) error {
 	if v == nil {
 		return nil
@@ -144,8 +144,7 @@ func (l *StringList) UnmarshalText(v []byte) error {
 //   nil                 defaults to false
 type Bool bool
 
-// Scan converts the different types of representation of a boolean in the
-// database into a bool type.
+// Scan converts the data from the DB.
 func (b *Bool) Scan(src interface{}) error {
 	if b == nil {
 		return fmt.Errorf("boolean not initialized")
@@ -262,12 +261,12 @@ func (b *Bool) UnmarshalText(text []byte) error {
 // HTML is a string which indicates that the string has been HTML-escaped.
 type HTML template.HTML
 
-// Value implements the SQL Value function to determine what to store in the DB.
+// Value determines what to store in the DB.
 func (h HTML) Value() (driver.Value, error) {
 	return string(h), nil
 }
 
-// Scan converts the data returned from the DB into the struct.
+// Scan converts the data from the DB.
 func (h *HTML) Scan(v interface{}) error {
 	*h = HTML(v.([]byte))
 	return nil
