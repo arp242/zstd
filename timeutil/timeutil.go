@@ -5,12 +5,6 @@ import (
 	"time"
 )
 
-// UnixMilli returns the number of milliseconds elapsed since January 1, 1970
-// UTC.
-func UnixMilli() int64 {
-	return time.Now().UnixNano() / 1000000
-}
-
 var (
 	day    = 24 * time.Hour
 	day100 = 24 * time.Hour * 100
