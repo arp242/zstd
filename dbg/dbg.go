@@ -1,5 +1,5 @@
 // Package dbg contains helper functions useful when debugging programs.
-package dbg // import "zgo.at/utils/dbg"
+package dbg
 
 import (
 	"fmt"

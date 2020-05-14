@@ -1,5 +1,5 @@
 // Package httputilx provides HTTP utility functions.
-package httputilx // import "zgo.at/utils/httputilx"
+package httputilx
 
 import (
 	"bytes"

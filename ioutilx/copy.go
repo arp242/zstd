@@ -13,7 +13,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"zgo.at/utils/sliceutil"
+	"zgo.at/utils/stringutil"
 )
 
 // ErrSameFile is used when the source and destination file are the same file.
@@ -336,7 +336,7 @@ func CopyTree(src, dst string, options *CopyTreeOptions) error {
 	}
 
 	for _, entry := range entries {
-		if sliceutil.InStringSlice(ignoredNames, entry.Name()) {
+		if stringutil.Contains(ignoredNames, entry.Name()) {
 			continue
 		}
 

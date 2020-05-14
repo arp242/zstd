@@ -1,4 +1,4 @@
-package mathutil
+package floatutil
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 )
 
 func TestRound(t *testing.T) {
-	cases := []struct {
+	tests := []struct {
 		in   float64
 		want float64
 	}{
@@ -18,17 +18,17 @@ func TestRound(t *testing.T) {
 		{-123.5, -124},
 	}
 
-	for _, c := range cases {
-		got := Round(c.in)
-		if got != c.want {
-			t.Errorf("Round(%f) => %f, want %f", c.in, got, c.want)
+	for _, tt := range tests {
+		got := Round(tt.in)
+		if got != tt.want {
+			t.Errorf("Round(%f) => %f, want %f", tt.in, got, tt.want)
 		}
 	}
 
 }
 
 func TestRoundPlus(t *testing.T) {
-	cases := []struct {
+	tests := []struct {
 		in        float64
 		precision int
 		want      float64
@@ -39,17 +39,17 @@ func TestRoundPlus(t *testing.T) {
 		{-123.555555, 3, -123.556},
 	}
 
-	for _, c := range cases {
-		got := RoundPlus(c.in, c.precision)
-		if got != c.want {
-			t.Errorf("Round(%f) => %f, want %f", c.in, got, c.want)
+	for _, tt := range tests {
+		got := RoundPlus(tt.in, tt.precision)
+		if got != tt.want {
+			t.Errorf("Round(%f) => %f, want %f", tt.in, got, tt.want)
 		}
 	}
 
 }
 
 func TestIsSignedZero(t *testing.T) {
-	cases := []struct {
+	tests := []struct {
 		in   string
 		want bool
 	}{
@@ -59,16 +59,16 @@ func TestIsSignedZero(t *testing.T) {
 		{"-0", true},
 	}
 
-	for _, tc := range cases {
-		t.Run(fmt.Sprintf("%v", tc.in), func(t *testing.T) {
-			f, err := strconv.ParseFloat(tc.in, 64)
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("%v", tt.in), func(t *testing.T) {
+			f, err := strconv.ParseFloat(tt.in, 64)
 			if err != nil {
 				t.Fatal(err)
 			}
 
 			out := IsSignedZero(f)
-			if out != tc.want {
-				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
+			if out != tt.want {
+				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tt.want)
 			}
 		})
 	}
@@ -92,31 +92,6 @@ func TestByte(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(fmt.Sprintf("%v", tc.in), func(t *testing.T) {
 			out := Byte(tc.in).String()
-			if out != tc.want {
-				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
-			}
-		})
-	}
-}
-
-func TestNonZero(t *testing.T) {
-	cases := []struct {
-		a, b int64
-		c    []int64
-		want int64
-	}{
-		{0, 0, nil, 0},
-		{0, 0, []int64{0, 0}, 0},
-
-		{42, 2, nil, 42},
-		{0, 43, nil, 43},
-		{0, 0, []int64{5, 0}, 5},
-		{0, 0, []int64{6, 6}, 6},
-	}
-
-	for i, tc := range cases {
-		t.Run(fmt.Sprintf("%b", i), func(t *testing.T) {
-			out := NonZero(tc.a, tc.b, tc.c...)
 			if out != tc.want {
 				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
 			}

@@ -1,9 +1,41 @@
-package mathutil // import "zgo.at/utils/mathutil"
+package floatutil
 
 import (
 	"fmt"
 	"math"
+	"strconv"
+	"strings"
 )
+
+// Join a float with the given separator.
+func Join(nums []float64, sep string) string {
+	var numStr []string
+	for _, e := range nums {
+		numStr = append(numStr, strconv.FormatFloat(e, 'f', -1, 64))
+	}
+
+	return strings.Join(numStr, sep)
+}
+
+// Split converts a string of numbers to a []float64.
+func Split(s, sep string) ([]float64, error) {
+	s = strings.Trim(s, " \t\n"+sep)
+	if len(s) == 0 {
+		return nil, nil
+	}
+
+	items := strings.Split(s, sep)
+	ret := make([]float64, len(items))
+	for i := range items {
+		val, err := strconv.ParseFloat(strings.TrimSpace(items[i]), 64)
+		if err != nil {
+			return nil, err
+		}
+		ret[i] = val
+	}
+
+	return ret, nil
+}
 
 // Round will round the value to the nearest natural number.
 //
@@ -23,48 +55,9 @@ func RoundPlus(f float64, precision int) float64 {
 	return Round(f*shift) / shift
 }
 
-// Min gets the lowest of two numbers.
-func Min(a, b int64) int64 {
-	if a > b {
-		return b
-	}
-	return a
-}
-
-// Max gets the highest of two numbers.
-func Max(a, b int64) int64 {
-	if a < b {
-		return b
-	}
-	return a
-}
-
 // Limit a value between a lower and upper limit.
 func Limit(v, lower, upper float64) float64 {
 	return math.Max(math.Min(v, upper), lower)
-}
-
-// NonZero returns the first argument that is not 0. It will return 0 if all
-// arguments are 0.
-func NonZero(a, b int64, c ...int64) int64 {
-	if a != 0 {
-		return a
-	}
-	if b != 0 {
-		return b
-	}
-	for i := range c {
-		if c[i] != 0 {
-			return c[i]
-		}
-	}
-	return 0
-}
-
-// DivideCeil divides two integers and rounds up, rather than down (which is
-// what happens when you do int64/int64).
-func DivideCeil(count int64, pageSize int64) int64 {
-	return int64(math.Ceil(float64(count) / float64(pageSize)))
 }
 
 // IsSignedZero checks if this number is a signed zero (i.e. -0, instead of +0).

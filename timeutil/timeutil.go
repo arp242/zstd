@@ -1,4 +1,4 @@
-package timeutil // import "zgo.at/utils/timeutil"
+package timeutil
 
 import (
 	"fmt"

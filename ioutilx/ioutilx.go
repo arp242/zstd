@@ -1,5 +1,5 @@
 // Package ioutilx implements some I/O utility functions.
-package ioutilx // import "zgo.at/utils/ioutilx"
+package ioutilx
 
 import (
 	"bytes"

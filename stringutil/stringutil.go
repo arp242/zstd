@@ -1,12 +1,17 @@
 // Package stringutil adds functions for working with strings.
-package stringutil // import "zgo.at/utils/stringutil"
+//
+// All functions work correctly on UTF-8 characters.
+package stringutil
 
 import (
+	"math/rand"
 	"regexp"
+	"sort"
 	"strings"
+	"time"
 )
 
-// Fields slices s in to all substrings separated by sep. Leading/trailing
+// Fields slices s to all substrings separated by sep. Leading/trailing
 // whitespace and empty elements will be removed.
 //
 // e.g. "a;b", "a; b", "  a  ; b", and "a; b;" will all result in {"a", "b"}.
@@ -101,4 +106,83 @@ func GetLine(in string, n int) string {
 		return ""
 	}
 	return arr[n-1]
+}
+
+// Uniq removes duplicate entries from list; the list will be sorted.
+func Uniq(list []string) []string {
+	sort.Strings(list)
+	var last string
+	l := list[:0]
+	for _, str := range list {
+		if str != last {
+			l = append(l, str)
+		}
+		last = str
+	}
+	return l
+}
+
+// Contains reports whether str is within the list.
+func Contains(list []string, str string) bool {
+	for _, item := range list {
+		if item == str {
+			return true
+		}
+	}
+	return false
+}
+
+// Repeat returns a slice with the string s repeated n times.
+func Repeat(s string, n int) (r []string) {
+	for i := 0; i < n; i++ {
+		r = append(r, s)
+	}
+	return r
+}
+
+// Choose chooses a random item from the list.
+func Choose(l []string) string {
+	if len(l) == 0 {
+		return ""
+	}
+	rand.Seed(time.Now().UnixNano())
+	return l[rand.Intn(len(l))]
+}
+
+// Filter a list. The function will be called for every item and those that
+// return false will not be included in the return value.
+func Filter(list []string, fun func(string) bool) []string {
+	var ret []string
+	for _, e := range list {
+		if fun(e) {
+			ret = append(ret, e)
+		}
+	}
+
+	return ret
+}
+
+// FilterEmpty can be used as an argument for Filter() and will return false if
+// e is empty or contains only whitespace.
+func FilterEmpty(e string) bool { return strings.TrimSpace(e) != "" }
+
+// Difference returns a new slice with elements that are in "set" but not in
+// "others".
+func Difference(set []string, others ...[]string) []string {
+	out := []string{}
+	for _, setItem := range set {
+		found := false
+		for _, o := range others {
+			if Contains(o, setItem) {
+				found = true
+				break
+			}
+		}
+
+		if !found {
+			out = append(out, setItem)
+		}
+	}
+
+	return out
 }
