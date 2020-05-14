@@ -66,7 +66,6 @@ func TestExpand(t *testing.T) {
 				"github.com/teamwork/utils/netutil",
 				"github.com/teamwork/utils/runtimeutil",
 				"github.com/teamwork/utils/sliceutil",
-				"github.com/teamwork/utils/sqlutil",
 				"github.com/teamwork/utils/stringutil",
 				"github.com/teamwork/utils/syncutil",
 				"github.com/teamwork/utils/timeutil",
