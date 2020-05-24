@@ -1,6 +1,7 @@
 package intutil
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"testing"
@@ -233,5 +234,33 @@ func TestDifference(t *testing.T) {
 				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tt.want)
 			}
 		})
+	}
+}
+
+func TestInt(t *testing.T) {
+	i := Int(42)
+
+	if v := i.String(); v != "42" {
+		t.Errorf("String: %#v", v)
+	}
+	if v := i.Int(); v != int(42) {
+		t.Errorf("Int: %#v", v)
+	}
+	if v := i.Int64(); v != int64(42) {
+		t.Errorf("Int64: %#v", v)
+	}
+	if v := i.Float32(); v != float32(42) {
+		t.Errorf("Float32: %#v", v)
+	}
+	if v := i.Float64(); v != float64(42) {
+		t.Errorf("Float64: %#v", v)
+	}
+
+	v, err := json.Marshal(i)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(v) != "42" {
+		t.Errorf("json: %#v", v)
 	}
 }
