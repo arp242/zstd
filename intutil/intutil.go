@@ -18,12 +18,11 @@ func (s Int) Float64() float64 { return float64(s) }
 
 // Join a slice of ints to a comma separated string with the given separator.
 func Join(ints []int64, sep string) string {
-	var intStr []string
-	for _, e := range ints {
-		intStr = append(intStr, strconv.Itoa(int(e)))
+	s := make([]string, len(ints))
+	for i := range ints {
+		s[i] = strconv.FormatInt(ints[i], 10)
 	}
-
-	return strings.Join(intStr, sep)
+	return strings.Join(s, sep)
 }
 
 // Uniq removes duplicate entries from the list. The list will be sorted.

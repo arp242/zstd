@@ -98,7 +98,7 @@ func TestJoin(t *testing.T) {
 		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
 			got := Join(tt.in, ", ")
 			if got != tt.expected {
-				t.Errorf("want: %q\ngot:  %q", tt.expected, got)
+				t.Errorf("\nwant: %q\ngot:  %q", tt.expected, got)
 			}
 		})
 	}
@@ -262,5 +262,13 @@ func TestInt(t *testing.T) {
 	}
 	if string(v) != "42" {
 		t.Errorf("json: %#v", v)
+	}
+}
+
+func BenchmarkJoin(b *testing.B) {
+	b.ReportAllocs()
+	l := []int64{213, 52, 6342, 123, 6, 873, 123, 5463, 767, 12312, 1211, 90}
+	for n := 0; n < b.N; n++ {
+		Join(l, "")
 	}
 }

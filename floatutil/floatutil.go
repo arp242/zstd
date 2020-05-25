@@ -9,12 +9,11 @@ import (
 
 // Join a float with the given separator.
 func Join(nums []float64, sep string) string {
-	var numStr []string
-	for _, e := range nums {
-		numStr = append(numStr, strconv.FormatFloat(e, 'f', -1, 64))
+	s := make([]string, len(nums))
+	for i := range nums {
+		s[i] = strconv.FormatFloat(nums[i], 'f', -1, 64)
 	}
-
-	return strings.Join(numStr, sep)
+	return strings.Join(s, sep)
 }
 
 // Split converts a string of numbers to a []float64.

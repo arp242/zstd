@@ -61,3 +61,15 @@ func TestAtomicInt(t *testing.T) {
 		go func(ii int) { atom.Value() }(i)
 	}
 }
+
+func TestWithLock(t *testing.T) {
+	mu := new(sync.Mutex)
+
+	// Be lazy and rely on the race detector to report failures.
+	var s int
+	go WithLock(mu, func() { s = 1 })
+	mu.Lock()
+	_ = s
+	mu.Unlock()
+	time.Sleep(10 * time.Millisecond)
+}
