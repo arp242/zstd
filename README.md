@@ -1,12 +1,11 @@
-[![Build Status](https://travis-ci.org/zgoat/utils.svg?branch=master)](https://travis-ci.org/zgoat/utils)
-[![codecov](https://codecov.io/gh/zgoat/utils/branch/master/graph/badge.svg?token=n0k8YjbQOL)](https://codecov.io/gh/zgoat/utils)
-[![GoDoc](https://godoc.org/github.com/zgoat/utils?status.svg)](https://godoc.org/github.com/zgoat/utils)
+[![Build Status](https://travis-ci.org/zgoat/zstd.svg?branch=master)](https://travis-ci.org/zgoat/zstd)
+[![codecov](https://codecov.io/gh/zgoat/zstd/branch/master/graph/badge.svg?token=n0k8YjbQOL)](https://codecov.io/gh/zgoat/zstd)
+[![GoDoc](https://godoc.org/github.com/zgoat/zstd?status.svg)](https://godoc.org/github.com/zgoat/zstd)
 
-`utils` is a collection of small – and sometimes not so small – extensions to
+`zstd` is a collection of small – and sometimes not so small – extensions to
 Go's standard library. There are no external dependencies.
 
-The naming scheme is `[type]util` or `[pkgname]util`. If there already is a
-`*util` packge in stdlib it's named `utilx` (e.g. `ioutilx`).
+The naming scheme is `z[type]` or `z[pkgname]`.
 
 Other useful packages:
 

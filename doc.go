@@ -1,2 +1,2 @@
-// Package utils is a collection of often used extensions to Go's stdlib.
-package utils
+// Package zstd is a collection of extensions to Go's stdlib.
+package zstd

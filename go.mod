@@ -1,4 +1,4 @@
-module zgo.at/utils
+module zgo.at/zstd
 
 go 1.13
 
