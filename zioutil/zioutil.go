@@ -47,3 +47,10 @@ func Exists(path string) bool {
 	_, err := os.Stat(path)
 	return !os.IsNotExist(err)
 }
+
+type nopCloser struct{ io.Writer }
+
+func (nopCloser) Close() error { return nil }
+
+// NopCloser returns a WriteCloser with a no-op Close method.
+func NopCloser(r io.Writer) io.WriteCloser { return nopCloser{r} }
