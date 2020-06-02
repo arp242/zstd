@@ -51,3 +51,12 @@ func ReadPermissions(mode os.FileMode) Permissions {
 		},
 	}
 }
+
+// Arg gets the nth argument from os.Args, or an empty string if os.Args is too
+// short.
+func Arg(n int) string {
+	if n > len(os.Args)-1 {
+		return ""
+	}
+	return os.Args[n]
+}
