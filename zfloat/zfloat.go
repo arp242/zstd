@@ -1,3 +1,4 @@
+// Package zfloat implements functions for floats.
 package zfloat
 
 import (

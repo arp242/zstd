@@ -1,4 +1,4 @@
-// +build unix
+// +build aix darwin dragonfly freebsd js,wasm linux netbsd openbsd solaris
 
 package zos
 
@@ -12,7 +12,7 @@ import (
 func Readable(s os.FileInfo) (bool, error) {
 	stat, ok := s.Sys().(*syscall.Stat_t)
 	if !ok {
-		return false, fmt.Errorf("zosutil.Readable: assert to syscall.Stat_t failed; platform not supported?")
+		return false, fmt.Errorf("zos.Readable: assert to syscall.Stat_t failed; platform not supported?")
 	}
 
 	perm := ReadPermissions(s.Mode())
@@ -23,7 +23,7 @@ func Readable(s os.FileInfo) (bool, error) {
 
 	gids, err := os.Getgroups()
 	if err != nil {
-		return false, fmt.Errorf("zosutil.Readable: %w", err)
+		return false, fmt.Errorf("zos.Readable: %w", err)
 	}
 	for _, gid := range gids {
 		if int(stat.Gid) == gid {
@@ -38,7 +38,7 @@ func Readable(s os.FileInfo) (bool, error) {
 func Writable(s os.FileInfo) (bool, error) {
 	stat, ok := s.Sys().(*syscall.Stat_t)
 	if !ok {
-		return false, fmt.Errorf("zosutil.Writable: assert to syscall.Stat_t failed; platform not supported?")
+		return false, fmt.Errorf("zos.Writable: assert to syscall.Stat_t failed; platform not supported?")
 	}
 
 	perm := ReadPermissions(s.Mode())
@@ -49,7 +49,7 @@ func Writable(s os.FileInfo) (bool, error) {
 
 	gids, err := os.Getgroups()
 	if err != nil {
-		return false, fmt.Errorf("zosutil.Writable: %w", err)
+		return false, fmt.Errorf("zos.Writable: %w", err)
 	}
 	for _, gid := range gids {
 		if int(stat.Gid) == gid {

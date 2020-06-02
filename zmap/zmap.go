@@ -1,4 +1,4 @@
-// Package zmap provides a set if functions for working with maps.
+// Package zmap implements functions for maps.
 package zmap
 
 // Reverse the keys and values of a map.

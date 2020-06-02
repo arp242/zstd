@@ -1,3 +1,4 @@
+// Package ztime implements functions for date and time.
 package ztime
 
 import (

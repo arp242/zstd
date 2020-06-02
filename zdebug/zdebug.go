@@ -1,4 +1,4 @@
-// Package zdebug contains helper functions useful when debugging programs.
+// Package zdebug implements functions useful when debugging programs.
 package zdebug
 
 import (

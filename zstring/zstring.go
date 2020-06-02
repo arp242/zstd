@@ -1,6 +1,6 @@
-// Package zstring adds functions for working with strings.
+// Package zstring implements functions for strings.
 //
-// All functions work correctly on UTF-8 characters.
+// All functions work correctly on UTF-8 characters unless mentioned otherwise.
 package zstring
 
 import (

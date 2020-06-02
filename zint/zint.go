@@ -1,3 +1,4 @@
+// Package zint implements functions for ints.
 package zint
 
 import (

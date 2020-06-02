@@ -1,4 +1,4 @@
-// +build !unix
+// +build plan9 windows
 
 package zos
 

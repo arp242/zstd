@@ -1,3 +1,4 @@
+// Package zos implements functions for interfacing with the operating system.
 package zos
 
 import "os"

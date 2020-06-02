@@ -1,3 +1,4 @@
+// Package zbyte implements functions for byte slices.
 package zbyte
 
 import "unicode/utf8"
