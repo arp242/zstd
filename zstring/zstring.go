@@ -35,32 +35,39 @@ func Fields(s, sep string) []string {
 	return f
 }
 
+// Sub returns a substring starting at start and ending at end.
+//
+// Unlike regular string slicing this operates on runes/UTF-8 characters, rather
+// than bytes.
+func Sub(s string, start, end int) string {
+	var (
+		nchars    int
+		startbyte = -1
+	)
+	for bytei := range s {
+		if nchars == start {
+			startbyte = bytei
+		}
+		if nchars == end {
+			return s[startbyte:bytei]
+		}
+		nchars++
+	}
+	if startbyte == -1 {
+		return ""
+	}
+	return s[startbyte:]
+}
+
 // Left returns the "n" left characters of the string.
 //
 // If the string is shorter than "n" it will return the first "n" characters of
 // the string with "…" appended. Otherwise the entire string is returned as-is.
 func Left(s string, n int) string {
-	if n < 0 {
-		n = 0
+	ss := Sub(s, 0, n)
+	if len(s) != len(ss) {
+		return ss + "…"
 	}
-
-	// Quick check for non-multibyte strings.
-	if len(s) <= n {
-		return s
-	}
-
-	var (
-		chari int
-		bytei int
-	)
-	for bytei = range s {
-		chari++
-
-		if chari > n {
-			return s[:bytei] + "…"
-		}
-	}
-
 	return s
 }
 

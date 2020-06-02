@@ -29,6 +29,39 @@ func TestFields(t *testing.T) {
 	}
 }
 
+func TestSub(t *testing.T) {
+	cases := []struct {
+		in   string
+		i, j int
+		want string
+	}{
+		{"", 0, 0, ""},
+		{"Hello", 0, 1, "H"},
+		{"Hello", 1, 5, "ello"},
+		{"汉语漢語", 0, 1, "汉"},
+		{"汉语漢語", 0, 3, "汉语漢"},
+		{"汉语漢語", 2, 4, "漢語"},
+		{"汉语漢語", 0, 4, "汉语漢語"},
+
+		// Length longer than string.
+		{"He", 0, 100, "He"},
+		{"汉语漢語", 0, 100, "汉语漢語"},
+
+		// Start longer than string.
+		{"He", 100, 100, ""},
+		{"汉语漢語", 100, 100, ""},
+	}
+
+	for i, tt := range cases {
+		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
+			out := Sub(tt.in, tt.i, tt.j)
+			if out != tt.want {
+				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tt.want)
+			}
+		})
+	}
+}
+
 func TestLeft(t *testing.T) {
 	cases := []struct {
 		in   string
@@ -40,7 +73,6 @@ func TestLeft(t *testing.T) {
 		{"Hello", 5, "Hello"},
 		{"Hello", 4, "Hell…"},
 		{"Hello", 0, "…"},
-		{"Hello", -2, "…"},
 		{"汉语漢語", 1, "汉…"},
 		{"汉语漢語", 3, "汉语漢…"},
 		{"汉语漢語", 4, "汉语漢語"},
@@ -148,8 +180,19 @@ func TestGetLine(t *testing.T) {
 	}
 }
 
+func BenchmarkSub(b *testing.B) {
+	text := strings.Repeat("Hello, world, it's a sentences!\n", 200)
+	b.ReportAllocs()
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		Sub(text, 50, 250)
+	}
+}
+
 func BenchmarkLeft(b *testing.B) {
 	text := strings.Repeat("Hello, world, it's a sentences!\n", 200)
+	b.ReportAllocs()
+	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
 		Left(text, 250)
 	}
@@ -157,6 +200,8 @@ func BenchmarkLeft(b *testing.B) {
 
 func BenchmarkRemoveUnprintable(b *testing.B) {
 	text := strings.Repeat("Hello, world, it's a sentences!\n", 20000)
+	b.ReportAllocs()
+	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
 		GetLine(text, 200)
 	}
