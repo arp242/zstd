@@ -7,5 +7,5 @@ The naming scheme is `z[type]` or `z[pkgname]`.
 
 Other useful packages:
 
-- [`github.com/Teamwork/toutf8`](https://github.com/Teamwork/toutf8) – Convert
-  strings to UTF-8.
+- [`github.com/jinzhu/now`](https://github.com/jinzhu/now) – Manipulate dates.
+- [`github.com/teamwork/toutf8`](https://github.com/Teamwork/toutf8) – Convert strings to UTF-8.
