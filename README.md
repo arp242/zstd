@@ -7,5 +7,10 @@ The naming scheme is `z[type]` or `z[pkgname]`.
 
 Other useful packages:
 
-- [`github.com/jinzhu/now`](https://github.com/jinzhu/now) – Manipulate dates.
-- [`github.com/teamwork/toutf8`](https://github.com/Teamwork/toutf8) – Convert strings to UTF-8.
+- [`github.com/jinzhu/now`][now]       – Manipulate dates.
+- [`github.com/dustin/go-humanize`][h] – Make various things more human-readable.
+- [`github.com/teamwork/toutf8`]       – Convert strings to UTF-8.
+
+[now]: https://github.com/jinzhu/now
+[h]: https://github.com/dustin/go-humanize
+[utf8]: https://github.com/Teamwork/toutf8
