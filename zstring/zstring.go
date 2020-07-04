@@ -8,6 +8,7 @@ import (
 	"sort"
 	"strings"
 	"time"
+	"unicode/utf8"
 )
 
 // Reverse a string.
@@ -193,4 +194,40 @@ func Difference(set []string, others ...[]string) []string {
 	}
 
 	return out
+}
+
+// AlignLeft left-aligns a string, filling up any remaining width with spaces.
+func AlignLeft(s string, n int) string {
+	l := utf8.RuneCountInString(s)
+	if l >= n {
+		return s
+	}
+	return s + strings.Repeat(" ", n-l)
+}
+
+// AlignRight right-aligns a string, filling up any remaining width with spaces.
+func AlignRight(s string, n int) string {
+	l := utf8.RuneCountInString(s)
+	if l >= n {
+		return s
+	}
+	return strings.Repeat(" ", n-l) + s
+}
+
+// AlignCenter centre-aligns a string, filling up any remaining width with spaces.
+func AlignCenter(s string, n int) string {
+	if s == "" {
+		return strings.Repeat(" ", n)
+	}
+
+	l := utf8.RuneCountInString(s)
+	if l >= n {
+		return s
+	}
+
+	pad := strings.Repeat(" ", (n-l)/2)
+	if n%2 == 0 {
+		return pad + s + pad + " "
+	}
+	return pad + s + pad
 }

@@ -342,6 +342,45 @@ func TestDifference(t *testing.T) {
 	}
 }
 
+func TestAlign(t *testing.T) {
+	tests := []struct {
+		in                  string
+		n                   int
+		left, right, center string
+	}{
+		{"", 4, "    ", "    ", "    "},
+		{"a", 4, "a   ", "   a", " a  "},
+
+		{"Hello", 4, "Hello", "Hello", "Hello"},
+		{"Hello", -2, "Hello", "Hello", "Hello"},
+
+		{"Hello", 6, "Hello ", " Hello", "Hello "},
+		{"Hello", 7, "Hello  ", "  Hello", " Hello "},
+		{"Hello", 8, "Hello   ", "   Hello", " Hello  "},
+		{"Hello", 9, "Hello    ", "    Hello", "  Hello  "},
+		{"Hello", 10, "Hello     ", "     Hello", "  Hello   "},
+		{"Hello", 11, "Hello      ", "      Hello", "   Hello   "},
+	}
+
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("%s_%d", tt.in, tt.n), func(t *testing.T) {
+			left := AlignLeft(tt.in, tt.n)
+			right := AlignRight(tt.in, tt.n)
+			center := AlignCenter(tt.in, tt.n)
+
+			if left != tt.left {
+				t.Errorf("left wrong\ngot:  %q\nwant: %q", left, tt.left)
+			}
+			if right != tt.right {
+				t.Errorf("right wrong\ngot:  %q\nwant: %q", right, tt.right)
+			}
+			if center != tt.center {
+				t.Errorf("center wrong\ngot:  %q\nwant: %q", center, tt.center)
+			}
+		})
+	}
+}
+
 func BenchmarkReverse(b *testing.B) {
 	s := strings.Repeat("H€łø🖖", 20)
 	b.ReportAllocs()
