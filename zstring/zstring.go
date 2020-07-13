@@ -5,7 +5,6 @@ package zstring
 
 import (
 	"math/rand"
-	"regexp"
 	"sort"
 	"strings"
 	"time"
@@ -23,7 +22,7 @@ func Reverse(s string) string {
 // Fields slices s to all substrings separated by sep. Leading/trailing
 // whitespace and empty elements will be removed.
 //
-// e.g. "a;b", "a; b", "  a  ; b", and "a; b;" will all result in {"a", "b"}.
+// e.g. "a;b", "a; b", "  a  ; b", and "a; b;" will all result in ["a", "b"].
 func Fields(s, sep string) []string {
 	s = strings.TrimSpace(s)
 	if s == "" {
@@ -83,7 +82,7 @@ func Left(s string, n int) string {
 // UpperFirst transforms the first character to upper case, leaving the rest of
 // the casing alone.
 func UpperFirst(s string) string {
-	if len(s) < 2 {
+	if len(s) <= 1 {
 		return strings.ToUpper(s)
 	}
 	for _, c := range s {
@@ -96,7 +95,7 @@ func UpperFirst(s string) string {
 // LowerFirst transforms the first character to lower case, leaving the rest of
 // the casing alone.
 func LowerFirst(s string) string {
-	if len(s) < 2 {
+	if len(s) <= 1 {
 		return strings.ToLower(s)
 	}
 	for _, c := range s {
@@ -104,13 +103,6 @@ func LowerFirst(s string) string {
 		return strings.ToLower(sc) + s[len(sc):]
 	}
 	return ""
-}
-
-var reUnprintable = regexp.MustCompile("[\x00-\x1F\u200e\u200f]")
-
-// RemoveUnprintable removes unprintable characters (0 to 31 ASCII) from a string.
-func RemoveUnprintable(s string) string {
-	return reUnprintable.ReplaceAllString(s, "")
 }
 
 // GetLine gets the nth line \n-denoted line from a string.
