@@ -7,6 +7,29 @@ import (
 	"testing"
 )
 
+func TestReverse(t *testing.T) {
+	tests := []struct {
+		in, want string
+	}{
+		{"", ""},
+		{"ab", "ba"},
+		{"Hello, world", "dlrow ,olleH"},
+		{"H€łø🖖", "🖖øł€H"},
+
+		// This is broken, as combining marks. That's probably okay.
+		//{"🤦‍♂️", "🤦‍♂️"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.in, func(t *testing.T) {
+			got := Reverse(tt.in)
+			if got != tt.want {
+				t.Errorf("\ngot:  %q\nwant: %q", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestFields(t *testing.T) {
 	tests := []struct {
 		in   string
@@ -344,4 +367,15 @@ func TestDifference(t *testing.T) {
 			}
 		})
 	}
+}
+
+func BenchmarkReverse(b *testing.B) {
+	s := strings.Repeat("H€łø🖖", 20)
+	b.ReportAllocs()
+
+	var c string
+	for n := 0; n < b.N; n++ {
+		c = Reverse(s)
+	}
+	_ = c
 }
