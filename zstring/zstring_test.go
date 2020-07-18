@@ -153,33 +153,6 @@ func TestLowerFirst(t *testing.T) {
 	}
 }
 
-func TestRemoveUnprintable(t *testing.T) {
-	cases := []struct {
-		in      string
-		lenLost int
-		want    string
-	}{
-		{"Hello, 世界", 0, "Hello, 世界"},
-		{"m", 1, "m"},
-		{"m", 0, "m"},
-		{" ", 3, " "},
-		{"a‎b‏c", 6, "abc"}, // only 2 removed but count as 3 each
-	}
-
-	for i, tt := range cases {
-		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
-			out := RemoveUnprintable(tt.in)
-			charsRemoved := len(tt.in) - len(out)
-			if tt.lenLost != charsRemoved {
-				t.Errorf("\ncharsRemoved:  %#v\nwant: %#v\n", charsRemoved, tt.lenLost)
-			}
-			if out != tt.want {
-				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tt.want)
-			}
-		})
-	}
-}
-
 func TestGetLine(t *testing.T) {
 	cases := []struct {
 		in   string
