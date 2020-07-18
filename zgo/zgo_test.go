@@ -213,18 +213,29 @@ func TestResolveImport(t *testing.T) {
 	})
 }
 
-func TestTagName(t *testing.T) {
+func TestTag(t *testing.T) {
 	cases := []struct {
 		in, inName, want string
+		wantAttr         []string
 	}{
-		{`json:"w00t"`, "json", "w00t"},
-		{`yaml:"w00t"`, "json", "Original"},
-		{`json:"w00t" yaml:"xxx""`, "yaml", "xxx"},
-		{`JSON:"w00t"`, "json", "Original"},
-		{`JSON: "w00t"`, "json", "Original"},
-		{`json:"w00t,omitempty"`, "json", "w00t"},
-		{`json:"w00t,"`, "json", "w00t"},
-		{`json:"-"`, "json", "-"},
+		{`json:"w00t"`, "json",
+			"w00t", nil},
+		{`yaml:"w00t"`, "json",
+			"Original", nil},
+		{`json:"w00t" yaml:"xxx""`, "yaml",
+			"xxx", nil},
+		{`JSON:"w00t"`, "json",
+			"Original", nil},
+		{`JSON: "w00t"`, "json",
+			"Original", nil},
+		{`json:"w00t,omitempty"`, "json",
+			"w00t", []string{"omitempty"}},
+		{`json:"w00t,omitempty,readonly"`, "json",
+			"w00t", []string{"omitempty", "readonly"}},
+		{`json:"w00t,"`, "json",
+			"w00t", []string{""}},
+		{`json:"-"`, "json",
+			"-", nil},
 	}
 
 	for _, tc := range cases {
@@ -233,9 +244,13 @@ func TestTagName(t *testing.T) {
 				Names: []*ast.Ident{&ast.Ident{Name: "Original"}},
 				Tag:   &ast.BasicLit{Value: fmt.Sprintf("`%v`", tc.in)}}
 
-			out := TagName(f, tc.inName)
+			out, attr := Tag(f, tc.inName)
 			if out != tc.want {
 				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
+			}
+
+			if !reflect.DeepEqual(attr, tc.wantAttr) {
+				t.Errorf("\nout:  %#v\nwant: %#v\n", attr, tc.wantAttr)
 			}
 		})
 	}

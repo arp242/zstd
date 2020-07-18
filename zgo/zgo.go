@@ -212,11 +212,12 @@ func ResolveImport(file, pkgName string) (string, error) {
 	return r, nil
 }
 
-// TagName gets the tag name for a struct field with all attributes (like
-// omitempty) removed. It will return the struct field name if there is no tag.
+// TagName gets the tag name for a struct field and all attributes (like
+// omitempty) in a list. It will return the struct field name if there is no
+// tag.
 //
 // This function does not do any validation on the tag format. Use "go vet"!
-func TagName(f *ast.Field, n string) string {
+func Tag(f *ast.Field, n string) (string, []string) {
 	// For e.g.:
 	//  A, B string `json:"x"`
 	//
@@ -229,23 +230,32 @@ func TagName(f *ast.Field, n string) string {
 
 	if f.Tag == nil {
 		if len(f.Names) == 0 {
-			return getEmbedName(f.Type)
+			return getEmbedName(f.Type), nil
 		}
-		return f.Names[0].Name
+		return f.Names[0].Name, nil
 	}
 
 	tag := reflect.StructTag(strings.Trim(f.Tag.Value, "`")).Get(n)
 	if tag == "" {
 		if len(f.Names) == 0 {
-			return getEmbedName(f.Type)
+			return getEmbedName(f.Type), nil
 		}
-		return f.Names[0].Name
+		return f.Names[0].Name, nil
 	}
 
 	if p := strings.Index(tag, ","); p != -1 {
-		return tag[:p]
+		return tag[:p], strings.Split(tag[p+1:], ",")
 	}
-	return tag
+	return tag, nil
+}
+
+// TagName gets the tag name for a struct field with all attributes (like
+// omitempty) removed. It will return the struct field name if there is no tag.
+//
+// This function does not do any validation on the tag format. Use "go vet"!
+func TagName(f *ast.Field, n string) string {
+	name, _ := Tag(f, n)
+	return name
 }
 
 // Embedded struct:
