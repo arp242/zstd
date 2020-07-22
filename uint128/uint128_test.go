@@ -43,5 +43,16 @@ func TestUint128(t *testing.T) {
 		t.Errorf("Format(10)")
 	}
 
-	//n2, err := New([]byte{})
+	_, err = New(nil)
+	if err == nil {
+		t.Fatal(err)
+	}
+
+	if i.IsZero() {
+		t.Fatal()
+	}
+	i2 := Uint128{}
+	if !i2.IsZero() {
+		t.Fatal()
+	}
 }

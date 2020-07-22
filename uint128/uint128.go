@@ -27,6 +27,10 @@ func Parse(s string, base int) (Uint128, error) {
 	return i, i.Parse(s, base)
 }
 
+func (i Uint128) IsZero() bool {
+	return i.H == 0 && i.L == 0
+}
+
 func (i Uint128) Bytes() ([]byte, error) {
 	w := new(bytes.Buffer)
 	err := binary.Write(w, binary.BigEndian, i)
