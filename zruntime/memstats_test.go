@@ -6,7 +6,10 @@ import (
 	"testing"
 )
 
+// TODO: actually test this!
 func TestMemStats(t *testing.T) {
+	t.Skip()
+
 	var m MemStats
 	m.Read()
 	m.Print(0)
