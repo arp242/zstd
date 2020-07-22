@@ -62,6 +62,24 @@ func TestAtomicInt(t *testing.T) {
 	}
 }
 
+func TestAtomicInt64(t *testing.T) {
+	atom := NewAtomicInt64(42)
+	if v := atom.Value(); v != 42 {
+		t.Errorf("wrong value: %v", v)
+	}
+
+	atom.Set(666)
+	if v := atom.Value(); v != 666 {
+		t.Errorf("wrong value: %v", v)
+	}
+
+	// For go test -race to ensure there are no data races.
+	for i := 0; i < 10; i++ {
+		go func(ii int) { atom.Set(int64(ii)) }(i)
+		go func(ii int) { atom.Value() }(i)
+	}
+}
+
 func TestWithLock(t *testing.T) {
 	mu := new(sync.Mutex)
 
