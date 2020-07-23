@@ -1,4 +1,4 @@
-package uint128
+package zint
 
 import (
 	"testing"

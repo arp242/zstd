@@ -48,6 +48,7 @@ func (m *MemStats) Reset() {
 	m.MemStats = runtime.MemStats{}
 	m.values = reflect.Value{}
 	m.prev = reflect.Value{}
+	m.prevRead = time.Time{}
 }
 
 // Read the current memory stats, moving any current value to the previous one.
