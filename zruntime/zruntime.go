@@ -5,6 +5,7 @@ import (
 	"math"
 	"os"
 	"reflect"
+	"runtime"
 	"strings"
 )
 
@@ -26,6 +27,11 @@ func TestVerbose() bool {
 		}
 	}
 	return false
+}
+
+// FuncName gets the name of a function.
+func FuncName(f interface{}) string {
+	return runtime.FuncForPC(reflect.ValueOf(f).Pointer()).Name()
 }
 
 // SizeOf gets the memory size of an object in bytes.
