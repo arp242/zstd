@@ -2,8 +2,10 @@
 package ztest
 
 import (
+	"bytes"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -141,3 +143,89 @@ func SP(s string) *string { return &s }
 
 // I64P makes a new Int64 Pointer.
 func I64P(i int64) *int64 { return &i }
+
+var inlines map[string]struct {
+	inlined bool
+	line    string
+}
+
+// MustInline issues a t.Error() if the Go compiler doesn't report that this
+// function can be inlined.
+//
+// The first argument must the the full package name (i.e. "zgo.at/zstd/zint"),
+// and the rest are function names to test:
+//
+//   ParseUint128         Regular function
+//   Uint128.IsZero       Method call
+//   (*Uint128).Parse     Pointer method
+//
+// The results are cached, so running it multiple times is fine.
+//
+// Inspired by the test in cmd/compile/internal/gc/inl_test.go
+func MustInline(t *testing.T, pkg string, funs ...string) {
+	t.Helper()
+
+	if inlines == nil {
+		getInlines(t)
+	}
+
+	for _, f := range funs {
+		f = pkg + " " + f
+		l, ok := inlines[f]
+		if !ok {
+			t.Errorf("unknown function: %q", f)
+		}
+		if !l.inlined {
+			t.Errorf(l.line)
+		}
+	}
+}
+
+func getInlines(t *testing.T) {
+	out, err := exec.Command("go", "list", "-f={{.Module.Path}}|{{.Module.Dir}}").CombinedOutput()
+	if err != nil {
+		t.Errorf("ztest.MustInline: %s\n%s", err, string(out))
+		return
+	}
+	out = out[:len(out)-1]
+	i := bytes.IndexRune(out, '|')
+	mod, dir := string(out[:i]), string(out[i+1:])
+
+	cmd := exec.Command("go", "build", "-gcflags=-m -m", mod+"/...")
+	cmd.Dir = dir
+	out, err = cmd.CombinedOutput()
+	if err != nil {
+		t.Errorf("ztest.MustInline: %s\n%s", err, string(out))
+		return
+	}
+
+	inlines = make(map[string]struct {
+		inlined bool
+		line    string
+	})
+
+	var pkg string
+
+	add := func(line string, i int, in bool) {
+		fname := strings.TrimSuffix(line[i:i+strings.IndexRune(line[i:], ':')], " as")
+		inlines[pkg+" "+fname] = struct {
+			inlined bool
+			line    string
+		}{in, mod + line}
+	}
+
+	for _, line := range strings.Split(string(out), "\n") {
+		if strings.HasPrefix(line, "# ") {
+			pkg = line[2:]
+		}
+		if i := strings.Index(line, ": can inline "); i > -1 {
+			add(line, i+13, true)
+		}
+		if i := strings.Index(line, ": inline call to "); i > -1 {
+			add(line, i+17, true)
+		}
+		if i := strings.Index(line, ": cannot inline "); i > -1 {
+			add(line, i+16, false)
+		}
+	}
+}
