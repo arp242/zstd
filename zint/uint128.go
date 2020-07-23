@@ -1,6 +1,7 @@
 package zint
 
 import (
+	"database/sql/driver"
 	"fmt"
 	"strconv"
 )
@@ -60,8 +61,7 @@ func (i Uint128) Bytes() []byte {
 }
 
 // Value determines what to store in the DB.
-//func (i Uint128) Value() (driver.Value, error) {
-func (i Uint128) Value() (interface{}, error) { return i.Bytes(), nil }
+func (i Uint128) Value() (driver.Value, error) { return i.Bytes(), nil }
 
 // Scan converts the data from the DB.
 func (i *Uint128) Scan(v interface{}) error {
