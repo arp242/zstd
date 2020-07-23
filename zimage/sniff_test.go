@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"testing"
 
-	"zgo.at/ztest/image"
+	"zgo.at/zstd/ztest/image"
 )
 
 func TestDetectImage(t *testing.T) {

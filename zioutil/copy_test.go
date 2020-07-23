@@ -9,7 +9,7 @@ import (
 	"syscall"
 	"testing"
 
-	"zgo.at/ztest"
+	"zgo.at/zstd/ztest"
 )
 
 func TestMain(m *testing.M) {

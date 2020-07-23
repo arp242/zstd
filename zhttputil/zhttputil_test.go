@@ -16,7 +16,8 @@ import (
 	"strings"
 	"testing"
 
-	"zgo.at/ztest"
+	"zgo.at/zstd/zioutil"
+	"zgo.at/zstd/ztest"
 )
 
 func TestDumpBody(t *testing.T) {

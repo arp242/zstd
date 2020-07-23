@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"zgo.at/ztest"
+	"zgo.at/zstd/ztest"
 )
 
 // This also tests ResolvePackage() and ResolveWildcard().
