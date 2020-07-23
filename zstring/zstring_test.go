@@ -5,6 +5,8 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+
+	"zgo.at/zstd/ztest"
 )
 
 func TestReverse(t *testing.T) {
@@ -86,6 +88,8 @@ func TestSub(t *testing.T) {
 }
 
 func TestLeft(t *testing.T) {
+	ztest.MustInline(t, "zgo.at/zstd/zstring Left")
+
 	cases := []struct {
 		in   string
 		n    int
@@ -272,6 +276,8 @@ func TestChoose(t *testing.T) {
 }
 
 func TestFilter(t *testing.T) {
+	ztest.MustInline(t, "zgo.at/zstd/zstring FilterEmpty")
+
 	cases := []struct {
 		fun  func(string) bool
 		in   []string
