@@ -49,8 +49,9 @@ func NewAtomicInt(value int32) *AtomicInt {
 	return &i
 }
 
-func (i *AtomicInt) Set(value int32) { atomic.StoreInt32((*int32)(i), value) }
-func (i *AtomicInt) Value() int32    { return atomic.LoadInt32((*int32)(i)) }
+func (i *AtomicInt) Set(value int32)   { atomic.StoreInt32((*int32)(i), value) }
+func (i *AtomicInt) Add(n int32) int32 { return atomic.AddInt32((*int32)(i), n) }
+func (i *AtomicInt) Value() int32      { return atomic.LoadInt32((*int32)(i)) }
 
 // AtomicInt64 uses sync/atomic to store and read the value of an int32.
 type AtomicInt64 int64
@@ -62,5 +63,6 @@ func NewAtomicInt64(value int64) *AtomicInt64 {
 	return &i
 }
 
-func (i *AtomicInt64) Set(value int64) { atomic.StoreInt64((*int64)(i), value) }
-func (i *AtomicInt64) Value() int64    { return atomic.LoadInt64((*int64)(i)) }
+func (i *AtomicInt64) Set(value int64)   { atomic.StoreInt64((*int64)(i), value) }
+func (i *AtomicInt64) Add(n int64) int64 { return atomic.AddInt64((*int64)(i), n) }
+func (i *AtomicInt64) Value() int64      { return atomic.LoadInt64((*int64)(i)) }

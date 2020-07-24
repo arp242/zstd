@@ -54,6 +54,13 @@ func TestAtomicInt(t *testing.T) {
 	if v := atom.Value(); v != 666 {
 		t.Errorf("wrong value: %v", v)
 	}
+	n := atom.Add(2)
+	if n != 668 {
+		t.Errorf("wrong value: %v", n)
+	}
+	if v := atom.Value(); v != 668 {
+		t.Errorf("wrong value: %v", v)
+	}
 
 	// For go test -race to ensure there are no data races.
 	for i := 0; i < 10; i++ {
@@ -70,6 +77,14 @@ func TestAtomicInt64(t *testing.T) {
 
 	atom.Set(666)
 	if v := atom.Value(); v != 666 {
+		t.Errorf("wrong value: %v", v)
+	}
+
+	n := atom.Add(2)
+	if n != 668 {
+		t.Errorf("wrong value: %v", n)
+	}
+	if v := atom.Value(); v != 668 {
 		t.Errorf("wrong value: %v", v)
 	}
 
