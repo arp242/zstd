@@ -397,3 +397,85 @@ func BenchmarkReverse(b *testing.B) {
 	}
 	_ = c
 }
+
+func TestUpto(t *testing.T) {
+	ztest.MustInline(t, "zgo.at/zstd/zstring", "Upto", "From")
+
+	tests := []struct {
+		in, sep, upto, from string
+	}{
+		{"", "", "", ""},
+		{"ab", ":", "ab", "ab"},
+		{"a:b", ":", "a", "b"},
+		{"a:b", "::", "a:b", "a:b"},
+		{"a::b", "::", "a", "b"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.in, func(t *testing.T) {
+			a := Upto(tt.in, tt.sep)
+			b := From(tt.in, tt.sep)
+
+			if a != tt.upto {
+				t.Errorf("upto\ngot:  %q\nwant: %q", a, tt.upto)
+			}
+			if b != tt.from {
+				t.Errorf("from\ngot:  %q\nwant: %q", b, tt.from)
+			}
+		})
+	}
+}
+
+func TestSplit(t *testing.T) {
+	tests := []struct {
+		in, sep string
+		want2   []string
+		want3   []string
+		want4   []string
+	}{
+		{"a", ":",
+			[]string{"a", ""},
+			[]string{"a", "", ""},
+			[]string{"a", "", "", ""},
+		},
+		{"a:b", ":",
+			[]string{"a", "b"},
+			[]string{"a", "b", ""},
+			[]string{"a", "b", "", ""},
+		},
+
+		{"a:b:c:d:e", ":",
+			[]string{"a", "b:c:d:e"},
+			[]string{"a", "b", "c:d:e"},
+			[]string{"a", "b", "c", "d:e"},
+		},
+
+		{"a:::b:c:d:e", ":",
+			[]string{"a", "::b:c:d:e"},
+			[]string{"a", "", ":b:c:d:e"},
+			[]string{"a", "", "", "b:c:d:e"},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.in, func(t *testing.T) {
+			got1, got2 := Split2(tt.in, tt.sep)
+			got := []string{got1, got2}
+			if !reflect.DeepEqual(got, tt.want2) {
+				t.Errorf("\ngot:  %q\nwant: %q", got, tt.want2)
+			}
+
+			got1, got2, got3 := Split3(tt.in, tt.sep)
+			got = []string{got1, got2, got3}
+			if !reflect.DeepEqual(got, tt.want3) {
+				t.Errorf("\ngot:  %q\nwant: %q", got, tt.want3)
+			}
+
+			got1, got2, got3, got4 := Split4(tt.in, tt.sep)
+			got = []string{got1, got2, got3, got4}
+			if !reflect.DeepEqual(got, tt.want4) {
+				t.Errorf("\ngot:  %q\nwant: %q", got, tt.want4)
+			}
+		})
+	}
+}

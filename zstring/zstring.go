@@ -231,3 +231,65 @@ func AlignCenter(s string, n int) string {
 	}
 	return pad + s + pad
 }
+
+// Split2 splits a string with strings.SplitN(.., 2) and returns the result.
+//
+// This makes some string splits a bit more elegant:
+//
+//   key, value := zstring.Split2(line, "=")
+func Split2(str, sep string) (string, string) {
+	s := strings.SplitN(str, sep, 2)
+	if len(s) == 1 {
+		return s[0], ""
+	}
+	return s[0], s[1]
+}
+
+// Split3 splits a string with strings.SplitN(.., 3) and returns the result.
+func Split3(str, sep string) (string, string, string) {
+	s := strings.SplitN(str, sep, 3)
+	if len(s) < 3 {
+		m := make([]string, 3)
+		copy(m, s)
+		s = m
+	}
+	return s[0], s[1], s[2]
+}
+
+// Split4 splits a string with strings.SplitN(.., 4) and returns the result.
+func Split4(str, sep string) (string, string, string, string) {
+	s := strings.SplitN(str, sep, 4)
+	if len(s) < 4 {
+		m := make([]string, 4)
+		copy(m, s)
+		s = m
+	}
+	return s[0], s[1], s[2], s[3]
+}
+
+// Upto slices the string up to the first occurrence of sep. This is a shortcut
+// for:
+//
+//   if i := strings.Index(s, sep); i > -1 {
+//     s = s[:i]
+//   }
+func Upto(s string, sep string) string {
+	i := strings.Index(s, sep)
+	if i == -1 {
+		return s
+	}
+	return s[:i]
+}
+
+// From slices the string from first occurrence of sep. This is a shortcut for:
+//
+//   if i := strings.Index(s, sep); i > -1 {
+//     s = s[i+len(sep):]
+//   }
+func From(s string, sep string) string {
+	i := strings.Index(s, sep)
+	if i == -1 {
+		return s
+	}
+	return s[i+len(sep):]
+}
