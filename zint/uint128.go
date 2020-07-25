@@ -103,6 +103,9 @@ func (i *Uint128) Scan(v interface{}) error {
 	if !ok {
 		return fmt.Errorf("Uint128.Scan: must be []byte, not %T", v)
 	}
+	if len(b) == 0 {
+		return nil
+	}
 	return i.New(b)
 }
 
@@ -110,4 +113,9 @@ func (i *Uint128) Scan(v interface{}) error {
 func (i Uint128) MarshalText() ([]byte, error) { return []byte(i.Format(16)), nil }
 
 // UnmarshalText parses text in to the Go data structure.
-func (i *Uint128) UnmarshalText(v []byte) error { return i.Parse(string(v), 16) }
+func (i *Uint128) UnmarshalText(v []byte) error {
+	if len(v) == 0 {
+		return nil
+	}
+	return i.Parse(string(v), 16)
+}
