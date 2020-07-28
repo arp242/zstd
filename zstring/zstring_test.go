@@ -31,6 +31,16 @@ func TestReverse(t *testing.T) {
 		})
 	}
 }
+func BenchmarkReverse(b *testing.B) {
+	s := strings.Repeat("H€łø🖖", 20)
+	b.ReportAllocs()
+
+	var c string
+	for n := 0; n < b.N; n++ {
+		c = Reverse(s)
+	}
+	_ = c
+}
 
 func TestFields(t *testing.T) {
 	tests := []struct {
@@ -387,15 +397,40 @@ func TestAlign(t *testing.T) {
 	}
 }
 
-func BenchmarkReverse(b *testing.B) {
-	s := strings.Repeat("H€łø🖖", 20)
-	b.ReportAllocs()
+func TestIndexPairs(t *testing.T) {
+	tests := []struct {
+		in, start, end string
+		want           [][]int
+	}{
+		{"", "{", "}", nil},
+		{"xx", "{", "}", nil},
+		{"{xx}", "{", "}", [][]int{{0, 3}}},
+		{"{xx} {yyy}", "{", "}", [][]int{{5, 9}, {0, 3}}},
 
-	var c string
-	for n := 0; n < b.N; n++ {
-		c = Reverse(s)
+		// No end mark
+		{" {xx} {yyy", "{", "}", [][]int{{1, 4}}},
+		{" {xx} {yyy {x}", "{", "}", [][]int{{6, 13}, {1, 4}}},
+
+		// Nested
+		{"{xx {yy} }", "{", "}", [][]int{{0, 7}}},
 	}
-	_ = c
+
+	for i, tt := range tests {
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			got := IndexPairs(tt.in, tt.start, tt.end)
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("\ngot:  %#v\nwant: %#v", got, tt.want)
+			}
+		})
+	}
+}
+func BenchmarkIndexPairs(b *testing.B) {
+	text := "Hello {world}, {asc}\n"
+	b.ReportAllocs()
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		IndexPairs(text, "{", "}")
+	}
 }
 
 func TestUpto(t *testing.T) {

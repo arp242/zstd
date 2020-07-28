@@ -293,3 +293,37 @@ func From(s string, sep string) string {
 	}
 	return s[i+len(sep):]
 }
+
+// IndexPairs finds the position of all start/end pairs.
+//
+// Nested pairs are not supported.
+//
+// The return value is from last match to first match; this makes it easier to
+// manipulate the string based on the indexes.
+func IndexPairs(str, start, end string) [][]int {
+	r := make([][]int, 0, 4)
+
+	var pos int
+	for {
+		s := strings.Index(str[pos:], start)
+		if s == -1 {
+			break
+		}
+		e := strings.Index(str[pos+s:], end)
+		if e == -1 {
+			break
+		}
+
+		r = append(r, []int{pos + s, pos + s + e})
+		pos = pos + s + e
+	}
+	if len(r) == 0 {
+		return nil
+	}
+
+	for i := len(r)/2 - 1; i >= 0; i-- {
+		opp := len(r) - 1 - i
+		r[i], r[opp] = r[opp], r[i]
+	}
+	return r
+}
