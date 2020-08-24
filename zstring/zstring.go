@@ -68,16 +68,48 @@ func Sub(s string, start, end int) string {
 	return s[startbyte:]
 }
 
-// Left returns the "n" left characters of the string.
+// ElideLeft returns the "n" left characters of the string.
 //
 // If the string is shorter than "n" it will return the first "n" characters of
 // the string with "…" appended. Otherwise the entire string is returned as-is.
-func Left(s string, n int) string {
+func ElideLeft(s string, n int) string {
 	ss := Sub(s, 0, n)
 	if len(s) != len(ss) {
 		return ss + "…"
 	}
 	return s
+}
+
+// ElideRight returns the "n" right characters of the string.
+//
+// If the string is shorter than "n" it will return the first "n" characters of
+// the string with "…" appended. Otherwise the entire string is returned as-is.
+func ElideRight(s string, n int) string {
+	ss := Sub(Reverse(s), 0, n)
+	if len(s) != len(ss) {
+		return "…" + Reverse(ss)
+	}
+	return s
+}
+
+// ElideCenter returns the "n" characters of the string.
+//
+// If the string is shorter than "n" it will return the first n/2 characters and
+// last n/2 characters of the string with "…" inserted in the centre. Otherwise
+// the entire string is returned as-is.
+func ElideCenter(s string, n int) string {
+	cc := utf8.RuneCountInString(s)
+	if n >= cc {
+		return s
+	}
+
+	var start string
+	if n%2 == 0 {
+		start = Sub(s, 0, n/2)
+	} else {
+		start = Sub(s, 0, n/2+1)
+	}
+	return start + "…" + Sub(s, cc-n/2, cc)
 }
 
 // UpperFirst transforms the first character to upper case, leaving the rest of

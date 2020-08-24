@@ -97,29 +97,43 @@ func TestSub(t *testing.T) {
 	}
 }
 
-func TestLeft(t *testing.T) {
+func TestElide(t *testing.T) {
 	ztest.MustInline(t, "zgo.at/zstd/zstring Left")
 
 	cases := []struct {
-		in   string
-		n    int
-		want string
+		in         string
+		n          int
+		wantLeft   string
+		wantRight  string
+		wantCenter string
 	}{
-		{"Hello", 100, "Hello"},
-		{"Hello", 1, "H…"},
-		{"Hello", 5, "Hello"},
-		{"Hello", 4, "Hell…"},
-		{"Hello", 0, "…"},
-		{"汉语漢語", 1, "汉…"},
-		{"汉语漢語", 3, "汉语漢…"},
-		{"汉语漢語", 4, "汉语漢語"},
+		{"Hello", 100, "Hello", "Hello", "Hello"},
+		{"Hello", 1, "H…", "…o", "H…"},
+		{"Hello", 2, "He…", "…lo", "H…o"},
+		{"Hello", 5, "Hello", "Hello", "Hello"},
+		{"Hello", 4, "Hell…", "…ello", "He…lo"},
+		{"Hello", 0, "…", "…", "…"},
+		{"汉语漢語", 1, "汉…", "…語", "汉…"},
+		{"汉语漢語", 2, "汉语…", "…漢語", "汉…語"},
+		{"汉语漢語", 3, "汉语漢…", "…语漢語", "汉语…語"},
+		{"汉语漢語", 4, "汉语漢語", "汉语漢語", "汉语漢語"},
 	}
 
 	for i, tt := range cases {
 		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
-			out := Left(tt.in, tt.n)
-			if out != tt.want {
-				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tt.want)
+			left := ElideLeft(tt.in, tt.n)
+			if left != tt.wantLeft {
+				t.Errorf("\nout:  %#v\nwant: %#v\n", left, tt.wantLeft)
+			}
+
+			right := ElideRight(tt.in, tt.n)
+			if right != tt.wantRight {
+				t.Errorf("\nout:  %#v\nwant: %#v\n", right, tt.wantRight)
+			}
+
+			center := ElideCenter(tt.in, tt.n)
+			if center != tt.wantCenter {
+				t.Errorf("\nout:  %#v\nwant: %#v\n", center, tt.wantCenter)
 			}
 		})
 	}
@@ -199,12 +213,12 @@ func BenchmarkSub(b *testing.B) {
 	}
 }
 
-func BenchmarkLeft(b *testing.B) {
+func BenchmarkElideLeft(b *testing.B) {
 	text := strings.Repeat("Hello, world, it's a sentences!\n", 200)
 	b.ReportAllocs()
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
-		Left(text, 250)
+		ElideLeft(text, 250)
 	}
 }
 
@@ -434,8 +448,6 @@ func BenchmarkIndexPairs(b *testing.B) {
 }
 
 func TestUpto(t *testing.T) {
-	ztest.MustInline(t, "zgo.at/zstd/zstring", "Upto", "From")
-
 	tests := []struct {
 		in, sep, upto, from string
 	}{
