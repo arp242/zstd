@@ -48,6 +48,21 @@ func Exists(path string) bool {
 	return !os.IsNotExist(err)
 }
 
+// Newer reports if the file's mtime is more recent than base.
+func ChangedFrom(file, base string) bool {
+	filest, err := os.Stat(file)
+	if err != nil {
+		return true
+	}
+
+	basest, err := os.Stat(base)
+	if err != nil {
+		return true
+	}
+
+	return filest.ModTime().After(basest.ModTime())
+}
+
 type nopCloser struct{ io.Writer }
 
 func (nopCloser) Close() error { return nil }
