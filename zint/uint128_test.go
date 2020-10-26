@@ -3,13 +3,11 @@ package zint
 import (
 	"fmt"
 	"testing"
-
-	"zgo.at/zstd/ztest"
 )
 
 func TestUint128(t *testing.T) {
-	ztest.MustInline(t, "zgo.at/zstd/zint",
-		"NewUint128", "Uint128.IsZero", "Uint128.String")
+	//ztest.MustInline(t, "zgo.at/zstd/zint",
+	//	"NewUint128", "Uint128.IsZero", "Uint128.String")
 
 	tests := []struct {
 		in               []byte

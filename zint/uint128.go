@@ -27,13 +27,13 @@ func ParseUint128(s string, base int) (Uint128, error) {
 	return i, i.Parse(s, base)
 }
 
-func (u Uint128) String() string { return u.Format(16) }
+func (i Uint128) String() string { return i.Format(16) }
 func (i Uint128) IsZero() bool   { return i[0] == 0 && i[1] == 0 }
 
 // TODO: this is not really printin a number, but just printing the 2 numbers
 // side-by-side, rather than actually adding up the bits.
-func (u Uint128) Format(base int) string {
-	return strconv.FormatUint(u[0], base) + "-" + strconv.FormatUint(u[1], base)
+func (i Uint128) Format(base int) string {
+	return strconv.FormatUint(i[0], base) + "-" + strconv.FormatUint(i[1], base)
 }
 
 // New sets this uint128 from a [16]byte.
