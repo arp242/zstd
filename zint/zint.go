@@ -103,7 +103,7 @@ func Filter(list []int64, fun func(int64) bool) []int64 {
 
 // FilterEmpty can be used as an argument for Filter() and will return false if
 // e is empty or contains only whitespace.
-func FilterIntEmpty(e int64) bool { return e != 0 }
+func FilterEmpty(e int64) bool { return e != 0 }
 
 // Min gets the lowest of two numbers.
 func Min(a, b int64) int64 {

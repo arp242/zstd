@@ -2,7 +2,10 @@ package zfmt
 
 import "testing"
 
+type typ int8
+
 func TestBinary(t *testing.T) {
+	i := int8(7)
 	tests := []struct {
 		in   interface{}
 		want string
@@ -11,6 +14,8 @@ func TestBinary(t *testing.T) {
 		{int8(7), "0000_0111"},
 		{int8(127), "0111_1111"},
 		{int8(-127), "1111_1111"},
+		{typ(7), "0000_0111"},
+		{&i, "0000_0111"},
 
 		{uint8(0), "0000_0000"},
 		{uint8(7), "0000_0111"},

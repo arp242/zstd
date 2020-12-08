@@ -1,24 +1,36 @@
+// Package zfmt implements additional formatting functions.
 package zfmt
 
 import (
 	"fmt"
+	"math/bits"
+	"reflect"
 	"regexp"
+	"strconv"
 )
 
 // Binary returns the binary representation of a number.
 func Binary(c interface{}) string {
+	t := reflect.TypeOf(c)
+	if t.Kind() == reflect.Ptr {
+		t = t.Elem()
+		c = reflect.ValueOf(c).Elem().Interface()
+	}
+
 	l := ""
-	switch c.(type) {
-	case int8, uint8:
+	switch t.Kind() {
+	case reflect.Int8, reflect.Uint8:
 		l = "8"
-	case int16, uint16:
+	case reflect.Int16, reflect.Uint16:
 		l = "16"
-	case int32, uint32:
+	case reflect.Int32, reflect.Uint32:
 		l = "32"
-	case int64, uint64, int, uint:
+	case reflect.Int64, reflect.Uint64:
 		l = "64"
+	case reflect.Int, reflect.Uint:
+		l = strconv.Itoa(bits.UintSize)
 	default:
-		panic(fmt.Sprintf("not a number: %T: %[1]q", c, c))
+		panic(fmt.Sprintf("zfmt.Binary: not a number but %T: %[1]v", c, c))
 	}
 
 	b := fmt.Sprintf("%0"+l+"b", c)
@@ -34,6 +46,5 @@ func Binary(c interface{}) string {
 		return string(r)
 	}
 	reBin := regexp.MustCompile(`([01])([01])([01])([01])([01])([01])([01])([01])`)
-
 	return fmt.Sprintf("%s", reverse(reBin.ReplaceAllString(reverse(b), `$1$2$3${4}_$5$6$7$8 `)))[1:]
 }

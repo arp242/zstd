@@ -32,34 +32,34 @@ func TestNonZero(t *testing.T) {
 	}
 }
 
-func TestFilterInt(t *testing.T) {
+func TestFilter(t *testing.T) {
 	cases := []struct {
 		fun  func(int64) bool
 		in   []int64
 		want []int64
 	}{
 		{
-			FilterIntEmpty,
+			FilterEmpty,
 			[]int64(nil),
 			[]int64(nil),
 		},
 		{
-			FilterIntEmpty,
+			FilterEmpty,
 			[]int64{},
 			[]int64(nil),
 		},
 		{
-			FilterIntEmpty,
+			FilterEmpty,
 			[]int64{1},
 			[]int64{1},
 		},
 		{
-			FilterIntEmpty,
+			FilterEmpty,
 			[]int64{0, 1, 0},
 			[]int64{1},
 		},
 		{
-			FilterIntEmpty,
+			FilterEmpty,
 			[]int64{0, 1, 0, 2, -1, 0, 0, 0, 42, 666, -666, 0, 0, 0},
 			[]int64{1, 2, -1, 42, 666, -666},
 		},

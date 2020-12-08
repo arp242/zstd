@@ -1,3 +1,4 @@
+// Package zfilepath implements functions for manipulating filename paths.
 package zfilepath
 
 import "path/filepath"
