@@ -5,6 +5,13 @@ import (
 	"testing"
 )
 
+func TestGoroutineID(t *testing.T) {
+	id := GoroutineID()
+	if id <= 0 {
+		t.Errorf("lower than 0: %d", id)
+	}
+}
+
 func TestSizeOf(t *testing.T) {
 	n := int64(123)
 	tests := []struct {

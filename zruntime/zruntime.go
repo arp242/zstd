@@ -2,10 +2,13 @@
 package zruntime
 
 import (
+	"bytes"
+	"fmt"
 	"math"
 	"os"
 	"reflect"
 	"runtime"
+	"strconv"
 	"strings"
 )
 
@@ -32,6 +35,30 @@ func TestVerbose() bool {
 // FuncName gets the name of a function.
 func FuncName(f interface{}) string {
 	return runtime.FuncForPC(reflect.ValueOf(f).Pointer()).Name()
+}
+
+// GoroutineID gets the current goroutine ID.
+//
+// Go doesn't give access to this to discourage certain unwise design patterns,
+// but in some cases it can still be useful; for example for some tests or
+// debugging.
+func GoroutineID() uint64 {
+	b := make([]byte, 64)
+	b = b[:runtime.Stack(b, false)]
+	b = bytes.TrimPrefix(b, []byte("goroutine "))
+
+	i := bytes.IndexByte(b, ' ')
+	if i < 0 {
+		panic(fmt.Sprintf("could not parse %q", b))
+	}
+
+	b = b[:i]
+	n, err := strconv.ParseUint(string(b), 10, 64)
+	if err != nil {
+		panic(fmt.Sprintf("could not parse %q: %v", b, err))
+
+	}
+	return n
 }
 
 // SizeOf gets the memory size of an object in bytes.
