@@ -1,8 +1,15 @@
 package zint
 
 import (
+	"encoding"
+	"encoding/json"
 	"fmt"
 	"testing"
+)
+
+var (
+	_ encoding.TextUnmarshaler = new(Bitflag8)
+	_ json.Unmarshaler         = new(Bitflag8)
 )
 
 func TestBitflag(t *testing.T) {
@@ -28,4 +35,25 @@ func TestBitflag(t *testing.T) {
 
 	d.Clear(FooBar)
 	test("true false false")
+
+	t.Run("json", func(t *testing.T) {
+		f := Foo | Bar
+		j, err := json.Marshal(f)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if string(j) != "3" {
+			t.Errorf(string(j))
+		}
+
+		var nf Bitflag8
+		err = json.Unmarshal(j, &nf)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if uint8(nf) != 3 {
+			t.Error(nf)
+		}
+	})
 }
