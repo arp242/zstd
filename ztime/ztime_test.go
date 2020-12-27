@@ -1,7 +1,6 @@
 package ztime
 
 import (
-	"fmt"
 	"testing"
 	"time"
 )
@@ -23,7 +22,7 @@ func TestFormatDuration(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(fmt.Sprintf("%s", tt.in), func(t *testing.T) {
+		t.Run("", func(t *testing.T) {
 			out := FormatDuration(tt.in)
 			if out != tt.want {
 				t.Errorf("\nout:  %q\nwant: %q", out, tt.want)

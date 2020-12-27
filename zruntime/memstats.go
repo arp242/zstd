@@ -143,7 +143,7 @@ func (m *MemStats) String() string {
 	return m.out.String()
 }
 
-func (m MemStats) value(k string) {
+func (m *MemStats) value(k string) {
 	fmt.Fprintf(m.out, "\t%-14s", k)
 	v := m.values.FieldByName(k)
 	v2 := m.prev.FieldByName(k)
@@ -183,7 +183,7 @@ func (m MemStats) value(k string) {
 	m.out.WriteRune('\n')
 }
 
-func (m MemStats) duration(v, p reflect.Value) {
+func (m *MemStats) duration(v, p reflect.Value) {
 	d := time.Duration(v.Uint())
 	fmt.Fprintf(m.out, "%15s", d)
 
@@ -199,7 +199,7 @@ func (m MemStats) duration(v, p reflect.Value) {
 	}
 }
 
-func (m MemStats) time(v, p reflect.Value) {
+func (m *MemStats) time(v, p reflect.Value) {
 	t := time.Unix(0, int64(v.Uint())).In(time.Local)
 	fmt.Fprintf(m.out, "%15s", t.Format("15:04:05.0000"))
 
@@ -216,7 +216,7 @@ func (m MemStats) time(v, p reflect.Value) {
 	}
 }
 
-func (m MemStats) bytes(v, p reflect.Value) {
+func (m *MemStats) bytes(v, p reflect.Value) {
 	fmt.Fprintf(m.out, "%14.2fk", float64(v.Uint())/1024)
 
 	if p.IsValid() {
@@ -230,7 +230,7 @@ func (m MemStats) bytes(v, p reflect.Value) {
 	}
 }
 
-func (m MemStats) float(v, p reflect.Value) {
+func (m *MemStats) float(v, p reflect.Value) {
 	fmt.Fprintf(m.out, "%15.10f", v.Float())
 
 	if p.IsValid() {
@@ -238,7 +238,7 @@ func (m MemStats) float(v, p reflect.Value) {
 	}
 }
 
-func (m MemStats) number(v, p reflect.Value) {
+func (m *MemStats) number(v, p reflect.Value) {
 	fmt.Fprintf(m.out, "%15d", v.Uint())
 
 	if p.IsValid() {
@@ -251,7 +251,7 @@ func (m MemStats) number(v, p reflect.Value) {
 	}
 }
 
-func (m MemStats) perc(diff int64, orig uint64) string {
+func (m *MemStats) perc(diff int64, orig uint64) string {
 	if diff == 0 {
 		return fmt.Sprintf("%+11s", "-")
 	}

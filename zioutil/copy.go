@@ -123,7 +123,6 @@ func IsSymlink(fi os.FileInfo) bool {
 func CopyData(src, dst string) error {
 	src, srcStat, err := copyCheck(src, dst)
 	if err != nil {
-		return err
 		return fmt.Errorf("CopyData: %w", err)
 	}
 

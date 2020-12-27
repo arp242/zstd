@@ -46,5 +46,5 @@ func Binary(c interface{}) string {
 		return string(r)
 	}
 	reBin := regexp.MustCompile(`([01])([01])([01])([01])([01])([01])([01])([01])`)
-	return fmt.Sprintf("%s", reverse(reBin.ReplaceAllString(reverse(b), `$1$2$3${4}_$5$6$7$8 `)))[1:]
+	return reverse(reBin.ReplaceAllString(reverse(b), `$1$2$3${4}_$5$6$7$8 `))[1:]
 }

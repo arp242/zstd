@@ -9,7 +9,7 @@ import (
 )
 
 type ts struct {
-	Ts Timestamp `json:"ts"`
+	TS Timestamp `json:"ts"`
 }
 
 func TestTimestamp(t *testing.T) {
