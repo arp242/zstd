@@ -1,29 +1,39 @@
-// +build testhttp
-
 package zhttputil
-
-// Copyright 2011 The Go Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
 
 import (
 	"bytes"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
+	"net/http/httptest"
 	"net/url"
-	"runtime"
 	"strings"
 	"testing"
-
-	"zgo.at/zstd/zioutil"
-	"zgo.at/zstd/ztest"
 )
 
-func TestDumpBody(t *testing.T) {
-	numg0 := runtime.NumGoroutine()
+func TestSafeClient(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(http.ResponseWriter, *http.Request) {}))
 
-	cases := []struct {
+	c := SafeClient()
+	resp, err := c.Get(srv.URL)
+	if err == nil {
+		t.Fatal("err is nil")
+	}
+	if resp != nil {
+		t.Fatal("resp not nil", resp)
+	}
+}
+
+// Based on httputil.DumpRequest
+//
+// Copyright 2011 The Go Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+func TestDumpBody(t *testing.T) {
+	chunk := func(s string) string { return fmt.Sprintf("%x\r\n%s\r\n", len(s), s) }
+
+	tests := []struct {
 		Req  http.Request
 		Body interface{} // optional []byte or func() io.ReadCloser to populate Req.Body
 
@@ -158,74 +168,35 @@ func TestDumpBody(t *testing.T) {
 		},
 	}
 
-	for i, tc := range cases {
-		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
 			setBody := func() {
-				if tc.Body == nil {
+				if tt.Body == nil {
 					return
 				}
-				switch b := tc.Body.(type) {
+				switch b := tt.Body.(type) {
 				case []byte:
-					tc.Req.Body = zioutil.NopCloser(bytes.NewReader(b))
+					tt.Req.Body = ioutil.NopCloser(bytes.NewReader(b))
 				case func() io.ReadCloser:
-					tc.Req.Body = b()
+					tt.Req.Body = b()
 				default:
-					t.Fatalf("unsupported Body of %T", tc.Body)
+					t.Fatalf("unsupported Body of %T", tt.Body)
 				}
-			}
-			setBody()
-			if tc.Req.Header == nil {
-				tc.Req.Header = make(http.Header)
 			}
 
 			setBody()
-			dump, err := DumpBody(&tc.Req, tc.ReadN)
+			if tt.Req.Header == nil {
+				tt.Req.Header = make(http.Header)
+			}
+
+			setBody()
+			dump, err := DumpBody(&tt.Req, tt.ReadN)
 			if err != nil {
 				t.Fatal(err)
 			}
-			if string(dump) != tc.WantDump {
-				t.Errorf("\nwant: %#v\ngot:  %#v\n", tc.WantDump, string(dump))
+			if string(dump) != tt.WantDump {
+				t.Errorf("\nwant: %#v\ngot:  %#v\n", tt.WantDump, string(dump))
 			}
 		})
 	}
-
-	if dg := runtime.NumGoroutine() - numg0; dg > 4 {
-		buf := make([]byte, 4096)
-		buf = buf[:runtime.Stack(buf, true)]
-		t.Errorf("Unexpectedly large number of new goroutines: %d new: %s", dg, buf)
-	}
-}
-
-func chunk(s string) string {
-	return fmt.Sprintf("%x\r\n%s\r\n", len(s), s)
-}
-
-// TODO: better to not depend on interwebz...
-func TestFetch(t *testing.T) {
-	cases := []struct {
-		in, want, wantErr string
-	}{
-		{"http://example.com", "<html>", ""},
-		{"http://fairly-certain-this-doesnt-exist-asdasd12g1ghdfddd.com", "", "cannot download"},
-		{"http://httpbin.org/status/400", "", "400"},
-		{"http://httpbin.org/status/500", "", "500"},
-		// Make sure we return the body as well.
-		{"http://httpbin.org/status/418", "teapot", "418"},
-	}
-
-	for _, tc := range cases {
-		t.Run(fmt.Sprintf("%v", tc.in), func(t *testing.T) {
-			out, err := Fetch(tc.in)
-			if !ztest.ErrorContains(err, tc.wantErr) {
-				t.Errorf("wrong error\nout:  %#v\nwant: %#v\n", err, tc.wantErr)
-			}
-			if !strings.Contains(string(out), tc.want) {
-				t.Errorf("\nout:  %#v\nwant: %#v\n", string(out), tc.want)
-			}
-		})
-	}
-}
-
-// TODO: Add test.
-func TestSave(t *testing.T) {
 }

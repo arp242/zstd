@@ -14,7 +14,49 @@ import (
 	"time"
 
 	"zgo.at/zstd/zioutil"
+	"zgo.at/zstd/znet"
 )
+
+// SafeClient returns a HTTP client that is only allowed to connect on the given
+// ports to non-private addresses.
+//
+// This also sets the Timeout to 30 seconds, instead of the no timeout.
+//
+// See: https://www.agwa.name/blog/post/preventing_server_side_request_forgery_in_golang
+//
+// Also see SafeTransport() and znet.SafeDialer().
+func SafeClient() *http.Client {
+	return &http.Client{
+		Transport: SafeTransport(nil),
+
+		// Set a timeout too; this should be enough for most purposes.
+		Timeout: 30 * time.Second,
+	}
+
+}
+
+// SafeTransport returns a HTTP transport that is only allowed to connect on the
+// given ports to non-private addresses.
+//
+// Port 80 and 443 are used if the list is empty.
+//
+// Also see SafeClient() and znet.SafeDialer().
+func SafeTransport(ports []int) *http.Transport {
+	if len(ports) == 0 {
+		ports = []int{80, 443}
+	}
+	return &http.Transport{
+		DialContext: znet.SafeDialer([]string{"tcp4", "tcp6"}, ports).DialContext,
+
+		// Defaults from net/http.DefaultTransport
+		Proxy:                 http.ProxyFromEnvironment,
+		ForceAttemptHTTP2:     true,
+		MaxIdleConns:          100,
+		IdleConnTimeout:       90 * time.Second,
+		TLSHandshakeTimeout:   10 * time.Second,
+		ExpectContinueTimeout: 1 * time.Second,
+	}
+}
 
 // DumpBody reads the body of a HTTP request without consuming it, so it can be
 // read again later.
