@@ -37,8 +37,24 @@ import (
 	"time"
 )
 
+type DiffOpt int
+
+const (
+	// Normalize whitespace: remove all whitespace at the start and end of a
+	// line.
+	DiffNormalizeWhitespace DiffOpt = iota + 1
+)
+
 // Diff two strings and format as a unified diff.
-func Diff(out, want string) string {
+func Diff(out, want string, opt ...DiffOpt) string {
+	for _, o := range opt {
+		if o == DiffNormalizeWhitespace {
+			re := regexp.MustCompile(`(?m)(^\s+|\s+$)`)
+			out = re.ReplaceAllString(out, "")
+			want = re.ReplaceAllString(want, "")
+		}
+	}
+
 	diff := unifiedDiff{
 		A:       splitLines(strings.TrimSpace(out)),
 		B:       splitLines(strings.TrimSpace(want)),
