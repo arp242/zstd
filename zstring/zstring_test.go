@@ -7,6 +7,47 @@ import (
 	"testing"
 )
 
+func TestWordWrap(t *testing.T) {
+	tests := []struct {
+		n      int
+		prefix string
+		in     string
+		want   string
+	}{
+		{10, "",
+			"Hello",
+			"Hello"},
+		{3, "", "Hello",
+			"Hello"},
+
+		{10, "",
+			"Hello, world!",
+			"Hello,\nworld!"},
+		{10, "",
+			"Hello, world! it's a test",
+			"Hello,\nworld!\nit's a\ntest"},
+		{30, "",
+			"Click this link yo: https://github.com/zgoat/zstd/blob/master/README.md",
+			"Click this link yo:\nhttps://github.com/zgoat/zstd/blob/master/README.md"},
+
+		{10, "> ",
+			"> Hello, world! it's a test",
+			"> Hello,\n> world!\n> it's a\n> test"},
+		{10, "> ",
+			"> H€łłø, ωørłð¿ it’s a ţësţ",
+			"> H€łłø,\n> ωørłð¿\n> it’s a\n> ţësţ"},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			got := WordWrap(tt.in, tt.prefix, tt.n)
+			if got != tt.want {
+				t.Errorf("\ngot:\n%s\n\nwant:\n%s", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestTabWidth(t *testing.T) {
 	tests := []struct {
 		in   string

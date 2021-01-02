@@ -8,6 +8,7 @@ import (
 	"sort"
 	"strings"
 	"time"
+	"unicode"
 	"unicode/utf8"
 )
 
@@ -358,6 +359,57 @@ func IndexPairs(str, start, end string) [][]int {
 		r[i], r[opp] = r[opp], r[i]
 	}
 	return r
+}
+
+// WordWrap word wraps at n columns and prefixes subsequent lines with "prefix".
+//
+// Note the prefix is excluded from the length calculations; so if you want to
+// wrap at 80 with a prefix of "> ", then you should wrap at 78.
+func WordWrap(text, prefix string, n int) string {
+	l := TabWidth(text)
+	if l <= n {
+		return text
+	}
+
+	// TODO: should probably look at http://www.unicode.org/reports/tr29/
+	// But for now this will do.
+
+	var (
+		out  strings.Builder
+		line = make([]rune, 0, n)
+	)
+	for _, c := range text {
+		line = append(line, c)
+
+		if len(line) > 0 && len(line)%n == 0 {
+			next := make([]rune, 0, 8) // Remove part of the last word and carry over to next line.
+			for j := len(line) - 1; j >= 0; j-- {
+				if (unicode.IsSpace(line[j]) || line[j] == '-') && line[j] != 0x00a0 {
+					break
+				}
+				next = append(next, line[j])
+			}
+
+			if len(next) == n { // Word is longer than the wrap limit: just write it.
+				continue
+			}
+
+			for i, j := 0, len(next)-1; i < j; i, j = i+1, j-1 { // Reverse
+				next[i], next[j] = next[j], next[i]
+			}
+
+			out.WriteString(strings.TrimRight(string(line[:len(line)-len(next)]), " \t\n"))
+			out.WriteRune('\n')
+			out.WriteString(prefix)
+
+			line = append(make([]rune, 0, n), next...)
+		}
+	}
+
+	if len(line) > 0 {
+		out.WriteString(string(line))
+	}
+	return out.String()
 }
 
 // Tabwidth gets the display width of a string, taking tabs in to account.
