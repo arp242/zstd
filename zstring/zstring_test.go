@@ -5,9 +5,41 @@ import (
 	"reflect"
 	"strings"
 	"testing"
-
-	"zgo.at/zstd/ztest"
 )
+
+func TestTabWidth(t *testing.T) {
+	tests := []struct {
+		in   string
+		want int
+	}{
+		{"", 0},
+		{"a", 1},
+
+		// Tabs.
+		{"\t", 8},
+		{"\ta", 9},
+		{"a\t", 8},
+		{"aaaa\tx", 9},
+		{"aaaaaaa\tx", 9},
+
+		{"\t\t", 16},
+		{"a\ta\t", 16},
+		{"a\ta\ta", 17},
+
+		// Emojis.
+		// {"🧑\u200d🚒", 1},
+		// {"🧑🏽\u200d🚒", 1},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			got := TabWidth(tt.in)
+			if got != tt.want {
+				t.Errorf("\ngot:  %d\nwant: %d", got, tt.want)
+			}
+		})
+	}
+}
 
 func TestReverse(t *testing.T) {
 	tests := []struct {
@@ -98,8 +130,6 @@ func TestSub(t *testing.T) {
 }
 
 func TestElide(t *testing.T) {
-	ztest.MustInline(t, "zgo.at/zstd/zstring Left")
-
 	cases := []struct {
 		in         string
 		n          int
@@ -300,8 +330,6 @@ func TestChoose(t *testing.T) {
 }
 
 func TestFilter(t *testing.T) {
-	ztest.MustInline(t, "zgo.at/zstd/zstring FilterEmpty")
-
 	cases := []struct {
 		fun  func(string) bool
 		in   []string

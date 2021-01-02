@@ -359,3 +359,20 @@ func IndexPairs(str, start, end string) [][]int {
 	}
 	return r
 }
+
+// Tabwidth gets the display width of a string, taking tabs in to account.
+//
+// This does *not* handle various unicode aspects (i.e. graphmeme clusters,
+// display width).
+func TabWidth(s string) int {
+	l := utf8.RuneCountInString(s)
+	if strings.Index(s, "\t") == -1 {
+		return l
+	}
+
+	split := strings.Split(s, "\t")
+	for _, ss := range split[:len(split)-1] {
+		l += 7 - utf8.RuneCountInString(ss)
+	}
+	return l
+}
