@@ -2,12 +2,9 @@
 
 package zos
 
-import (
-	"os"
-	"syscall"
-)
+import "syscall"
 
 const (
-	SIGUSR1 os.Signal = syscall.SIGUSR1
-	SIGUSR2 os.Signal = syscall.SIGUSR2
+	SIGUSR1 = syscall.SIGUSR1
+	SIGUSR2 = syscall.SIGUSR2
 )
