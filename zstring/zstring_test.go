@@ -595,3 +595,27 @@ func TestSplit(t *testing.T) {
 		})
 	}
 }
+
+func TestIndexAll(t *testing.T) {
+	tests := []struct {
+		in, find string
+		want     []int
+	}{
+		{"", "", nil},
+		{"", ".", nil},
+		{".", "", nil},
+		{"a.b", ".", []int{1}},
+		{"a.b.", ".", []int{1, 3}},
+		{".a.b.", ".", []int{0, 2, 4}},
+		{".a.b.", "b.", []int{3}},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			got := IndexAll(tt.in, tt.find)
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("\ngot:  %#v\nwant: %#v", got, tt.want)
+			}
+		})
+	}
+}

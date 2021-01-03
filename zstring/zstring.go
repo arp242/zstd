@@ -327,6 +327,26 @@ func From(s string, sep string) string {
 	return s[i+len(sep):]
 }
 
+// IndexAll finds all occurences of the string "find".
+func IndexAll(s, find string) []int {
+	if s == "" || find == "" {
+		return nil
+	}
+	var (
+		found = make([]int, 0, 2)
+		pos   int
+	)
+	for {
+		p := strings.Index(s[pos:], find)
+		if p == -1 {
+			break
+		}
+		found = append(found, pos+p)
+		pos += p + 1
+	}
+	return found
+}
+
 // IndexPairs finds the position of all start/end pairs.
 //
 // Nested pairs are not supported.
