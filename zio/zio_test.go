@@ -1,9 +1,8 @@
-package zioutil
+package zio
 
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"strings"
 	"testing"
@@ -15,11 +14,11 @@ func TestDumpReader(t *testing.T) {
 		want string
 	}{
 		{
-			ioutil.NopCloser(strings.NewReader("Hello")),
+			io.NopCloser(strings.NewReader("Hello")),
 			"Hello",
 		},
 		{
-			ioutil.NopCloser(strings.NewReader("لوحة المفاتيح العربية")),
+			io.NopCloser(strings.NewReader("لوحة المفاتيح العربية")),
 			"لوحة المفاتيح العربية",
 		},
 		{
@@ -49,7 +48,7 @@ func TestDumpReader(t *testing.T) {
 }
 
 func mustRead(t *testing.T, r io.Reader) string {
-	out, err := ioutil.ReadAll(r)
+	out, err := io.ReadAll(r)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -62,7 +61,7 @@ func TestExists(t *testing.T) {
 		want bool
 	}{
 		{".", true},               // Dir
-		{"zioutil_test.go", true}, // File
+		{"zio.go", true},          // File
 		{"/dev/null", true},       // Device
 		{"/proc/1/environ", true}, // Not readable
 		{"/etc/localtime", true},  // Symlink

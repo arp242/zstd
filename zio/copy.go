@@ -1,4 +1,4 @@
-package zioutil
+package zio
 
 // Note that these functions may not be portable to all systems. Specifically,
 // none of this is tested on Windows.
@@ -8,7 +8,7 @@ package zioutil
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"time"
@@ -263,7 +263,7 @@ type CopyTreeOptions struct {
 	Symlinks               bool
 	IgnoreDanglingSymlinks bool
 	CopyFunction           func(string, string, Modes) error
-	Ignore                 func(string, []os.FileInfo) []string
+	Ignore                 func(string, []fs.DirEntry) []string
 }
 
 // DefaultCopyTreeOptions is used when the options to CopyTree() is nil.
@@ -289,7 +289,7 @@ var DefaultCopyTreeOptions = &CopyTreeOptions{
 //
 // The optional ignore argument is a callable. If given, it is called with the
 // `src` parameter, which is the directory being visited by CopyTree(), and
-// `names` which is the list of `src` contents, as returned by ioutil.ReadDir():
+// `names` which is the list of `src` contents, as returned by os.ReadDir():
 //
 //   callable(src, entries) -> ignoredNames
 //
@@ -319,7 +319,7 @@ func CopyTree(src, dst string, options *CopyTreeOptions) error {
 		return &ErrExists{dst}
 	}
 
-	entries, err := ioutil.ReadDir(src)
+	entries, err := os.ReadDir(src)
 	if err != nil {
 		return fmt.Errorf("CopyTree: %w", err)
 	}

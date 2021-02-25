@@ -1,4 +1,4 @@
-package zioutil
+package zio
 
 import "os"
 

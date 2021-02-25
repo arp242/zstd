@@ -3,7 +3,7 @@ package zcrypto
 import "testing"
 
 func TestHashFile(t *testing.T) {
-	f := "../zioutil/testdata/file1"
+	f := "../zio/testdata/file1"
 
 	hash, err := HashFile(f)
 	if err != nil {

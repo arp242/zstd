@@ -1,6 +1,6 @@
 // +build darwin dragonfly freebsd linux nacl netbsd openbsd solaris
 
-package zioutil
+package zio
 
 import (
 	"errors"

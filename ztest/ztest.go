@@ -3,7 +3,6 @@ package ztest
 
 import (
 	"bytes"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -31,7 +30,7 @@ func Read(t *testing.T, paths ...string) []byte {
 	t.Helper()
 
 	path := filepath.Join(paths...)
-	file, err := ioutil.ReadFile(path)
+	file, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatalf("cannot read %v: %v", path, err)
 	}
@@ -46,7 +45,7 @@ func Read(t *testing.T, paths ...string) []byte {
 func TempFile(t *testing.T, data string) (string, func()) {
 	t.Helper()
 
-	fp, err := ioutil.TempFile(os.TempDir(), "gotest")
+	fp, err := os.CreateTemp(os.TempDir(), "gotest")
 	if err != nil {
 		t.Fatalf("test.TempFile: could not create file in %v: %v", os.TempDir(), err)
 	}

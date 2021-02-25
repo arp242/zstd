@@ -1,8 +1,8 @@
-package zioutil
+package zio
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
@@ -251,12 +251,12 @@ func clean(t *testing.T, n string) {
 }
 
 func filesMatch(t *testing.T, src, dst string) {
-	srcContents, err := ioutil.ReadFile(src)
+	srcContents, err := os.ReadFile(src)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	dstContents, err := ioutil.ReadFile(dst)
+	dstContents, err := os.ReadFile(dst)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -313,7 +313,7 @@ func TestCopyTree(t *testing.T) {
 
 	err := CopyTree("testdata", "test_copytree", &CopyTreeOptions{
 		Symlinks: false,
-		Ignore: func(path string, fi []os.FileInfo) []string {
+		Ignore: func(path string, fi []fs.DirEntry) []string {
 			return []string{"fifo"}
 		},
 		CopyFunction:           Copy,

@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/http/httputil"
 	"os"
@@ -13,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"zgo.at/zstd/zioutil"
+	"zgo.at/zstd/zio"
 	"zgo.at/zstd/znet"
 )
 
@@ -72,7 +71,7 @@ func DumpBody(r *http.Request, maxSize int64) ([]byte, error) {
 		return nil, nil
 	}
 
-	save, body, err := zioutil.DumpReader(r.Body)
+	save, body, err := zio.DumpReader(r.Body)
 	if err != nil {
 		return nil, err
 	}
@@ -129,7 +128,7 @@ func Fetch(url string) ([]byte, error) {
 
 	// TODO: Maybe add sanity check to bail out of the Content-Length is very
 	// large?
-	data, err := ioutil.ReadAll(response.Body)
+	data, err := io.ReadAll(response.Body)
 	if err != nil {
 		return nil, fmt.Errorf("cannot read body of %q: %w", url, err)
 	}

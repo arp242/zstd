@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -176,7 +175,7 @@ func TestDumpBody(t *testing.T) {
 				}
 				switch b := tt.Body.(type) {
 				case []byte:
-					tt.Req.Body = ioutil.NopCloser(bytes.NewReader(b))
+					tt.Req.Body = io.NopCloser(bytes.NewReader(b))
 				case func() io.ReadCloser:
 					tt.Req.Body = b()
 				default:
