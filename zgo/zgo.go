@@ -16,6 +16,35 @@ import (
 	"strings"
 )
 
+// ModuleRoot gets the full path to the module root directory.
+//
+// Returns empty string if it can't find a module.
+func ModuleRoot() string {
+	dir, err := os.Getwd()
+	if err != nil {
+		return ""
+	}
+	dir, err = filepath.Abs(dir)
+	if err != nil {
+		return ""
+	}
+
+	pdir := dir
+	for {
+		if _, err := os.Stat(filepath.Join(dir, "go.mod")); err == nil {
+			return dir
+		}
+		pdir = dir
+		dir = filepath.Dir(dir)
+
+		if dir == pdir {
+			break
+		}
+
+	}
+	return ""
+}
+
 // Expand a list of package and/or directory names to Go package names.
 //
 //  - "./example" is expanded to "full/package/path/example".

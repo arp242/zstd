@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"go/build"
 	"go/token"
+	"os"
 	"reflect"
 	"sort"
 	"strings"
@@ -12,6 +13,19 @@ import (
 
 	"zgo.at/zstd/ztest"
 )
+
+func TestModuleRoot(t *testing.T) {
+	if r := ModuleRoot(); r != "/home/martin/code/zstd" {
+		t.Error(r)
+	}
+
+	wd, _ := os.Getwd()
+	defer os.Chdir(wd)
+	os.Chdir("/etc")
+	if r := ModuleRoot(); r != "" {
+		t.Error(r)
+	}
+}
 
 // This also tests ResolvePackage() and ResolveWildcard().
 func TestExpand(t *testing.T) {
