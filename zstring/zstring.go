@@ -448,3 +448,59 @@ func TabWidth(s string) int {
 	}
 	return l
 }
+
+// HasSuffixes tests whether the string s ends with any of the suffixes.
+//
+// Identical to:
+//
+//   strings.HasSuffix(s, "one") || strings.HasSuffix(s, "two")
+func HasSuffixes(s string, suffixes ...string) bool {
+	for _, suf := range suffixes {
+		h := strings.HasSuffix(s, suf)
+		if h {
+			return true
+		}
+	}
+	return false
+}
+
+// HasPrefixes tests whether the string s starts with any of the prefixes.
+//
+// Identical to:
+//
+//   strings.HasPrefix(s, "one") || strings.HasPrefix(s, "two")
+func HasPrefixes(s string, prefixes ...string) bool {
+	for _, pre := range prefixes {
+		h := strings.HasPrefix(s, pre)
+		if h {
+			return true
+		}
+	}
+	return false
+}
+
+// TrimSuffixes returns s without the provided trailing suffixes strings.
+//
+// Identical to:
+//
+//   s = strings.TrimSuffix(s, "one")
+//   s = strings.TrimSuffix(s, "two")
+func TrimSuffixes(s string, suffixes ...string) string {
+	for _, suf := range suffixes {
+		s = strings.TrimSuffix(s, suf)
+	}
+	return s
+}
+
+// TrimPrefixes returns s without the provided leading prefixes strings.
+//
+// Identical to:
+//
+//   s = strings.TrimPrefix(s, "one")
+//   s = strings.TrimPrefix(s, "two")
+func TrimPrefixes(s string, prefixes ...string) string {
+	for _, pre := range prefixes {
+		s = strings.TrimPrefix(s, pre)
+	}
+	return s
+}
