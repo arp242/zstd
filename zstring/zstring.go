@@ -174,6 +174,16 @@ func Contains(list []string, str string) bool {
 	return false
 }
 
+// ContainsAny reports whether any of the strings are in the list
+func ContainsAny(list []string, strs ...string) bool {
+	for _, s := range strs {
+		if Contains(list, s) {
+			return true
+		}
+	}
+	return false
+}
+
 // Repeat returns a slice with the string s repeated n times.
 func Repeat(s string, n int) (r []string) {
 	for i := 0; i < n; i++ {

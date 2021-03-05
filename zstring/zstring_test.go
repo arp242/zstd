@@ -350,6 +350,30 @@ func TestContains(t *testing.T) {
 	}
 }
 
+func TestContainsAny(t *testing.T) {
+	tests := []struct {
+		list []string
+		find []string
+		want bool
+	}{
+		{[]string{"hello"}, []string{"hello"}, true},
+		{[]string{"hello"}, []string{"hell"}, false},
+		{[]string{"hello", "world", "test"}, []string{"world"}, true},
+		{[]string{"hello", "world", "test"}, []string{""}, false},
+		{[]string{"hello", "world", "test"}, []string{"asd", "asd", "test"}, true},
+		{[]string{}, []string{""}, false},
+	}
+
+	for i, tt := range tests {
+		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
+			got := ContainsAny(tt.list, tt.find...)
+			if got != tt.want {
+				t.Errorf("want: %#v\ngot:  %#v", tt.want, got)
+			}
+		})
+	}
+}
+
 func TestChoose(t *testing.T) {
 	tests := []struct {
 		in   []string
