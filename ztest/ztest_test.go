@@ -12,19 +12,19 @@ func TestReplace(t *testing.T) {
 		patt     []string
 	}{
 		{
-			"Time: 4.12361 ms", "AAA",
+			"Time: 4.12361 ms", "XXX",
 			[]string{`Time: [0-9.]+ ms`},
 		},
 		{
-			"Time: 4.12361 ms", "Time: AAA ms",
+			"Time: 4.12361 ms", "Time: XXX ms",
 			[]string{`Time: ([0-9.]+) ms`},
 		},
 		{
-			"Time: 4.12361 ms", "Time: AAA.BBB ms",
+			"Time: 4.12361 ms", "Time: XXX.XXX ms",
 			[]string{`Time: ([0-9]+)\.([0-9]+) ms`},
 		},
 		{
-			"Time: 4.12361 ms", "Time: AAA.BBB CC",
+			"Time: 4.12361 ms", "Time: XXX.XXX XX",
 			[]string{`Time: ([0-9]+)\.([0-9]+) ms`, `ms`},
 		},
 		{
@@ -36,11 +36,11 @@ Planning Time: 0.026 ms
 Execution Time: 0.055 ms
 `,
 			`
-Seq Scan on tbl  (cost=AAA..BBB rows=6 width=36) (actual time=CCC..DDD rows=1 loops=1)
+Seq Scan on tbl  (cost=XXX..XXX rows=6 width=36) (actual time=XXX..XXX rows=1 loops=1)
   Filter: ((col1)::text = 'hello'::text)
   Rows Removed by Filter: 1
-Planning Time: EEE ms
-Execution Time: FFF ms
+Planning Time: XXX ms
+Execution Time: XXX ms
 `, []string{`([0-9]+.[0-9]+) ms`, `(?:cost|time)=([0-9.]+)\.\.([0-9.]+) `},
 		},
 	}

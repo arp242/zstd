@@ -10,8 +10,6 @@ import (
 	"sort"
 	"strings"
 	"testing"
-
-	"zgo.at/zstd/zint"
 )
 
 // ErrorContains checks if the error message in out contains the text in
@@ -28,8 +26,6 @@ func ErrorContains(out error, want string) bool {
 	}
 	return strings.Contains(out.Error(), want)
 }
-
-const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYz"
 
 // Replace pieces of text with a placeholder string.
 //
@@ -75,18 +71,12 @@ func Replace(s string, patt ...string) string {
 	}
 
 	sort.Slice(where, func(i, j int) bool { return where[i].start > where[j].start })
-	charidx := zint.MinInt(len(where), len(chars)) - 1
 	for _, w := range where {
 		l := 3
 		if !w.varWidth {
 			l = w.end - w.start
 		}
-
-		s = s[:w.start] + strings.Repeat(string(chars[charidx]), l) + s[w.end:]
-		charidx--
-		if charidx < 0 {
-			charidx = len(chars) - 1
-		}
+		s = s[:w.start] + strings.Repeat("X", l) + s[w.end:]
 	}
 	return s
 }
