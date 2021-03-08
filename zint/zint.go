@@ -121,6 +121,22 @@ func Max(a, b int64) int64 {
 	return a
 }
 
+// MinInt gets the lowest of two numbers.
+func MinInt(a, b int) int {
+	if a > b {
+		return b
+	}
+	return a
+}
+
+// MaxInt gets the highest of two numbers.
+func MaxInt(a, b int) int {
+	if a < b {
+		return b
+	}
+	return a
+}
+
 // NonZero returns the first argument that is not 0. It will return 0 if all
 // arguments are 0.
 func NonZero(a, b int64, c ...int64) int64 {

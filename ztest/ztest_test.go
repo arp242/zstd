@@ -12,24 +12,46 @@ func TestReplace(t *testing.T) {
 		patt     []string
 	}{
 		{
-			"Time: 4.12361 ms", "AAAAAAAAAAAAAAAA",
+			"Time: 4.12361 ms", "AAA",
 			[]string{`Time: [0-9.]+ ms`},
 		},
 		{
-			"Time: 4.12361 ms", "Time: AAAAAAA ms",
+			"Time: 4.12361 ms", "Time: AAA ms",
 			[]string{`Time: ([0-9.]+) ms`},
 		},
 		{
-			"Time: 4.12361 ms", "Time: A.BBBBB CC",
+			"Time: 4.12361 ms", "Time: AAA.BBB ms",
+			[]string{`Time: ([0-9]+)\.([0-9]+) ms`},
+		},
+		{
+			"Time: 4.12361 ms", "Time: AAA.BBB CC",
 			[]string{`Time: ([0-9]+)\.([0-9]+) ms`, `ms`},
+		},
+		{
+			`
+Seq Scan on tbl  (cost=0.00..25.88 rows=6 width=36) (actual time=0.007..0.014 rows=1 loops=1)
+  Filter: ((col1)::text = 'hello'::text)
+  Rows Removed by Filter: 1
+Planning Time: 0.026 ms
+Execution Time: 0.055 ms
+`,
+			`
+Seq Scan on tbl  (cost=AAA..BBB rows=6 width=36) (actual time=CCC..DDD rows=1 loops=1)
+  Filter: ((col1)::text = 'hello'::text)
+  Rows Removed by Filter: 1
+Planning Time: EEE ms
+Execution Time: FFF ms
+`, []string{`([0-9]+.[0-9]+) ms`, `(?:cost|time)=([0-9.]+)\.\.([0-9.]+) `},
 		},
 	}
 
 	for _, tt := range tests {
-		got := Replace(tt.in, tt.patt...)
-		if got != tt.want {
-			t.Errorf("\ngot:  %q\nwant: %q", got, tt.want)
-		}
+		t.Run("", func(t *testing.T) {
+			got := Replace(tt.in, tt.patt...)
+			if got != tt.want {
+				t.Errorf("\ngot:  %s\nwant: %s", got, tt.want)
+			}
+		})
 	}
 
 }

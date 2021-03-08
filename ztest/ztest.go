@@ -7,8 +7,11 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strings"
 	"testing"
+
+	"zgo.at/zstd/zint"
 )
 
 // ErrorContains checks if the error message in out contains the text in
@@ -33,27 +36,56 @@ const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYz"
 // This is use to test output which isn't stable, for example because it
 // contains times:
 //
-//   ztest.Replace("Time: 123s", `Time: (\d+) s`)
+//   ztest.Replace("Time: 1161 seconds", `Time: (\d+) s`)
 //
-// Will result in "Time: AAAs".
+// Will result in "Time: AAAA seconds".
+//
+// The number of replacement characters is equal to the input, unless the
+// pattern contains "+" or "*" in which case it's always replaced by three
+// characters.
 func Replace(s string, patt ...string) string {
-	var charidx int
+	type x struct {
+		start, end int
+		varWidth   bool
+	}
+	var where []x
+
+	// Collect what to replace first so we can order things sensibly from A → B
+	// → C → D, etc.
 	for _, p := range patt {
-		re := regexp.MustCompile(p)
-		for _, m := range re.FindAllStringSubmatchIndex(s, -1) {
+		varWidth := false
+		if i := strings.IndexAny(p, "+*"); i >= 0 {
+			varWidth = i == 0 || p[i-1] != '\\'
+		}
+
+		for _, m := range regexp.MustCompile(p).FindAllStringSubmatchIndex(s, -1) {
 			off := 2
-			if len(m) == 2 { // No groups, replace everything with XXXX.
+			if len(m) == 2 { // No groups, replace everything.
 				off = 0
 			}
 
 			for i := off; len(m) > i; i += 2 {
-				start, end := m[i], m[i+1]
-				s = s[:start] + strings.Repeat(string(chars[charidx]), end-start) + s[end:]
-				charidx++
-				if charidx > len(chars) {
-					charidx = 0
-				}
+				where = append(where, x{
+					start:    m[i],
+					end:      m[i+1],
+					varWidth: varWidth,
+				})
 			}
+		}
+	}
+
+	sort.Slice(where, func(i, j int) bool { return where[i].start > where[j].start })
+	charidx := zint.MinInt(len(where), len(chars)) - 1
+	for _, w := range where {
+		l := 3
+		if !w.varWidth {
+			l = w.end - w.start
+		}
+
+		s = s[:w.start] + strings.Repeat(string(chars[charidx]), l) + s[w.end:]
+		charidx--
+		if charidx < 0 {
+			charidx = len(chars) - 1
 		}
 	}
 	return s
