@@ -32,23 +32,20 @@ var (
 	DefaultContentType = "application/json"
 )
 
-// NewRequest returns a new incoming server Request, suitable for passing to an
-// echo.HandlerFunc for testing.
+// NewRequest creates a new request with some sensible defaults set.
 func NewRequest(method, target string, body io.Reader) *http.Request {
-	req := httptest.NewRequest(method, target, body)
-
-	if req.Host == "" || req.Host == "example.com" {
-		req.Host = DefaultHost
+	r := httptest.NewRequest(method, target, body)
+	if r.Host == "" || r.Host == "example.com" {
+		r.Host = DefaultHost
 	}
-	if req.Header.Get("Content-Type") == "" {
-		req.Header.Set("Content-Type", DefaultContentType)
+	if r.Header.Get("Content-Type") == "" {
+		r.Header.Set("Content-Type", DefaultContentType)
 	}
-
-	return req
+	return r
 }
 
-// Body returns the JSON representation of the passed in argument as an
-// io.Reader. This is useful for creating a request body. For example:
+// Body returns the JSON representation as an io.Reader. This is useful for
+// creating a request body. For example:
 //
 //   NewRequest("POST", "/", ztest.Body(someStruct{
 //       Foo: "bar",
@@ -61,33 +58,32 @@ func Body(a interface{}) *bytes.Reader {
 	return bytes.NewReader(j)
 }
 
-// HTTP sets up a HTTP test. A GET request will be made for you if req is nil.
+// HTTP sets up a HTTP test. A GET request will be made if r is nil.
 //
 // For example:
 //
-//     rr := test.HTTP(t, nil, MyHandler)
+//   rr := ztest.HTTP(t, nil, MyHandler)
 //
 // Or for a POST request:
 //
-//     req, err := http.NewRequest("POST", "/v1/email", b)
-//     if err != nil {
-//     	t.Fatalf("cannot make request: %v", err)
-//     }
-//     req.Header.Set("Content-Type", ct)
-//     rr := test.HTTP(t, req, MyHandler)
-func HTTP(t *testing.T, req *http.Request, h http.Handler) *httptest.ResponseRecorder {
+//   r, err := zhttp.NewRequest("POST", "/v1/email", nil)
+//   if err != nil {
+//       t.Fatal(err)
+//   }
+//   rr := ztest.HTTP(t, r, MyHandler)
+func HTTP(t *testing.T, r *http.Request, h http.Handler) *httptest.ResponseRecorder {
 	t.Helper()
 
 	rr := httptest.NewRecorder()
-	if req == nil {
+	if r == nil {
 		var err error
-		req, err = http.NewRequest("GET", "", nil)
+		r, err = http.NewRequest("GET", "", nil)
 		if err != nil {
 			t.Fatalf("cannot make request: %v", err)
 		}
 	}
 
-	h.ServeHTTP(rr, req)
+	h.ServeHTTP(rr, r)
 	return rr
 }
 
@@ -98,7 +94,7 @@ func HTTP(t *testing.T, req *http.Request, h http.Handler) *httptest.ResponseRec
 //
 // Don't forget to set the Content-Type from the return value:
 //
-//   req.Header.Set("Content-Type", contentType)
+//   r.Header.Set("Content-Type", contentType)
 func MultipartForm(params ...map[string]string) (b *bytes.Buffer, contentType string, err error) {
 	b = &bytes.Buffer{}
 	w := multipart.NewWriter(b)

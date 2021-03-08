@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"testing"
 )
@@ -25,6 +26,39 @@ func ErrorContains(out error, want string) bool {
 	return strings.Contains(out.Error(), want)
 }
 
+const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYz"
+
+// Replace pieces of text with a placeholder string.
+//
+// This is use to test output which isn't stable, for example because it
+// contains times:
+//
+//   ztest.Replace("Time: 123s", `Time: (\d+) s`)
+//
+// Will result in "Time: AAAs".
+func Replace(s string, patt ...string) string {
+	var charidx int
+	for _, p := range patt {
+		re := regexp.MustCompile(p)
+		for _, m := range re.FindAllStringSubmatchIndex(s, -1) {
+			off := 2
+			if len(m) == 2 { // No groups, replace everything with XXXX.
+				off = 0
+			}
+
+			for i := off; len(m) > i; i += 2 {
+				start, end := m[i], m[i+1]
+				s = s[:start] + strings.Repeat(string(chars[charidx]), end-start) + s[end:]
+				charidx++
+				if charidx > len(chars) {
+					charidx = 0
+				}
+			}
+		}
+	}
+	return s
+}
+
 // Read data from a file.
 func Read(t *testing.T, paths ...string) []byte {
 	t.Helper()
@@ -32,42 +66,41 @@ func Read(t *testing.T, paths ...string) []byte {
 	path := filepath.Join(paths...)
 	file, err := os.ReadFile(path)
 	if err != nil {
-		t.Fatalf("cannot read %v: %v", path, err)
+		t.Fatalf("ztest.Read: cannot read %v: %v", path, err)
 	}
 	return file
 }
 
-// TempFile creates a new temporary file and returns the path and a clean
-// function to remove it.
-//
-//  f, clean := TempFile("some\ndata")
-//  defer clean()
-func TempFile(t *testing.T, data string) (string, func()) {
+// TempFile creates a new temporary file and returns the path.
+func TempFile(t *testing.T, data string) string {
 	t.Helper()
 
-	fp, err := os.CreateTemp(os.TempDir(), "gotest")
+	tmpdir := t.TempDir()
+	fp, err := os.CreateTemp(tmpdir, "ztest.*")
 	if err != nil {
-		t.Fatalf("test.TempFile: could not create file in %v: %v", os.TempDir(), err)
+		t.Fatalf("ztest.TempFile: could not create file in %v: %v", tmpdir, err)
 	}
 
 	defer func() {
 		err := fp.Close()
 		if err != nil {
-			t.Fatalf("test.TempFile: close: %v", err)
+			t.Fatalf("ztest.TempFile: close: %v", err)
 		}
 	}()
 
 	_, err = fp.WriteString(data)
 	if err != nil {
-		t.Fatalf("test.TempFile: write: %v", err)
+		t.Fatalf("ztest.TempFile: write: %v", err)
 	}
 
-	return fp.Name(), func() {
+	t.Cleanup(func() {
 		err := os.Remove(fp.Name())
 		if err != nil {
-			t.Errorf("test.TempFile: cannot remove %#v: %v", fp.Name(), err)
+			t.Errorf("ztest.TempFile: cannot remove %#v: %v", fp.Name(), err)
 		}
-	}
+	})
+
+	return fp.Name()
 }
 
 // NormalizeIndent removes tab indentation from every line.

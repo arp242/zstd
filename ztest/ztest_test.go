@@ -2,16 +2,43 @@ package ztest
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"testing"
 )
 
+func TestReplace(t *testing.T) {
+	tests := []struct {
+		in, want string
+		patt     []string
+	}{
+		{
+			"Time: 4.12361 ms", "AAAAAAAAAAAAAAAA",
+			[]string{`Time: [0-9.]+ ms`},
+		},
+		{
+			"Time: 4.12361 ms", "Time: AAAAAAA ms",
+			[]string{`Time: ([0-9.]+) ms`},
+		},
+		{
+			"Time: 4.12361 ms", "Time: A.BBBBB CC",
+			[]string{`Time: ([0-9]+)\.([0-9]+) ms`, `ms`},
+		},
+	}
+
+	for _, tt := range tests {
+		got := Replace(tt.in, tt.patt...)
+		if got != tt.want {
+			t.Errorf("\ngot:  %q\nwant: %q", got, tt.want)
+		}
+	}
+
+}
+
 func TestErrorContains(t *testing.T) {
-	cases := []struct {
-		err      error
-		str      string
-		expected bool
+	tests := []struct {
+		err  error
+		str  string
+		want bool
 	}{
 		{errors.New("Hello"), "Hello", true},
 		{errors.New("Hello, world"), "world", true},
@@ -22,34 +49,34 @@ func TestErrorContains(t *testing.T) {
 		{nil, "hello", false},
 	}
 
-	for _, tc := range cases {
-		t.Run(fmt.Sprintf("%v", tc.err), func(t *testing.T) {
-			out := ErrorContains(tc.err, tc.str)
-			if out != tc.expected {
-				t.Errorf("\nout:      %#v\nexpected: %#v\n", out, tc.expected)
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			out := ErrorContains(tt.err, tt.str)
+			if out != tt.want {
+				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tt.want)
 			}
 		})
 	}
 }
 
 func TestTempFile(t *testing.T) {
-	f, clean := TempFile(t, "hello\nworld")
+	var f string
+	t.Run("", func(t *testing.T) {
+		f = TempFile(t, "hello\nworld")
+		_, err := os.Stat(f)
+		if err != nil {
+			t.Fatalf("stat failed: %s", err)
+		}
+	})
 
 	_, err := os.Stat(f)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	clean()
-
-	_, err = os.Stat(f)
 	if err == nil {
-		t.Fatal(err)
+		t.Fatalf("stat didn't report any error, but the file should be gone")
 	}
 }
 
 func TestNormalizeIndent(t *testing.T) {
-	cases := []struct {
+	tests := []struct {
 		in, want string
 	}{
 		{
@@ -74,11 +101,11 @@ func TestNormalizeIndent(t *testing.T) {
 		},
 	}
 
-	for i, tc := range cases {
-		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
-			out := NormalizeIndent(tc.in)
-			if out != tc.want {
-				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			out := NormalizeIndent(tt.in)
+			if out != tt.want {
+				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tt.want)
 			}
 		})
 	}

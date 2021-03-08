@@ -40,7 +40,7 @@ import (
 type DiffOpt int
 
 const (
-	// Normalize whitespace: remove all whitespace at the start and end of a
+	// Normalize whitespace: remove all whitespace at the start and end of every
 	// line.
 	DiffNormalizeWhitespace DiffOpt = iota + 1
 )
@@ -55,13 +55,11 @@ func Diff(out, want string, opt ...DiffOpt) string {
 		}
 	}
 
-	diff := unifiedDiff{
+	d := makeUnifiedDiff(unifiedDiff{
 		A:       splitLines(strings.TrimSpace(out)),
 		B:       splitLines(strings.TrimSpace(want)),
 		Context: 3,
-	}
-
-	d := makeUnifiedDiff(diff)
+	})
 	if len(d) == 0 {
 		return ""
 	}
