@@ -3,8 +3,45 @@ package zdebug
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"runtime"
+	"strconv"
+
+	"zgo.at/zstd/zstring"
 )
+
+// PrintStack prints a stack trace to stderr.
+//
+// Unlike debug.PrintStack() the output is much more concise: every frame is a
+// single line with the package/function name and file location printed in
+// aligned columns.
+func PrintStack() {
+	var (
+		pc     = make([]uintptr, 50)
+		n      = runtime.Callers(2, pc)
+		frames = runtime.CallersFrames(pc[:n])
+
+		rows  = make([][]interface{}, 0, len(pc))
+		width = 0
+	)
+	for f, more := frames.Next(); more; f, more = frames.Next() {
+		if zstring.Contains([]string{"runtime.goexit", "testing.tRunner"}, f.Function) {
+			continue
+		}
+
+		loc := filepath.Base(f.File) + ":" + strconv.Itoa(f.Line)
+		if len(loc) > width {
+			width = len(loc)
+		}
+		rows = append(rows, []interface{}{loc, f.Function})
+	}
+
+	f := fmt.Sprintf("\t%%-%ds   %%s\n", width)
+	for _, r := range rows {
+		fmt.Fprintf(os.Stderr, f, r...)
+	}
+}
 
 // Loc gets a location in the stack trace.
 //
