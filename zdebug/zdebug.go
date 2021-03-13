@@ -2,6 +2,7 @@
 package zdebug
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -11,12 +12,12 @@ import (
 	"zgo.at/zstd/zstring"
 )
 
-// PrintStack prints a stack trace to stderr.
+// Stack gets a stack trace.
 //
-// Unlike debug.PrintStack() the output is much more concise: every frame is a
-// single line with the package/function name and file location printed in
-// aligned columns.
-func PrintStack() {
+// Unlike debug.Stack() the output is much more concise: every frame is a single
+// line with the package/function name and file location printed in aligned
+// columns.
+func Stack() []byte {
 	var (
 		pc     = make([]uintptr, 50)
 		n      = runtime.Callers(2, pc)
@@ -37,10 +38,21 @@ func PrintStack() {
 		rows = append(rows, []interface{}{loc, f.Function})
 	}
 
+	buf := new(bytes.Buffer)
 	f := fmt.Sprintf("\t%%-%ds   %%s\n", width)
 	for _, r := range rows {
-		fmt.Fprintf(os.Stderr, f, r...)
+		fmt.Fprintf(buf, f, r...)
 	}
+	return buf.Bytes()
+}
+
+// PrintStack prints a stack trace to stderr.
+//
+// Unlike debug.PrintStack() the output is much more concise: every frame is a
+// single line with the package/function name and file location printed in
+// aligned columns.
+func PrintStack() {
+	fmt.Fprint(os.Stderr, string(Stack()))
 }
 
 // Loc gets a location in the stack trace.
