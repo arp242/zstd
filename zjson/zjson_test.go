@@ -32,6 +32,15 @@ func TestTimestamp(t *testing.T) {
 	if err == nil {
 		t.Errorf("no error on NaN")
 	}
+
+	var zero ts
+	err = json.Unmarshal([]byte(`{"ts": 0}`), &zero)
+	if err != nil {
+		t.Error(err)
+	}
+	if !zero.TS.IsZero() {
+		t.Errorf("not zero: %#v", x)
+	}
 }
 
 func TestMustMarshal(t *testing.T) {

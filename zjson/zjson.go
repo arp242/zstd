@@ -22,7 +22,10 @@ func (t *Timestamp) UnmarshalJSON(v []byte) error {
 	if err != nil {
 		return err
 	}
-	t.Time = time.Unix(n, 0).UTC()
+	t.Time = time.Time{}
+	if n > 0 { // Make sure that IsZero() works.
+		t.Time = time.Unix(n, 0).UTC()
+	}
 	return nil
 }
 
