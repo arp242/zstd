@@ -18,11 +18,17 @@ func (t Timestamp) MarshalJSON() ([]byte, error) {
 
 // Unmarshal a Unix timestamp as a date.
 func (t *Timestamp) UnmarshalJSON(v []byte) error {
-	n, err := strconv.ParseInt(string(v), 10, 64)
-	if err != nil {
-		return err
-	}
 	t.Time = time.Time{}
+
+	vv := string(v)
+	if vv == "null" || vv == "undefined" || vv == "" || vv == "0" {
+		return nil
+	}
+
+	n, err := strconv.ParseInt(vv, 10, 64)
+	if err != nil {
+		return fmt.Errorf("Timestamp.UnmarshalJSON %q: %w", string(v), err)
+	}
 	if n > 0 { // Make sure that IsZero() works.
 		t.Time = time.Unix(n, 0).UTC()
 	}
