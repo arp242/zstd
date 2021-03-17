@@ -76,6 +76,8 @@ func TestPrivateIP(t *testing.T) {
 		// IPv4 mapped address.
 		{"::ffff:169.254.169.254", true},
 		{"::ffff:8.8.8.8", false},
+
+		{"2003:eb:bf46:b825:d038:4073:30f1:770d", false},
 	}
 
 	for _, tt := range tests {

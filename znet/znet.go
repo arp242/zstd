@@ -38,14 +38,17 @@ func setupPrivateCIDR() {
 		"240.0.0.0/4",     // Reserved (includes broadcast / 255.255.255.255); RFC 3232
 
 		//"::/0",          // Default route
-		"::/128",        // Unspecified address
-		"::1/128",       // Loopback
-		"2000::/3",      // Unicast
-		"2001:db8::/32", // Documentations and examples; RFC3849
-		"2002::/16",     // IPv6 to IPv4 relay; RFC7626
-		"fc00::/7",      // Unique local address IPv6; RFC4193
-		"fe80::/10",     // link local address
-		"ff00::/8",      // Multicast
+		"::/128",  // Unspecified address
+		"::1/128", // Loopback
+
+		"fc00::/7",  // Unique local address IPv6; RFC4193
+		"fe80::/10", // link local address
+		"ff00::/8",  // Multicast
+
+		// TODO: these cause wrong matches; I need to look in to this.
+		//"2000::/3", // Unicast
+		// "2001:db8::/32", // Documentations and examples; RFC3849
+		//"2002::/16", // IPv6 to IPv4 relay; RFC7626
 	}
 
 	privateCIDR = make([]*net.IPNet, 0, len(blocks))
