@@ -97,8 +97,10 @@ func IsSameFile(src string, dst string) error {
 	return nil
 }
 
-// IsSpecialFile reports if this file is a special file such as a named pipe,
-// device file, or socket. If so it will return a ErrSpecialFile.
+// IsSpecialFile reports if this file is a special file.
+//
+// For example a named pipe, device file, or socket. If so it will return a
+// ErrSpecialFile.
 func IsSpecialFile(fi os.FileInfo) error {
 	if (fi.Mode()&os.ModeDevice) == os.ModeDevice ||
 		(fi.Mode()&os.ModeNamedPipe) == os.ModeNamedPipe ||

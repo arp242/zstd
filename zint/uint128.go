@@ -30,6 +30,8 @@ func ParseUint128(s string, base int) (Uint128, error) {
 func (i Uint128) String() string { return i.Format(16) }
 func (i Uint128) IsZero() bool   { return i[0] == 0 && i[1] == 0 }
 
+// Format according to the given base.
+//
 // TODO: this is not really printin a number, but just printing the 2 numbers
 // side-by-side, rather than actually adding up the bits.
 func (i Uint128) Format(base int) string {

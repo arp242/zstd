@@ -18,8 +18,9 @@ type Once struct {
 	done      map[string]struct{}
 }
 
-// Do calls the function f for the given key if and only if Do is being called
-// for the first time for this key. In other words, given:
+// Do calls the function f for the given key only on the first invocation.
+//
+// In other words, given:
 //
 // 	var once Once
 //

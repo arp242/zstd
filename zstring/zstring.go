@@ -201,8 +201,10 @@ func Choose(l []string) string {
 	return l[rand.Intn(len(l))]
 }
 
-// Filter a list. The function will be called for every item and those that
-// return false will not be included in the return value.
+// Filter a list.
+//
+// The function will be called for every item and those that return false will
+// not be included in the return value.
 func Filter(list []string, fun func(string) bool) []string {
 	var ret []string
 	for _, e := range list {
@@ -214,8 +216,9 @@ func Filter(list []string, fun func(string) bool) []string {
 	return ret
 }
 
-// FilterEmpty can be used as an argument for Filter() and will return false if
-// e is empty or contains only whitespace.
+// FilterEmpty is a filter for Filter() to remove empty entries.
+//
+// An entry is considered "empty" if it's "" or contains only whitespace.
 func FilterEmpty(e string) bool { return strings.TrimSpace(e) != "" }
 
 // Difference returns a new slice with elements that are in "set" but not in

@@ -57,8 +57,9 @@ func SafeTransport(ports []int) *http.Transport {
 	}
 }
 
-// DumpBody reads the body of a HTTP request without consuming it, so it can be
+// DumpBody reads the body of a HTTP request without consuming it so it can be
 // read again later.
+//
 // It will read at most maxSize of bytes. Use -1 to read everything.
 //
 // It's based on httputil.DumpRequest.
@@ -143,8 +144,9 @@ func Fetch(url string) ([]byte, error) {
 	return data, nil
 }
 
-// Save an HTTP URL to the directory dir with the filename. The filename can be
-// generated from the URL if empty.
+// Save an HTTP URL to the directory dir with the filename.
+//
+// The filename can be generated from the URL if empty.
 //
 // It will return the full path to the save file. Note that it may create both a
 // file *and* return an error (e.g. in cases of non-200 status codes).

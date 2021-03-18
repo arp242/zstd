@@ -37,9 +37,10 @@ func DetectImage(data []byte) string {
 	return ""
 }
 
-// DetectImageStream works like DetectImage, but operates on a file stream. It
-// reads the minimal amount of data needed and Seek() back to where the offset
-// was.
+// DetectImageStream works like DetectImage, but operates on a file stream.
+//
+// It reads the minimal amount of data needed and Seek() back to where the
+// offset was.
 func DetectImageStream(fp io.ReadSeeker) (string, error) {
 	head := make([]byte, sniffLen)
 	n, err := fp.Read(head)

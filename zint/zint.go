@@ -88,8 +88,10 @@ func Range(start, end int) []int {
 	return rng
 }
 
-// Fiter a list. The function will be called for every item and those that
-// return false will not be included in the return value.
+// Fiter a list.
+//
+// The function will be called for every item and those that return false will
+// not be included in the return value.
 func Filter(list []int64, fun func(int64) bool) []int64 {
 	var ret []int64
 	for _, e := range list {
@@ -101,8 +103,7 @@ func Filter(list []int64, fun func(int64) bool) []int64 {
 	return ret
 }
 
-// FilterEmpty can be used as an argument for Filter() and will return false if
-// e is empty or contains only whitespace.
+// FilterEmpty is a filter for Filter() to remove empty entries.
 func FilterEmpty(e int64) bool { return e != 0 }
 
 // Min gets the lowest of two numbers.

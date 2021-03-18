@@ -38,10 +38,17 @@ func VerifyHash(filename, hash string) (bool, error) {
 	return ver == hash, nil
 }
 
-func Secret256() string { return secret(4) } // Secret number of 256 bits formatted in base36.
-func Secret192() string { return secret(3) } // Secret number of 192 bits formatted in base36.
-func Secret128() string { return secret(2) } // Secret number of 128 bits formatted in base36.
-func Secret64() string  { return secret(1) } // Secret number of 64 bits formatted in base36.
+// Secret number of 256 bits formatted in base36.
+func Secret256() string { return secret(4) }
+
+// Secret number of 192 bits formatted in base36.
+func Secret192() string { return secret(3) }
+
+// Secret number of 128 bits formatted in base36.
+func Secret128() string { return secret(2) }
+
+// Secret number of 64 bits formatted in base36.
+func Secret64() string { return secret(1) }
 
 // Secret256P is like Secret256() but returns a pointer.
 func Secret256P() *string {
