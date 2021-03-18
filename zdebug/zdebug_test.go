@@ -5,11 +5,24 @@ import (
 	"testing"
 )
 
+func TestCallers(t *testing.T) {
+	func() {
+		for _, c := range Callers() {
+			fmt.Println(c)
+		}
+	}()
+}
+
 func TestPrintStack(t *testing.T) {
-	PrintStack()
+	func() {
+		PrintStack()
+	}()
 }
 
 func TestLoc(t *testing.T) {
-	fmt.Println(Loc(0))
-	fmt.Println(Loc(1))
+	func() {
+		fmt.Println(Loc(0))
+		fmt.Println(Loc(1))
+		fmt.Println(Loc(2))
+	}()
 }

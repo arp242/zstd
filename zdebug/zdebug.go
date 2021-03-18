@@ -12,6 +12,38 @@ import (
 	"zgo.at/zstd/zstring"
 )
 
+type Caller struct {
+	Function string
+	File     string
+	Line     int
+}
+
+// Callers gets a list of callers.
+func Callers() []Caller {
+	var (
+		pc     = make([]uintptr, 50)
+		n      = runtime.Callers(2, pc)
+		frames = runtime.CallersFrames(pc[:n])
+	)
+
+	ret := make([]Caller, 0, n)
+	for f, more := frames.Next(); more; f, more = frames.Next() {
+		if zstring.Contains([]string{
+			"runtime.goexit", "testing.tRunner",
+			"zgo.at/zstd/zdebug.Stack",
+			"zgo.at/zstd/zdebug.PrintStack",
+		}, f.Function) {
+			continue
+		}
+		ret = append(ret, Caller{
+			File:     f.File,
+			Line:     f.Line,
+			Function: f.Function,
+		})
+	}
+	return ret
+}
+
 // Stack gets a stack trace.
 //
 // Unlike debug.Stack() the output is much more concise: every frame is a single
@@ -19,18 +51,11 @@ import (
 // columns.
 func Stack() []byte {
 	var (
-		pc     = make([]uintptr, 50)
-		n      = runtime.Callers(2, pc)
-		frames = runtime.CallersFrames(pc[:n])
-
-		rows  = make([][]interface{}, 0, len(pc))
-		width = 0
+		callers = Callers()
+		rows    = make([][]interface{}, 0, len(callers))
+		width   = 0
 	)
-	for f, more := frames.Next(); more; f, more = frames.Next() {
-		if zstring.Contains([]string{"runtime.goexit", "testing.tRunner"}, f.Function) {
-			continue
-		}
-
+	for _, f := range Callers() {
 		loc := filepath.Base(f.File) + ":" + strconv.Itoa(f.Line)
 		if len(loc) > width {
 			width = len(loc)
