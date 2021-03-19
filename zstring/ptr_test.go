@@ -5,15 +5,15 @@ import (
 	"testing"
 )
 
-func TestPointer(t *testing.T) {
-	test := func(ptr Pointer, want string) {
+func TestPtr(t *testing.T) {
+	test := func(ptr Ptr, want string) {
 		func(p *string) {
 			got := fmt.Sprintf("%p %s\n", p, *p)
 			if got != want {
 				t.Error()
 			}
 		}(ptr.P)
-		func(p Pointer) {
+		func(p Ptr) {
 			got := fmt.Sprintf("%p %s\n", p.P, p)
 			if got != want {
 				t.Error()
@@ -21,7 +21,7 @@ func TestPointer(t *testing.T) {
 		}(ptr)
 	}
 
-	ptr := NewPointer("hello")
+	ptr := NewPtr("hello")
 	test(ptr, fmt.Sprintf("%p hello\n", ptr.P))
 
 	ptr.Set("X")

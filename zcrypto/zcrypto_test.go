@@ -1,6 +1,8 @@
 package zcrypto
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestHashFile(t *testing.T) {
 	f := "../zio/testdata/file1"

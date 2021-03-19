@@ -9,7 +9,7 @@ import (
 	"strconv"
 )
 
-// Binary returns the binary representation of a number.
+// Binary returns a nicely formatted binary representation of a number.
 func Binary(c interface{}) string {
 	t := reflect.TypeOf(c)
 	if t.Kind() == reflect.Ptr {

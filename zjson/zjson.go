@@ -27,7 +27,7 @@ func (t *Timestamp) UnmarshalJSON(v []byte) error {
 
 	n, err := strconv.ParseInt(vv, 10, 64)
 	if err != nil {
-		return fmt.Errorf("Timestamp.UnmarshalJSON %q: %w", string(v), err)
+		return fmt.Errorf("Timestamp.UnmarshalJSON %q: %w", vv, err)
 	}
 	if n > 0 { // Make sure that IsZero() works.
 		t.Time = time.Unix(n, 0).UTC()
@@ -72,7 +72,6 @@ func Indent(data []byte, v interface{}, prefix, indent string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	return json.MarshalIndent(v, prefix, indent)
 }
 

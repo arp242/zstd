@@ -10,6 +10,8 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+
+	"zgo.at/zstd/zstring"
 )
 
 // Test reports if we're running a go test command.
@@ -59,6 +61,31 @@ func GoroutineID() uint64 {
 
 	}
 	return n
+}
+
+// Callers gets a list of callers.
+func Callers(filterFun ...string) []runtime.Frame {
+	var (
+		pc     = make([]uintptr, 50)
+		n      = runtime.Callers(2, pc)
+		frames = runtime.CallersFrames(pc[:n])
+	)
+
+	filterFun = append(filterFun, []string{
+		"runtime.goexit",
+		"testing.tRunner",
+		"zgo.at/zstd/zdebug.Stack",
+		"zgo.at/zstd/zdebug.PrintStack",
+	}...)
+
+	ret := make([]runtime.Frame, 0, n)
+	for f, more := frames.Next(); more; f, more = frames.Next() {
+		if zstring.HasPrefixes(f.Function, filterFun...) {
+			continue
+		}
+		ret = append(ret, f)
+	}
+	return ret
 }
 
 // SizeOf gets the memory size of an object in bytes.

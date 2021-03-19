@@ -11,7 +11,7 @@ import (
 // returns if the function is already run.
 //
 // This implementation is a bit slower than the stdlib one; the benchmark
-// regresses ~1.6ns/op to ~52ns/op on my system.
+// regresses from ~1.6ns/op to ~52ns/op on my system.
 type Once struct {
 	m         sync.Mutex
 	forgotten bool
@@ -31,8 +31,8 @@ type Once struct {
 // The return value tells you if f is run; it's true on the first caller, and
 // false on all subsequent calls.
 //
-// Since f is niladic, it may be necessary to use a function literal to capture
-// the arguments to a function to be invoked by Do:
+// It may be necessary to use a function literal to capture the arguments to a
+// function to be invoked by Do:
 //
 // 	config.once.Do(func() { config.init(filename) })
 //
@@ -58,7 +58,7 @@ func (o *Once) Do(key string, f func()) bool {
 	return true
 }
 
-// Forget about a key.
+// Forget about a key, causing the next invocation to Do() to run again.
 func (o *Once) Forget(key string) {
 	o.m.Lock()
 	delete(o.done, key)

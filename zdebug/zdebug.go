@@ -9,53 +9,21 @@ import (
 	"runtime"
 	"strconv"
 
-	"zgo.at/zstd/zstring"
+	"zgo.at/zstd/zruntime"
 )
-
-type Caller struct {
-	Function string
-	File     string
-	Line     int
-}
-
-// Callers gets a list of callers.
-func Callers() []Caller {
-	var (
-		pc     = make([]uintptr, 50)
-		n      = runtime.Callers(2, pc)
-		frames = runtime.CallersFrames(pc[:n])
-	)
-
-	ret := make([]Caller, 0, n)
-	for f, more := frames.Next(); more; f, more = frames.Next() {
-		if zstring.Contains([]string{
-			"runtime.goexit", "testing.tRunner",
-			"zgo.at/zstd/zdebug.Stack",
-			"zgo.at/zstd/zdebug.PrintStack",
-		}, f.Function) {
-			continue
-		}
-		ret = append(ret, Caller{
-			File:     f.File,
-			Line:     f.Line,
-			Function: f.Function,
-		})
-	}
-	return ret
-}
 
 // Stack gets a stack trace.
 //
 // Unlike debug.Stack() the output is much more concise: every frame is a single
 // line with the package/function name and file location printed in aligned
 // columns.
-func Stack() []byte {
+func Stack(filterFun ...string) []byte {
 	var (
-		callers = Callers()
+		callers = zruntime.Callers(filterFun...)
 		rows    = make([][]interface{}, 0, len(callers))
 		width   = 0
 	)
-	for _, f := range Callers() {
+	for _, f := range callers {
 		loc := filepath.Base(f.File) + ":" + strconv.Itoa(f.Line)
 		if len(loc) > width {
 			width = len(loc)
@@ -76,8 +44,8 @@ func Stack() []byte {
 // Unlike debug.PrintStack() the output is much more concise: every frame is a
 // single line with the package/function name and file location printed in
 // aligned columns.
-func PrintStack() {
-	fmt.Fprint(os.Stderr, string(Stack()))
+func PrintStack(filterFun ...string) {
+	fmt.Fprint(os.Stderr, string(Stack(filterFun...)))
 }
 
 // Loc gets a location in the stack trace.

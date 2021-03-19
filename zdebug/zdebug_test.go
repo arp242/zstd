@@ -5,14 +5,6 @@ import (
 	"testing"
 )
 
-func TestCallers(t *testing.T) {
-	func() {
-		for _, c := range Callers() {
-			fmt.Println(c)
-		}
-	}()
-}
-
 func TestPrintStack(t *testing.T) {
 	func() {
 		PrintStack()

@@ -1,14 +1,33 @@
 // Package zbyte implements functions for byte slices.
 package zbyte
 
-import "unicode/utf8"
-
 // Binary reports if this looks like binary data.
+//
+// Something is considered binary if it contains a NULL byte in the first 8000
+// bytes.
+//
+// This is the same check as git uses; see buffer_is_binary.
 func Binary(b []byte) bool {
-	for i := range b {
-		if (b[i] <= 0x1f && b[i] != 0x09 && b[i] != 0x10 && b[i] != 0x13) || b[i] == 0xff {
+	for i := range ElideLeft(b, 8000) {
+		if b[i] == 0 {
 			return true
 		}
 	}
-	return !utf8.Valid(b)
+	return false
+}
+
+// ElideLeft returns the "n" left bytes.
+func ElideLeft(b []byte, n int) []byte {
+	if len(b) > n {
+		b = b[:n]
+	}
+	return b
+}
+
+// ElideRight returns the "n" right bytes.
+func ElideRight(b []byte, n int) []byte {
+	if len(b) > n {
+		b = b[len(b)-n:]
+	}
+	return b
 }

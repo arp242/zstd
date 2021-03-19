@@ -70,3 +70,11 @@ func TestSizeOfCycles(t *testing.T) {
 		t.Errorf("Cyclic size: got %d, want %d", got, want)
 	}
 }
+
+func TestCallers(t *testing.T) {
+	func() {
+		for _, c := range Callers() {
+			fmt.Println(c)
+		}
+	}()
+}

@@ -1,6 +1,8 @@
 // Package zstring implements functions for strings.
 //
-// All functions work correctly on UTF-8 characters unless mentioned otherwise.
+// All functions work correctly on Unicode codepoints/runes, but usually *don't*
+// work on unicode clusters. That is, things like emojis composed of multiple
+// codepoints and combining characters aren't dealt with.
 package zstring
 
 import (
@@ -47,7 +49,7 @@ func Fields(s, sep string) []string {
 
 // Sub returns a substring starting at start and ending at end.
 //
-// Unlike regular string slicing this operates on runes/UTF-8 characters, rather
+// Unlike regular string slicing this operates on runes/UTF-8 codepoints, rather
 // than bytes.
 func Sub(s string, start, end int) string {
 	var (

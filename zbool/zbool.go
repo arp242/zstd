@@ -1,3 +1,4 @@
+// Package zstring implements functions for booleans.
 package zbool
 
 import (

@@ -37,22 +37,12 @@ func Split(s, sep string) ([]float64, error) {
 	return ret, nil
 }
 
-// Round will round the value to the nearest natural number.
+// RoundTo rounds the value to the given precision.
 //
-// .5 will be rounded up.
-func Round(f float64) float64 {
-	if f < 0 {
-		return math.Ceil(f - 0.5)
-	}
-	return math.Floor(f + 0.5)
-}
-
-// RoundPlus will round the value to the given precision.
-//
-// e.g. RoundPlus(7.258, 2) will return 7.26
-func RoundPlus(f float64, precision int) float64 {
+// e.g. RoundTo(7.258, 2) will return 7.26
+func RoundTo(f float64, precision int) float64 {
 	shift := math.Pow(10, float64(precision))
-	return Round(f*shift) / shift
+	return math.Round(f*shift) / shift
 }
 
 // Limit a value between a lower and upper limit.

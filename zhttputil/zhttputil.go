@@ -1,6 +1,9 @@
 // Package zhttputil provides HTTP utility functions.
 package zhttputil
 
+// TODO: this should really be named "zhttp", but the reason it's not is because
+// I have a zgo.at/zhttp package alread 😅 I need to rename that one.
+
 import (
 	"bytes"
 	"fmt"

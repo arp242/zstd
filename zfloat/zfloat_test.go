@@ -7,27 +7,7 @@ import (
 	"testing"
 )
 
-func TestRound(t *testing.T) {
-	tests := []struct {
-		in   float64
-		want float64
-	}{
-		{123.4999, 123},
-		{123.5, 124},
-		{123.999, 124},
-		{-123.5, -124},
-	}
-
-	for _, tt := range tests {
-		got := Round(tt.in)
-		if got != tt.want {
-			t.Errorf("Round(%f) => %f, want %f", tt.in, got, tt.want)
-		}
-	}
-
-}
-
-func TestRoundPlus(t *testing.T) {
+func TestRoundTo(t *testing.T) {
 	tests := []struct {
 		in        float64
 		precision int
@@ -40,9 +20,9 @@ func TestRoundPlus(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		got := RoundPlus(tt.in, tt.precision)
+		got := RoundTo(tt.in, tt.precision)
 		if got != tt.want {
-			t.Errorf("Round(%f) => %f, want %f", tt.in, got, tt.want)
+			t.Errorf("RoundTo(%f) => %f, want %f", tt.in, got, tt.want)
 		}
 	}
 

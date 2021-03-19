@@ -2,7 +2,7 @@ package zint
 
 import "strconv"
 
-// Pointer provides a more convenient way to deal with pointers.
+// Ptr provides a more convenient way to deal with pointers.
 //
 //   s := "x"
 //   p = &s                     →  p = NewPtr("x").P
@@ -11,16 +11,16 @@ import "strconv"
 //
 //   v := "<nil>"
 //   if p != nil { v = *p }     →  fmt.Println(p)
-type Pointer struct{ P *int }
+type Ptr struct{ P *int }
 
-// NewPointer creates a new Pointer instance set to a pointer of s.
-func NewPointer(s int) Pointer { return Pointer{&s} }
+// NewPtr creates a new Ptr instance set to a pointer of s.
+func NewPtr(s int) Ptr { return Ptr{&s} }
 
-// Set Pointer to the pointer of s.
-func (p *Pointer) Set(s int) { p.P = &s }
+// Set to the pointer of s.
+func (p *Ptr) Set(s int) { p.P = &s }
 
 // String gets the string value, or "<nil>" if the pointer is nil.
-func (p Pointer) String() string {
+func (p Ptr) String() string {
 	if p.P == nil {
 		return "<nil>"
 	}
@@ -28,14 +28,14 @@ func (p Pointer) String() string {
 }
 
 // Value gets the pointer value, or 0 if the pointer is nil.
-func (p Pointer) Value() int {
+func (p Ptr) Value() int {
 	if p.P == nil {
 		return 0
 	}
 	return int(*p.P)
 }
 
-// Pointer64 provides a more convenient way to deal with pointers.
+// Ptr64 provides a more convenient way to deal with pointers.
 //
 //   s := "x"
 //   p = &s                     →  p = NewPtr("x").P
@@ -44,16 +44,16 @@ func (p Pointer) Value() int {
 //
 //   v := "<nil>"
 //   if p != nil { v = *p }     →  fmt.Println(p)
-type Pointer64 struct{ P *int64 }
+type Ptr64 struct{ P *int64 }
 
-// NewPointer64 creates a new Pointer64 instance set to a pointer of s.
-func NewPointer64(s int64) Pointer64 { return Pointer64{&s} }
+// NewPtr64 creates a new Ptr64 instance set to a pointer of s.
+func NewPtr64(s int64) Ptr64 { return Ptr64{&s} }
 
-// Set Pointer64 to the pointer of s.
-func (p *Pointer64) Set(s int64) { p.P = &s }
+// Set to the pointer of s.
+func (p *Ptr64) Set(s int64) { p.P = &s }
 
 // String gets the string value, or "<nil>" if the pointer is nil.
-func (p Pointer64) String() string {
+func (p Ptr64) String() string {
 	if p.P == nil {
 		return "<nil>"
 	}
@@ -61,7 +61,7 @@ func (p Pointer64) String() string {
 }
 
 // Value gets the pointer value, or 0 if the pointer is nil.
-func (p Pointer64) Value() int64 {
+func (p Ptr64) Value() int64 {
 	if p.P == nil {
 		return 0
 	}

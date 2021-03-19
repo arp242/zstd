@@ -5,15 +5,15 @@ import (
 	"testing"
 )
 
-func TestPointer(t *testing.T) {
-	test := func(ptr Pointer, want string) {
+func TestPtr(t *testing.T) {
+	test := func(ptr Ptr, want string) {
 		func(p *int) {
 			got := fmt.Sprintf("%p %d\n", p, *p)
 			if got != want {
 				t.Error()
 			}
 		}(ptr.P)
-		func(p Pointer) {
+		func(p Ptr) {
 			got := fmt.Sprintf("%p %s\n", p.P, p)
 			if got != want {
 				t.Error()
@@ -21,7 +21,7 @@ func TestPointer(t *testing.T) {
 		}(ptr)
 	}
 
-	ptr := NewPointer(42)
+	ptr := NewPtr(42)
 	test(ptr, fmt.Sprintf("%p 42\n", ptr.P))
 
 	ptr.Set(666)
@@ -36,15 +36,15 @@ func TestPointer(t *testing.T) {
 	}
 }
 
-func TestPointer64(t *testing.T) {
-	test := func(ptr Pointer64, want string) {
+func TestPtr64(t *testing.T) {
+	test := func(ptr Ptr64, want string) {
 		func(p *int64) {
 			got := fmt.Sprintf("%p %d\n", p, *p)
 			if got != want {
 				t.Error()
 			}
 		}(ptr.P)
-		func(p Pointer64) {
+		func(p Ptr64) {
 			got := fmt.Sprintf("%p %s\n", p.P, p)
 			if got != want {
 				t.Error()
@@ -52,7 +52,7 @@ func TestPointer64(t *testing.T) {
 		}(ptr)
 	}
 
-	ptr := NewPointer64(42)
+	ptr := NewPtr64(42)
 	test(ptr, fmt.Sprintf("%p 42\n", ptr.P))
 
 	ptr.Set(666)
