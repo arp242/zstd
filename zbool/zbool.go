@@ -100,10 +100,10 @@ func (b Bool) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON converts the data from JSON.
 func (b *Bool) UnmarshalJSON(text []byte) error {
 	switch string(text) {
-	case "true":
+	case "true", "1", "on":
 		*b = true
 		return nil
-	case "false":
+	case "false", "0", "off":
 		*b = false
 		return nil
 	default:
@@ -123,9 +123,9 @@ func (b *Bool) UnmarshalText(text []byte) error {
 	}
 
 	switch strings.TrimSpace(strings.ToLower(string(text))) {
-	case "true", "1", `"true"`:
+	case "true", "1", "on":
 		*b = true
-	case "false", "0", `"false"`:
+	case "false", "0", "off":
 		*b = false
 	default:
 		return fmt.Errorf("zdb.Bool: invalid value %q", text)
@@ -133,3 +133,5 @@ func (b *Bool) UnmarshalText(text []byte) error {
 
 	return nil
 }
+
+func (b Bool) Bool() bool { return bool(b) }

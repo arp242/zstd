@@ -11,6 +11,18 @@ import (
 )
 
 func TestBool(t *testing.T) {
+	t.Run("Bool", func(t *testing.T) {
+		b := interface{ Bool() bool }(Bool(false))
+		if b.Bool() {
+			t.Error()
+		}
+
+		b = interface{ Bool() bool }(Bool(true))
+		if !b.Bool() {
+			t.Error()
+		}
+	})
+
 	t.Run("value", func(t *testing.T) {
 		cases := []struct {
 			in   Bool
