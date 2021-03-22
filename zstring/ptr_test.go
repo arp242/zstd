@@ -26,12 +26,12 @@ func TestPtr(t *testing.T) {
 
 	ptr.Set("X")
 	test(ptr, fmt.Sprintf("%p X\n", ptr.P))
-	if ptr.String() != "X" || ptr.Value() != "X" {
+	if ptr.String() != "X" || ptr.Val() != "X" {
 		t.Error()
 	}
 
 	ptr.P = nil
-	if ptr.String() != "<nil>" || ptr.Value() != "" {
+	if ptr.String() != "<nil>" || ptr.Val() != "" {
 		t.Error()
 	}
 }

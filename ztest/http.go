@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"zgo.at/zstd/zstring"
 )
 
 // Code checks if the error code in the recoder matches the desired one, and
@@ -15,14 +17,10 @@ import (
 func Code(t *testing.T, recorder *httptest.ResponseRecorder, want int) {
 	t.Helper()
 	if recorder.Code != want {
-		b := recorder.Body.String()
-		if len(b) > 250 {
-			b = b[:250]
-		}
-		t.Fatalf("wrong response code\nwant: %d %s\ngot:  %d %s\nbody: %v",
-			want, http.StatusText(want),
+		t.Errorf("wrong response code\nhave: %d %s\nwant: %d %s\nbody: %v",
 			recorder.Code, http.StatusText(recorder.Code),
-			b)
+			want, http.StatusText(want),
+			zstring.ElideLeft(recorder.Body.String(), 500))
 	}
 }
 

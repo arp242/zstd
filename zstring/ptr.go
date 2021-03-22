@@ -66,7 +66,7 @@ func (p Ptr) Value() (driver.Value, error) {
 
 // MarshalJSON converts the data to JSON.
 func (b Ptr) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%t", b)), nil
+	return []byte(fmt.Sprintf("%s", b)), nil
 }
 
 // UnmarshalJSON converts the data from JSON.

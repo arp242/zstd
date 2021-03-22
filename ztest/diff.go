@@ -34,6 +34,7 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -46,17 +47,11 @@ const (
 )
 
 // Diff two strings and format as a unified diff.
-func Diff(out, want string, opt ...DiffOpt) string {
-	for _, o := range opt {
-		if o == DiffNormalizeWhitespace {
-			re := regexp.MustCompile(`(?m)(^\s+|\s+$)`)
-			out = re.ReplaceAllString(out, "")
-			want = re.ReplaceAllString(want, "")
-		}
-	}
+func Diff(have, want string, opt ...DiffOpt) string {
+	have, want = applyOpt(have, want, opt...)
 
 	d := makeUnifiedDiff(unifiedDiff{
-		A:       splitLines(strings.TrimSpace(out)),
+		A:       splitLines(strings.TrimSpace(have)),
 		B:       splitLines(strings.TrimSpace(want)),
 		Context: 3,
 	})
@@ -80,7 +75,9 @@ func Diff(out, want string, opt ...DiffOpt) string {
 // 	 %(ANY 10)    any text at most 10 characters: .{,10}?
 //
 //   %(..)        any regular expression, but \ is not allowed.
-func DiffMatch(out, want string) string {
+func DiffMatch(have, want string, opt ...DiffOpt) string {
+	have, want = applyOpt(have, want, opt...)
+
 	now := time.Now().UTC()
 	r := strings.NewReplacer(
 		`%(YEAR)`, fmt.Sprintf("%d", now.Year()),
@@ -101,16 +98,17 @@ func DiffMatch(out, want string) string {
 
 			// TODO: we need to undo the \ from QuoteMeta() here, but this means
 			// we won't be allowed to use \. Be a bit smarter about this.
+			// TODO: doesn't quite seem to work?
 			return strings.ReplaceAll(m[3:len(m)-2], `\`, ``)
 		})
 
 	// Quick check for exact match.
-	if m := regexp.MustCompile(`^` + wantRe + `$`).MatchString(out); m {
+	if m := regexp.MustCompile(`^` + wantRe + `$`).MatchString(have); m {
 		return ""
 	}
 
 	diff := unifiedDiff{
-		A:       splitLines(strings.TrimSpace(out)),
+		A:       splitLines(strings.TrimSpace(have)),
 		B:       splitLines(strings.TrimSpace(wantRe)),
 		Context: 3,
 	}
@@ -123,6 +121,24 @@ func DiffMatch(out, want string) string {
 		return "ztest.DiffMatch: strings didn't match but no diff?" // Should never happen.
 	}
 	return "\n" + d
+}
+
+var (
+	reNormalizeWhitespace     *regexp.Regexp
+	reNormalizeWhitespaceOnce sync.Once
+)
+
+func applyOpt(have, want string, opt ...DiffOpt) (string, string) {
+	for _, o := range opt {
+		if o == DiffNormalizeWhitespace {
+			reNormalizeWhitespaceOnce.Do(func() {
+				reNormalizeWhitespace = regexp.MustCompile(`(?m)(^\s+|\s+$)`)
+			})
+			have = reNormalizeWhitespace.ReplaceAllString(have, "")
+			want = reNormalizeWhitespace.ReplaceAllString(want, "")
+		}
+	}
+	return have, want
 }
 
 type match struct{ A, B, Size int }

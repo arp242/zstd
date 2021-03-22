@@ -33,7 +33,7 @@ func TestBool(t *testing.T) {
 		}
 
 		for _, tc := range cases {
-			t.Run(fmt.Sprintf("%v", tc.in), func(t *testing.T) {
+			t.Run(fmt.Sprintf("%t", tc.in), func(t *testing.T) {
 				out, err := tc.in.Value()
 				if err != nil {
 					t.Fatal(err)
@@ -73,7 +73,7 @@ func TestBool(t *testing.T) {
 		}
 
 		for _, tc := range cases {
-			t.Run(fmt.Sprintf("%v", tc.in), func(t *testing.T) {
+			t.Run(fmt.Sprintf("%s", tc.in), func(t *testing.T) {
 				var out Bool
 				err := out.Scan(tc.in)
 				if !ztest.ErrorContains(err, tc.wantErr) {
@@ -97,7 +97,7 @@ func TestBool(t *testing.T) {
 		}
 
 		for _, tc := range cases {
-			t.Run(fmt.Sprintf("%v", tc.in), func(t *testing.T) {
+			t.Run(fmt.Sprintf("%t", tc.in), func(t *testing.T) {
 				out, err := tc.in.MarshalText()
 				if !ztest.ErrorContains(err, tc.wantErr) {
 					t.Errorf("\nout:  %#v\nwant: %#v\n", err, tc.wantErr)
@@ -125,7 +125,7 @@ func TestBool(t *testing.T) {
 		}
 
 		for _, tc := range cases {
-			t.Run(fmt.Sprintf("%v", tc.in), func(t *testing.T) {
+			t.Run(fmt.Sprintf("%s", tc.in), func(t *testing.T) {
 				var out Bool
 				err := out.UnmarshalText(tc.in)
 				if !ztest.ErrorContains(err, tc.wantErr) {

@@ -122,7 +122,7 @@ func (b *Bool) UnmarshalText(text []byte) error {
 		return fmt.Errorf("zdb.Bool: not initialized")
 	}
 
-	switch strings.TrimSpace(strings.ToLower(string(text))) {
+	switch strings.Trim(strings.TrimSpace(strings.ToLower(string(text))), `"`) {
 	case "true", "1", "on":
 		*b = true
 	case "false", "0", "off":

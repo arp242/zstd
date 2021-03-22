@@ -73,9 +73,9 @@ func TestErrorContains(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
-			out := ErrorContains(tt.err, tt.str)
-			if out != tt.want {
-				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tt.want)
+			have := ErrorContains(tt.err, tt.str)
+			if have != tt.want {
+				t.Errorf("\nhave: %#v\nwant: %#v\n", have, tt.want)
 			}
 		})
 	}
@@ -125,9 +125,9 @@ func TestNormalizeIndent(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
-			out := NormalizeIndent(tt.in)
-			if out != tt.want {
-				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tt.want)
+			have := NormalizeIndent(tt.in)
+			if have != tt.want {
+				t.Errorf("\nhave: %#v\nwant: %#v\n", have, tt.want)
 			}
 		})
 	}
@@ -151,9 +151,9 @@ func TestDiff(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
-			out := Diff(tt.inOut, tt.inWant)
-			if out != tt.want {
-				t.Errorf("\nout:\n%s\nwant:\n%s\nout:  %[1]q\nwant: %[2]q", out, tt.want)
+			have := Diff(tt.inOut, tt.inWant)
+			if have != tt.want {
+				t.Errorf("\nhave:\n%s\nwant:\n%s\nout:  %[1]q\nwant: %[2]q", have, tt.want)
 			}
 		})
 	}

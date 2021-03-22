@@ -4,6 +4,7 @@ package ztime
 import (
 	"fmt"
 	"math"
+	"os"
 	"strings"
 	"time"
 )
@@ -18,6 +19,16 @@ func Takes(f func()) time.Duration {
 	s := time.Now()
 	f()
 	return time.Now().Sub(s)
+}
+
+// TimeFunc prints how long it took for this function to end to stderr.
+//
+// You usually want to use this from defer:
+//
+//   defer ztime.TimeFunc()()
+func TimeFunc() func() {
+	s := time.Now()
+	return func() { fmt.Fprintln(os.Stderr, time.Now().Sub(s)) }
 }
 
 // DurationAs formats a duration as the given time unit.
