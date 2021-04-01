@@ -20,7 +20,9 @@ import (
 func EmbedOrDir(e embed.FS, dir string, dev bool) (fs.FS, error) {
 	var fsys fs.FS = e
 	if dev {
-		fsys = os.DirFS(zgo.ModuleRoot())
+		if r := zgo.ModuleRoot(); r != "" {
+			fsys = os.DirFS(r)
+		}
 	}
 	if dir == "" {
 		return fsys, nil
