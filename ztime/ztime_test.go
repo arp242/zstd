@@ -123,12 +123,12 @@ func TestStartOfWeek(t *testing.T) {
 	h.WriteString("Monday:\n")
 	for i := 0; i < 7; i++ {
 		fmt.Fprintf(h, "%d  %s → %s\n", i, mon.Add(i, Day).Format(f),
-			mon.Add(i, Day).StartOf(WeekMonday).Format(f))
+			mon.Add(i, Day).StartOf(Week(false)).Format(f))
 	}
 	h.WriteString("\nSunday:\n")
 	for i := 0; i < 7; i++ {
 		fmt.Fprintf(h, "%d  %s → %s\n", i, sun.Add(i, Day).Format(f),
-			sun.Add(i, Day).StartOf(WeekSunday).Format(f))
+			sun.Add(i, Day).StartOf(Week(true)).Format(f))
 	}
 
 	have := h.String()

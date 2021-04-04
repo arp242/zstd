@@ -76,6 +76,14 @@ func (p Period) String() string {
 	}
 }
 
+// Week returns WeekSunday or WeekMonday.
+func Week(sundayStartsWeek bool) Period {
+	if sundayStartsWeek {
+		return WeekSunday
+	}
+	return WeekMonday
+}
+
 // StartOf adjusts the time to the start of the given period.
 func StartOf(t time.Time, p Period) time.Time {
 	y, m, d, h, min, s, ns, l := t.Year(), int(t.Month()), t.Day(), t.Hour(), t.Minute(), t.Second(), t.Nanosecond(), t.Location()
