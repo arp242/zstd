@@ -10,6 +10,15 @@ import (
 	"zgo.at/zstd/zgo"
 )
 
+// MustReadFile is like fs.ReadFile, but will panic() on errors.
+func MustReadFile(fsys fs.FS, name string) []byte {
+	b, err := fs.ReadFile(fsys, name)
+	if err != nil {
+		panic("zfs.MustReadFile: " + err.Error())
+	}
+	return b
+}
+
 // EmbedOrDir returns e if dev is false, or a os.DirFS at the module root.
 //
 // This is intended to serve files from the local FS when developing and
