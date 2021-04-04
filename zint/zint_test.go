@@ -265,6 +265,35 @@ func TestInt(t *testing.T) {
 	}
 }
 
+func TestToIntSlice(t *testing.T) {
+	tests := []struct {
+		in   interface{}
+		ok   bool
+		want []int64
+	}{
+		{"", false, nil},
+		{1, false, nil},
+		{nil, false, nil},
+
+		{[]int(nil), true, []int64{}},
+		{[]int{}, true, []int64{}},
+		{[]int{1}, true, []int64{1}},
+		{[]int{-1}, true, []int64{-1}},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			have, ok := ToIntSlice(tt.in)
+			if ok != tt.ok {
+				t.Errorf("\nhave: %t\nwant: %t", ok, tt.ok)
+			}
+			if !reflect.DeepEqual(have, tt.want) {
+				t.Errorf("\nhave: %#v\nwant: %#v", have, tt.want)
+			}
+		})
+	}
+}
+
 func BenchmarkJoin(b *testing.B) {
 	b.ReportAllocs()
 	l := []int64{213, 52, 6342, 123, 6, 873, 123, 5463, 767, 12312, 1211, 90}

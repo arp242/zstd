@@ -342,7 +342,33 @@ func From(s string, sep string) string {
 	return s[i+len(sep):]
 }
 
-// IndexAll finds all occurences of the string "find".
+// IndexN finds the nth occurrence of a string.
+//
+// n starts at 1; returns -1 if there is no nth occurrence of this string.
+func IndexN(s, find string, n uint) int {
+	if s == "" || find == "" {
+		return -1
+	}
+	if n == 0 {
+		n = 1
+	}
+	n--
+
+	var (
+		off    int
+		nfound uint
+	)
+	for i := strings.Index(s[off:], find); i != -1; i = strings.Index(s[off:], find) {
+		if nfound == n {
+			return off + i
+		}
+		nfound++
+		off += i + len(find)
+	}
+	return -1
+}
+
+// IndexAll finds all occurrences of the string "find".
 func IndexAll(s, find string) []int {
 	if s == "" || find == "" {
 		return nil

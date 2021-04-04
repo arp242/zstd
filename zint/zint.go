@@ -181,3 +181,135 @@ func Difference(set []int64, others ...[]int64) []int64 {
 
 	return out
 }
+
+// ToIntSlice converts any []int type to an []int64.
+func ToIntSlice(v interface{}) ([]int64, bool) {
+	var r []int64
+	switch vv := v.(type) {
+	case []int64:
+		r = vv
+	case []uint64:
+		vvv := make([]int64, len(vv))
+		for i := range vv {
+			vvv[i] = int64(vv[i])
+		}
+		r = vvv
+
+	case []int8:
+		vvv := make([]int64, len(vv))
+		for i := range vv {
+			vvv[i] = int64(vv[i])
+		}
+		r = vvv
+	case []int16:
+		vvv := make([]int64, len(vv))
+		for i := range vv {
+			vvv[i] = int64(vv[i])
+		}
+		r = vvv
+	case []int32:
+		vvv := make([]int64, len(vv))
+		for i := range vv {
+			vvv[i] = int64(vv[i])
+		}
+		r = vvv
+	case []int:
+		vvv := make([]int64, len(vv))
+		for i := range vv {
+			vvv[i] = int64(vv[i])
+		}
+		r = vvv
+	case []uint8:
+		vvv := make([]int64, len(vv))
+		for i := range vv {
+			vvv[i] = int64(vv[i])
+		}
+		r = vvv
+	case []uint16:
+		vvv := make([]int64, len(vv))
+		for i := range vv {
+			vvv[i] = int64(vv[i])
+		}
+		r = vvv
+	case []uint32:
+		vvv := make([]int64, len(vv))
+		for i := range vv {
+			vvv[i] = int64(vv[i])
+		}
+		r = vvv
+	case []uint:
+		vvv := make([]int64, len(vv))
+		for i := range vv {
+			vvv[i] = int64(vv[i])
+		}
+		r = vvv
+	}
+
+	return r, r != nil
+}
+
+// ToUintSlice converts any []int type to an []uint64.
+func ToUintSlice(v interface{}) ([]uint64, bool) {
+	var r []uint64
+	switch vv := v.(type) {
+	case []int64:
+		vvv := make([]uint64, len(vv))
+		for i := range vv {
+			vvv[i] = uint64(vv[i])
+		}
+		r = vvv
+	case []uint64:
+		r = vv
+
+	case []int8:
+		vvv := make([]uint64, len(vv))
+		for i := range vv {
+			vvv[i] = uint64(vv[i])
+		}
+		r = vvv
+	case []int16:
+		vvv := make([]uint64, len(vv))
+		for i := range vv {
+			vvv[i] = uint64(vv[i])
+		}
+		r = vvv
+	case []int32:
+		vvv := make([]uint64, len(vv))
+		for i := range vv {
+			vvv[i] = uint64(vv[i])
+		}
+		r = vvv
+	case []int:
+		vvv := make([]uint64, len(vv))
+		for i := range vv {
+			vvv[i] = uint64(vv[i])
+		}
+		r = vvv
+	case []uint8:
+		vvv := make([]uint64, len(vv))
+		for i := range vv {
+			vvv[i] = uint64(vv[i])
+		}
+		r = vvv
+	case []uint16:
+		vvv := make([]uint64, len(vv))
+		for i := range vv {
+			vvv[i] = uint64(vv[i])
+		}
+		r = vvv
+	case []uint32:
+		vvv := make([]uint64, len(vv))
+		for i := range vv {
+			vvv[i] = uint64(vv[i])
+		}
+		r = vvv
+	case []uint:
+		vvv := make([]uint64, len(vv))
+		for i := range vv {
+			vvv[i] = uint64(vv[i])
+		}
+		r = vvv
+	}
+
+	return r, r != nil
+}

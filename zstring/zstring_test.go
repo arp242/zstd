@@ -643,3 +643,36 @@ func TestIndexAll(t *testing.T) {
 		})
 	}
 }
+
+func TestIndexN(t *testing.T) {
+	tests := []struct {
+		in, find string
+		n        uint
+		want     int
+	}{
+		{"", "", 1, -1},
+		{"", ".", 1, -1},
+		{".", "", 1, -1},
+
+		{"a.b.c.d", ".", 0, 1},
+		{"a.b.c.d", ".", 1, 1},
+		{"a.b.c.d", ".", 2, 3},
+		{"a.b.c.d", ".", 3, 5},
+		{"a.b.c.d", ".", 4, -1},
+
+		{"aa ... bb ... cc ... dd", "..", 0, 3},
+		{"aa ... bb ... cc ... dd", "..", 1, 3},
+		{"aa ... bb ... cc ... dd", "..", 2, 10},
+		{"aa ... bb ... cc ... dd", "..", 3, 17},
+		{"aa ... bb ... cc ... dd", "..", 4, -1},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			have := IndexN(tt.in, tt.find, tt.n)
+			if have != tt.want {
+				t.Errorf("\nhave: %#v\nwant: %#v", have, tt.want)
+			}
+		})
+	}
+}
