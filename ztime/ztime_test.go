@@ -101,8 +101,8 @@ func TestEndOf(t *testing.T) {
 		half hour       2020-06-18 14:59:59.999999999  2020-06-18 15:29:59.999999999  2020-06-18 15:59:59.999999999  2020-06-18 16:29:59.999999999
 		hour            2020-06-18 14:59:59.999999999  2020-06-18 15:59:59.999999999  2020-06-18 16:59:59.999999999  2020-06-18 17:59:59.999999999
 		day             2020-06-18 23:59:59.999999999  2020-06-19 23:59:59.999999999  2020-06-20 23:59:59.999999999  2020-06-21 23:59:59.999999999
-		week (Monday)   2020-06-22 23:59:59.999999999  2020-06-29 23:59:59.999999999  2020-07-06 23:59:59.999999999  2020-07-13 23:59:59.999999999
-		week (Sunday)   2020-06-21 23:59:59.999999999  2020-06-28 23:59:59.999999999  2020-07-05 23:59:59.999999999  2020-07-12 23:59:59.999999999
+		week (Monday)   2020-06-21 23:59:59.999999999  2020-06-28 23:59:59.999999999  2020-07-05 23:59:59.999999999  2020-07-12 23:59:59.999999999
+		week (Sunday)   2020-06-20 23:59:59.999999999  2020-06-27 23:59:59.999999999  2020-07-04 23:59:59.999999999  2020-07-11 23:59:59.999999999
 		month           2020-06-30 23:59:59.999999999  2020-07-31 23:59:59.999999999  2020-08-31 23:59:59.999999999  2020-09-30 23:59:59.999999999
 		quarter         2020-06-30 23:59:59.999999999  2020-09-30 23:59:59.999999999  2020-12-31 23:59:59.999999999  2021-03-31 23:59:59.999999999
 		half year       2020-06-30 23:59:59.999999999  2020-12-31 23:59:59.999999999  2021-06-30 23:59:59.999999999  2021-12-31 23:59:59.999999999
@@ -112,7 +112,7 @@ func TestEndOf(t *testing.T) {
 	}
 }
 
-func TestStartOfWeek(t *testing.T) {
+func TestWeek(t *testing.T) {
 	var (
 		mon = Time{time.Date(2021, 4, 5, 14, 49, 20, 666, time.UTC)}
 		sun = Time{time.Date(2021, 4, 4, 14, 49, 20, 666, time.UTC)}
@@ -122,34 +122,36 @@ func TestStartOfWeek(t *testing.T) {
 
 	h.WriteString("Monday:\n")
 	for i := 0; i < 7; i++ {
-		fmt.Fprintf(h, "%d  %s → %s\n", i, mon.Add(i, Day).Format(f),
-			mon.Add(i, Day).StartOf(Week(false)).Format(f))
+		fmt.Fprintf(h, "%d  %s → %s %s\n", i, mon.Add(i, Day).Format(f),
+			mon.Add(i, Day).StartOf(Week(false)).Format(f),
+			mon.Add(i, Day).EndOf(Week(false)).Format(f))
 	}
 	h.WriteString("\nSunday:\n")
 	for i := 0; i < 7; i++ {
-		fmt.Fprintf(h, "%d  %s → %s\n", i, sun.Add(i, Day).Format(f),
-			sun.Add(i, Day).StartOf(Week(true)).Format(f))
+		fmt.Fprintf(h, "%d  %s → %s %s\n", i, sun.Add(i, Day).Format(f),
+			sun.Add(i, Day).StartOf(Week(true)).Format(f),
+			sun.Add(i, Day).EndOf(Week(true)).Format(f))
 	}
 
 	have := h.String()
 	want := `
 		Monday:
-		0  Mon Apr  5 → Mon Apr  5
-		1  Tue Apr  6 → Mon Apr  5
-		2  Wed Apr  7 → Mon Apr  5
-		3  Thu Apr  8 → Mon Apr  5
-		4  Fri Apr  9 → Mon Apr  5
-		5  Sat Apr 10 → Mon Apr  5
-		6  Sun Apr 11 → Mon Apr  5
+		0  Mon Apr  5 → Mon Apr  5 Sun Apr 11
+		1  Tue Apr  6 → Mon Apr  5 Sun Apr 11
+		2  Wed Apr  7 → Mon Apr  5 Sun Apr 11
+		3  Thu Apr  8 → Mon Apr  5 Sun Apr 11
+		4  Fri Apr  9 → Mon Apr  5 Sun Apr 11
+		5  Sat Apr 10 → Mon Apr  5 Sun Apr 11
+		6  Sun Apr 11 → Mon Apr  5 Sun Apr 11
 
 		Sunday:
-		0  Sun Apr  4 → Sun Apr  4
-		1  Mon Apr  5 → Sun Apr  4
-		2  Tue Apr  6 → Sun Apr  4
-		3  Wed Apr  7 → Sun Apr  4
-		4  Thu Apr  8 → Sun Apr  4
-		5  Fri Apr  9 → Sun Apr  4
-		6  Sat Apr 10 → Sun Apr  4`
+		0  Sun Apr  4 → Sun Apr  4 Sat Apr 10
+		1  Mon Apr  5 → Sun Apr  4 Sat Apr 10
+		2  Tue Apr  6 → Sun Apr  4 Sat Apr 10
+		3  Wed Apr  7 → Sun Apr  4 Sat Apr 10
+		4  Thu Apr  8 → Sun Apr  4 Sat Apr 10
+		5  Fri Apr  9 → Sun Apr  4 Sat Apr 10
+		6  Sat Apr 10 → Sun Apr  4 Sat Apr 10`
 	if d := ztest.Diff(have, want, ztest.DiffNormalizeWhitespace); d != "" {
 		t.Error(d)
 	}

@@ -141,7 +141,7 @@ func EndOf(t time.Time, p Period) time.Time {
 	case Day:
 		h, min, s = 23, 59, 59
 	case WeekMonday, WeekSunday:
-		t = StartOf(t, p).AddDate(0, 0, 7)
+		t = StartOf(t, p).AddDate(0, 0, 6)
 		m, d, h, min, s = t.Month(), t.Day(), 23, 59, 59
 	case Month:
 		d, h, min, s = DaysInMonth(t), 23, 59, 59
