@@ -9,30 +9,39 @@ import (
 	"zgo.at/zstd/ztest"
 )
 
-func TestTakes(t *testing.T) {
-	tt := Takes(func() { time.Sleep(50 * time.Millisecond) })
-	if tt < 50*time.Millisecond || tt > 52*time.Millisecond {
-		t.Error(tt)
+func TestNew(t *testing.T) {
+	tz, err := time.LoadLocation("Asia/Makassar")
+	if err != nil {
+		t.Fatal(err)
 	}
-}
-
-func TestDurationAs(t *testing.T) {
 	tests := []struct {
-		d, as time.Duration
-		want  string
+		in   string
+		want time.Time
 	}{
-		{50 * time.Millisecond, time.Microsecond, "50000"},
-		{50 * time.Microsecond, time.Millisecond, "0.05"},
-		{1, time.Hour, "0.0000000000002"},
-		{1261616533, time.Millisecond, "1261.616533"},
-		{time.Duration(1261616533).Round(time.Microsecond), time.Millisecond, "1261.617"},
+		{"2020-06-18 14:15:16.999999999", time.Date(2020, 6, 18, 14, 15, 16, 999999999, time.UTC)},
+		{"2020-06-18 14:15:16.0", time.Date(2020, 6, 18, 14, 15, 16, 0, time.UTC)},
+		{"2020-06-18 14:15:16", time.Date(2020, 6, 18, 14, 15, 16, 0, time.UTC)},
+		{"2020-06-18 14:15", time.Date(2020, 6, 18, 14, 15, 0, 0, time.UTC)},
+		{"2020-06-18 14", time.Date(2020, 6, 18, 14, 0, 0, 0, time.UTC)},
+		{"2020-06-18", time.Date(2020, 6, 18, 0, 0, 0, 0, time.UTC)},
+		{"2020-06", time.Date(2020, 6, 1, 0, 0, 0, 0, time.UTC)},
+		{"2020", time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC)},
+
+		{"2020-06-18 14:15:16.999999999 WITA", time.Date(2020, 6, 18, 14, 15, 16, 999999999, tz)},
+		{"2020-06-18 14:15:16.0 WITA", time.Date(2020, 6, 18, 14, 15, 16, 0, tz)},
+		{"2020-06-18 14:15:16 WITA", time.Date(2020, 6, 18, 14, 15, 16, 0, tz)},
+		{"2020-06-18 14:15 WITA", time.Date(2020, 6, 18, 14, 15, 0, 0, tz)},
+		{"2020-06-18 14 WITA", time.Date(2020, 6, 18, 14, 0, 0, 0, tz)},
+		{"2020-06-18 WITA", time.Date(2020, 6, 18, 0, 0, 0, 0, tz)},
+		{"2020-06 WITA", time.Date(2020, 6, 1, 0, 0, 0, 0, tz)},
+		{"2020 WITA", time.Date(2020, 1, 1, 0, 0, 0, 0, tz)},
 	}
 
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
-			got := DurationAs(tt.d, tt.as)
-			if got != tt.want {
-				t.Errorf("\ngot:  %q\nwant: %q", got, tt.want)
+			have := New(tt.in)
+			if !have.Equal(tt.want) {
+				t.Errorf("\nhave: %s\nwant: %s", have, tt.want)
 			}
 		})
 	}
