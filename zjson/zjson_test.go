@@ -9,37 +9,62 @@ import (
 )
 
 func TestInt(t *testing.T) {
-	type ts struct {
-		TS Int `json:"ts"`
+	var x struct {
+		Int Int `json:"int"`
 	}
 
-	var x ts
-	MustUnmarshal([]byte(`{"ts": 1234567890}`), &x)
-
-	out := fmt.Sprintf("%v", x)
-	want := "{1234567890}"
-	if out != want {
-		t.Errorf("Unmarshal\nout:  %q\nwant: %q", out, want)
+	{ // Parse stings.
+		MustUnmarshal([]byte(`{"int":"1234567890"}`), &x)
+		have := fmt.Sprintf("%v", x)
+		want := "{1234567890}"
+		if have != want {
+			t.Errorf("Unmarshal\nhave: %q\nwant: %q", have, want)
+		}
+	}
+	{
+		have := string(MustMarshal(x))
+		want := `{"int":"1234567890"}`
+		if have != want {
+			t.Errorf("Marshal\nhave: %q\nwant: %q", have, want)
+		}
 	}
 
-	out2 := string(MustMarshal(x))
-	want2 := `{"ts":1234567890}`
-	if out2 != want2 {
-		t.Errorf("Marshal\nout:  %q\nwant: %q", out2, want2)
+	{ // Real ints work as well.
+		MustUnmarshal([]byte(`{"int":42}`), &x)
+		have := fmt.Sprintf("%v", x)
+		want := "{42}"
+		if have != want {
+			t.Errorf("Unmarshal\nhave: %q\nwant: %q", have, want)
+		}
+	}
+	{
+		have := string(MustMarshal(x))
+		want := `{"int":"42"}`
+		if have != want {
+			t.Errorf("Marshal\nhave: %q\nwant: %q", have, want)
+		}
 	}
 
-	err := json.Unmarshal([]byte(`{"ts": "NaN"}`), &x)
-	if err == nil {
-		t.Errorf("no error on NaN")
+	{ // Non-numbers don't
+		err := json.Unmarshal([]byte(`{"int": "NaN"}`), &x)
+		if err == nil {
+			t.Errorf("no error on NaN")
+		}
+	}
+
+	{ // Neither do floats.
+		err := json.Unmarshal([]byte(`{"int": "42.666"}`), &x)
+		if err == nil {
+			t.Errorf("no error on NaN")
+		}
 	}
 }
 
 func TestTimestamp(t *testing.T) {
-	type ts struct {
+	var x struct {
 		TS Timestamp `json:"ts"`
 	}
 
-	var x ts
 	MustUnmarshal([]byte(`{"ts": 1234567890}`), &x)
 
 	out := fmt.Sprintf("%v", x)
@@ -59,7 +84,9 @@ func TestTimestamp(t *testing.T) {
 		t.Errorf("no error on NaN")
 	}
 
-	var zero ts
+	var zero struct {
+		TS Timestamp `json:"ts"`
+	}
 	err = json.Unmarshal([]byte(`{"ts": 0}`), &zero)
 	if err != nil {
 		t.Error(err)

@@ -2,6 +2,7 @@
 package zjson
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"strconv"
@@ -13,12 +14,12 @@ type Int int64
 
 // Marshal in to JSON.
 func (i Int) MarshalJSON() ([]byte, error) {
-	return []byte(strconv.FormatInt(int64(i), 10)), nil
+	return append(append([]byte(`"`), strconv.FormatInt(int64(i), 10)...), '"'), nil
 }
 
 // Unmarshal a string timestamp as an int.
 func (i *Int) UnmarshalJSON(v []byte) error {
-	ii, err := strconv.ParseInt(string(v), 10, 64)
+	ii, err := strconv.ParseInt(string(bytes.Trim(v, `"`)), 10, 64)
 	*i = Int(ii)
 	return err
 }
