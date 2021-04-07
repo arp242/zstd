@@ -8,11 +8,37 @@ import (
 	"time"
 )
 
-type ts struct {
-	TS Timestamp `json:"ts"`
+func TestInt(t *testing.T) {
+	type ts struct {
+		TS Int `json:"ts"`
+	}
+
+	var x ts
+	MustUnmarshal([]byte(`{"ts": 1234567890}`), &x)
+
+	out := fmt.Sprintf("%v", x)
+	want := "{1234567890}"
+	if out != want {
+		t.Errorf("Unmarshal\nout:  %q\nwant: %q", out, want)
+	}
+
+	out2 := string(MustMarshal(x))
+	want2 := `{"ts":1234567890}`
+	if out2 != want2 {
+		t.Errorf("Marshal\nout:  %q\nwant: %q", out2, want2)
+	}
+
+	err := json.Unmarshal([]byte(`{"ts": "NaN"}`), &x)
+	if err == nil {
+		t.Errorf("no error on NaN")
+	}
 }
 
 func TestTimestamp(t *testing.T) {
+	type ts struct {
+		TS Timestamp `json:"ts"`
+	}
+
 	var x ts
 	MustUnmarshal([]byte(`{"ts": 1234567890}`), &x)
 

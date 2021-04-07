@@ -7,8 +7,10 @@ import (
 	"time"
 )
 
-// Time wraps time.Time to add {Start,End}Of and {For,Back}ward. To make it a
-// bit more convenient to run several operations.
+// Time wraps time.Time to add {Start,End}Of and Add(). To make it a bit more
+// convenient to run several operations.
+//
+// time.Time's Add() is renamed to AddTime() here.
 type Time struct{ time.Time }
 
 func (t Time) StartOf(p Period) Time    { return Time{StartOf(t.Time, p)} }
@@ -146,17 +148,16 @@ func LeapYear(t time.Time) bool {
 
 // DaysInMonth gets the number of days for the month.
 func DaysInMonth(t time.Time) int {
-	if t.Month() == 2 {
+	switch t.Month() {
+	default:
+		return 30
+	case 1, 3, 5, 7, 8, 10, 12:
+		return 31
+	case 2:
 		if LeapYear(t) {
 			return 29
 		}
 		return 28
-	}
-	switch t.Month() {
-	case 1, 3, 5, 7, 8, 10, 12:
-		return 31
-	default:
-		return 30
 	}
 }
 

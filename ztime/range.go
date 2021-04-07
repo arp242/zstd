@@ -6,6 +6,9 @@ import (
 )
 
 // A Range represents a time range from Start to End.
+//
+// The timezone is always taken from the start time. The end' timezone will be
+// adjusted if it differs.
 type Range struct {
 	Start, End time.Time
 }
@@ -46,7 +49,11 @@ func (r Range) In(loc *time.Location) Range {
 	return r
 }
 
-// Current gets the current period.
+// Current gets the current period p.
+//
+// For example with Range("2006-01-05 14:00:00", Month):
+//
+//  "2006-01-01 00:00:00" "2006-01-31 23:59:59"
 func (r Range) Current(p Period) Range {
 	return Range{
 		Start: StartOf(r.Start, p),
@@ -58,8 +65,7 @@ func (r Range) Current(p Period) Range {
 //
 // For example with Range("2006-01-05 14:00:00", Month):
 //
-//  false  →  current month: "2006-01-01 00:00:00" "2006-01-31 23:59:59"
-//  true   →  last month:    "2006-01-06 00:00:00" "2005-12-05 23:59:59"
+//  "2006-01-06 00:00:00" "2005-12-05 23:59:59"
 func (r Range) Last(p Period) Range {
 	pp := map[Period]Period{
 		Second:     0,
@@ -152,8 +158,9 @@ func (r Range) String() string {
 
 // Diff gets the difference between two dates.
 //
-// Add periods to get the difference in those periods. For example "Month, Day"
-// would return "29 months, 6 days", instead of "2 years, 5 months, 6 days".
+// Optionally pass any Period arguments to get the difference in those periods.
+// For example "Month, Day" would return "29 months, 6 days", instead of "2
+// years, 5 months, 6 days".
 //
 // The default is to get years, months, days, hours, minutes, and seconds.
 //
@@ -228,7 +235,6 @@ func (r Range) Diff(periods ...Period) Diff {
 	if !hasP(Second, periods) {
 		d.Secs = 0
 	}
-
 	return d
 }
 
@@ -257,6 +263,7 @@ func (d Diff) String() string {
 		if d.Days == 6 {
 			return "1 week"
 		}
+		// TODO?
 		//if (d.Days-1)%7 == 0 {
 		//	return n(d.Days/7) + " weeks"
 		//}

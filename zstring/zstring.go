@@ -2,7 +2,8 @@
 //
 // All functions work correctly on Unicode codepoints/runes, but usually *don't*
 // work on unicode clusters. That is, things like emojis composed of multiple
-// codepoints and combining characters aren't dealt with.
+// codepoints and combining characters aren't dealt with unless explicitly
+// mentioned otherwise.
 package zstring
 
 import (

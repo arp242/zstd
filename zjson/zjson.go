@@ -8,12 +8,27 @@ import (
 	"time"
 )
 
+// Int for APIs that return numbers as strings.
+type Int int64
+
+// Marshal in to JSON.
+func (i Int) MarshalJSON() ([]byte, error) {
+	return []byte(strconv.FormatInt(int64(i), 10)), nil
+}
+
+// Unmarshal a string timestamp as an int.
+func (i *Int) UnmarshalJSON(v []byte) error {
+	ii, err := strconv.ParseInt(string(v), 10, 64)
+	*i = Int(ii)
+	return err
+}
+
 // Timestamp for APIs that return dates as a numeric Unix timestamp.
 type Timestamp struct{ time.Time }
 
 // Marshal in to JSON.
 func (t Timestamp) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%d", t.Unix())), nil
+	return []byte(strconv.FormatInt(t.Unix(), 10)), nil
 }
 
 // Unmarshal a Unix timestamp as a date.
