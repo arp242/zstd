@@ -7,31 +7,41 @@ import (
 
 // A Range represents a time range from Start to End.
 //
-// The timezone is always taken from the start time. The end' timezone will be
+// The timezone is always taken from the start time. The end's timezone will be
 // adjusted if it differs.
 type Range struct {
+	// TODO: these should not be exported; they're only exported for now to make
+	// migrating to Range a bit easier.
 	Start, End time.Time
 }
 
 // NewRange creates a new range with the start date set.
-func NewRange(t time.Time) Range {
-	return Range{Start: t}
+func NewRange(start time.Time) Range {
+	return Range{Start: start}
 }
 
-// From sets this ranges start time.
+// From returns a copy with the start time set.
 //
-// Will apply the timezone from the passed time to the end time.
-func (r Range) From(t time.Time) Range {
-	r.Start = t
-	r.End = r.End.In(t.Location())
+// This will apply the timezone from the passed start time to the end time.
+func (r Range) From(start time.Time) Range {
+	r.Start = start
+	r.End = r.End.In(start.Location())
 	return r
 }
 
-// To sets this ranges end time.
+// To returns a copy with the end time set.
 //
-// Will apply the timezone from the start time.
-func (r Range) To(t time.Time) Range {
-	r.End = t.In(r.Start.Location())
+// This will apply the timezone from the start time to the passed end time.
+func (r Range) To(end time.Time) Range {
+	r.End = end.In(r.Start.Location())
+	return r
+}
+
+// Period returns a copy withh the end time set to n Period from the start time.
+//
+// This uses ztime.Add() and its "common sense" understanding of months.
+func (r Range) Period(n int, p Period) Range {
+	r.End = Add(r.Start, n, p)
 	return r
 }
 
@@ -49,11 +59,14 @@ func (r Range) In(loc *time.Location) Range {
 	return r
 }
 
-// Current gets the current period p.
+// Current returns a copy with the start and end times set the current Period p.
 //
-// For example with Range("2006-01-05 14:00:00", Month):
+// This uses the value of the start time. Any value in the end time is ignored.
 //
-//  "2006-01-01 00:00:00" "2006-01-31 23:59:59"
+// For example with NewRange("2020-06-18 14:00:00"):
+//
+//   Current(Month)       2020-06-01 00:00:00       → 2020-06-30 23:59:59
+//   Current(WeekMonday)  2020-06-15 00:00:00 (Mon) → 2020-06-21 23:59:59 (Sun)
 func (r Range) Current(p Period) Range {
 	return Range{
 		Start: StartOf(r.Start, p),
@@ -61,12 +74,22 @@ func (r Range) Current(p Period) Range {
 	}
 }
 
-// Last gets the Period before t, inclusive of t.
+// Last returns a copy with the start and end times set to the last Period p.
 //
-// For example with Range("2006-01-05 14:00:00", Month):
+// This uses the value of the start time. Any value in the end time is ignored.
 //
-//  "2006-01-06 00:00:00" "2005-12-05 23:59:59"
+// For example with NewRange("2020-06-18 14:00:00") (Thursday):
+//
+//   Last(Month)       2020-05-18 00:00:00       → 2020-06-18 23:59:59
+//   Last(WeekMonday)  2020-06-11 00:00:00 (Wed) → 2020-06-18 23:59:59 (Thu)
 func (r Range) Last(p Period) Range {
+	// TODO: are we sure this is what we want? Wouldn't make e.g. Thursday to
+	// Thursday make more sense?
+	//
+	//   Last(Month)       2020-05-18 00:00:00       → 2020-06-18 23:59:59
+	//   Last(WeekMonday)  2020-06-12 00:00:00 (Thu) → 2020-06-18 23:59:59 (Thu)
+	//
+	// Need to see how it's used in GC.
 	pp := map[Period]Period{
 		Second:     0,
 		Minute:     Second,
@@ -89,7 +112,7 @@ func (r Range) Last(p Period) Range {
 // String shows the range from start to end as a human-readable representation;
 // e.g. "current week", "last week", "previous month", etc.
 //
-// It falls back to "Mon Jan 2 – Mon Jan 2" if there's no clear way to describe
+// It falls back to "Mon Jan 2–Mon Jan 2" if there's no clear way to describe
 // it.
 func (r Range) String() string {
 	today := StartOf(Now().In(r.Start.Location()), Day)
@@ -158,11 +181,10 @@ func (r Range) String() string {
 
 // Diff gets the difference between two dates.
 //
-// Optionally pass any Period arguments to get the difference in those periods.
-// For example "Month, Day" would return "29 months, 6 days", instead of "2
-// years, 5 months, 6 days".
-//
-// The default is to get years, months, days, hours, minutes, and seconds.
+// Optionally pass any Period arguments to get the difference in those periods,
+// ignoring any others. For example "Month, Day" would return "29 months, 6
+// days", instead of "2 years, 5 months, 6 days". The default is to get
+// everything excluding weeks.
 //
 // Adapted from https://stackoverflow.com/a/36531443/660921
 func (r Range) Diff(periods ...Period) Diff {
@@ -205,46 +227,58 @@ func (r Range) Diff(periods ...Period) Diff {
 	if len(periods) == 0 {
 		return d
 	}
-	if !hasP(Year, periods) {
+
+	var hasY, hasM, hasW, hasD, hasH, hasMin, hasSec bool
+	for _, v := range periods {
+		switch v {
+		case Year:
+			hasY = true
+		case Month:
+			hasM = true
+		case WeekMonday, WeekSunday:
+			hasW = true
+		case Day:
+			hasD = true
+		case Hour:
+			hasH = true
+		case Minute:
+			hasMin = true
+		case Second:
+			hasSec = true
+		}
+	}
+
+	if !hasY {
 		d.Months += d.Years * 12
 		d.Years = 0
 	}
-	if !hasP(Month, periods) {
+	if !hasM {
 		t := r.Start
 		for ; d.Months > 0; d.Months-- {
 			d.Days += DaysInMonth(t)
 			t = Add(t, 1, Month)
 		}
 	}
-	if hasP(WeekMonday, periods) || hasP(WeekSunday, periods) {
+	if hasW {
 		d.Weeks = d.Days / 7
 		d.Days = d.Days % 7
 	}
-	if !hasP(Day, periods) {
+	if !hasD {
 		d.Hours += d.Days * 24
 		d.Days = 0
 	}
-	if !hasP(Hour, periods) {
+	if !hasH {
 		d.Mins += d.Hours * 60
 		d.Hours = 0
 	}
-	if !hasP(Minute, periods) {
+	if !hasMin {
 		d.Secs += d.Mins * 60
 		d.Mins = 0
 	}
-	if !hasP(Second, periods) {
+	if !hasSec {
 		d.Secs = 0
 	}
 	return d
-}
-
-func hasP(p Period, pp []Period) bool {
-	for _, v := range pp {
-		if v == p {
-			return true
-		}
-	}
-	return false
 }
 
 // Diff represents the difference between two times.

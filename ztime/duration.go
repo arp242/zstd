@@ -10,6 +10,9 @@ import (
 // DurationAs formats a duration as the given time unit, with fractions (if
 // any).
 //
+// For example DurationAs(d, time.Millisecond) will return "0.05" for 50
+// microseconds.
+//
 // Use Round() if you want to limit the precision.
 func DurationAs(d, as time.Duration) string {
 	f := float64(d) / float64(as)

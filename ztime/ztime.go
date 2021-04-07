@@ -25,10 +25,10 @@ func (t Time) Round(d time.Duration) Time           { return Time{t.Time.Round(d
 func (t Time) Truncate(d time.Duration) Time        { return Time{t.Time.Truncate(d)} }
 func (t Time) UTC() Time                            { return Time{t.Time.UTC()} }
 
-// Period to adjust a time by.
+// Period to adjust or align a time by.
 type Period uint8
 
-// Periods to adjust a time by.
+// Periods to adjust or align a time by.
 const (
 	_ Period = iota + 1
 	Second
@@ -107,9 +107,13 @@ func SetNow(t *testing.T, s string) {
 //  2006-01-02 15:04:05 MST
 //
 // Any part on the right can be omitted; for example New("2020-01-01") will
-// create a new date without any time. A timezone can always be added.
+// create a new date without any time, or New("2020-01-01 13") will create a
+// date with the hour set.
 //
-// Will panic on errors.
+// A timezone can always be added, for example New("2020-01-01 13 CET").
+//
+// This will panic on errors. This is mostly useful in tests to quickly create a
+// date without too much ceremony.
 func New(s string) time.Time {
 	tz := strings.LastIndexByte(s, ' ')
 	if tz > -1 && strings.ContainsAny(s[tz:], "0123456789") {
@@ -146,7 +150,7 @@ func LeapYear(t time.Time) bool {
 	return y%4 == 0 && (y%100 != 0 || y%400 == 0)
 }
 
-// DaysInMonth gets the number of days for the month.
+// DaysInMonth returns the number of days for this month.
 func DaysInMonth(t time.Time) int {
 	switch t.Month() {
 	default:
@@ -167,6 +171,9 @@ func LastInMonth(t time.Time) bool {
 }
 
 // StartOf adjusts the time to the start of the given period.
+//
+// For example StartOf(t, QuarterHour) with "15:19" will adjust the time to
+// "15:15".
 func StartOf(t time.Time, p Period) time.Time {
 	y, m, d, h, min, s, _, l := t.Year(), int(t.Month()), t.Day(), t.Hour(), t.Minute(), t.Second(), t.Nanosecond(), t.Location()
 	ns := 0
@@ -204,6 +211,9 @@ func StartOf(t time.Time, p Period) time.Time {
 }
 
 // EndOf adjusts the time to the end of the given period.
+//
+// For example EndOf(t, QuarterHour) with "15:19" will adjust the time to
+// "15:30".
 func EndOf(t time.Time, p Period) time.Time {
 	y, m, d, h, min, s, _, l := t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second(), t.Nanosecond(), t.Location()
 	ns := 999999999
@@ -239,10 +249,23 @@ func EndOf(t time.Time, p Period) time.Time {
 
 // Add a time period.
 //
-// For Month, Quarter, and HalfYear, and Year the time will be set to the last
-// day of the month if the new month has fewer days than the current day.
+// This matches common understanding of what things like "next month" mean;
+// adding or subtracting months will always end up in the expected month,
+// regardless of the number of days in either month.
 //
-// Use negative values to go substract periods.
+// For example:
+//
+//   Jan 31 + 1 month  = Feb 28 (or Feb 29, if it's a leap year)
+//   Dec 31 - 3 months = Sep 30
+//
+// This is done for Month, Quarter, and HalfYear.
+//
+// There is one special case for Year: if the date is Feb 29th, adding or
+// subtracting a year will land you on Feb 28th.
+//
+// Since leap seconds are irregular and unpredictable they are not handled. The
+// entire concept is silly and most programs should just pretend they don't
+// exist.
 func Add(t time.Time, n int, p Period) time.Time {
 	y, m, d, h, min, s, ns, l := t.Year(), int(t.Month()), t.Day(), t.Hour(), t.Minute(), t.Second(), t.Nanosecond(), t.Location()
 	switch p {
@@ -262,23 +285,17 @@ func Add(t time.Time, n int, p Period) time.Time {
 		d += 7 * n
 	case Month:
 		m += n
-		if n := DaysInMonth(time.Date(y, time.Month(m), 1, h, min, s, ns, l)); DaysInMonth(t) > n {
-			d = n
+		if x := DaysInMonth(time.Date(y, time.Month(m), 1, h, min, s, ns, l)); d > x {
+			d = x
 		}
 	case Quarter:
-		m += 3 * n
-		if n := DaysInMonth(time.Date(y, time.Month(m), 1, h, min, s, ns, l)); DaysInMonth(t) > n {
-			d = n
-		}
+		return Add(t, n*3, Month)
 	case HalfYear:
-		m += 6 * n
-		if n := DaysInMonth(time.Date(y, time.Month(m), 1, h, min, s, ns, l)); DaysInMonth(t) > n {
-			d = n
-		}
+		return Add(t, n*6, Month)
 	case Year:
 		y += n
 		if n := DaysInMonth(time.Date(y, time.Month(m), 1, h, min, s, ns, l)); DaysInMonth(t) > n {
-			d = n // To deal with leap years
+			d = n // Deal with leap years
 		}
 	}
 	return time.Date(y, time.Month(m), d, h, min, s, ns, l)
