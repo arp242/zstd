@@ -546,3 +546,13 @@ func TrimPrefixes(s string, prefixes ...string) string {
 	}
 	return s
 }
+
+// IsASCII reports if this string looks like it's plain 7-bit ASCII.
+func IsASCII(s string) bool {
+	for _, c := range s {
+		if c > 0x7f {
+			return false
+		}
+	}
+	return true
+}

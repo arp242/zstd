@@ -676,3 +676,26 @@ func TestIndexN(t *testing.T) {
 		})
 	}
 }
+
+func TestIsASCII(t *testing.T) {
+	tests := []struct {
+		in   string
+		want bool
+	}{
+		{"", true},
+		{"asd", true},
+		{"asó", false},
+		{"as€", false},
+
+		{"\x00", true},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			have := IsASCII(tt.in)
+			if have != tt.want {
+				t.Errorf("\nhave: %t\nwant: %t", have, tt.want)
+			}
+		})
+	}
+}
