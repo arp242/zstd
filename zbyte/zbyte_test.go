@@ -1,7 +1,6 @@
 package zbyte
 
 import (
-	"reflect"
 	"testing"
 )
 
@@ -17,9 +16,9 @@ func TestBinary(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
-			got := Binary(tt.in)
-			if got != tt.want {
-				t.Errorf("want: %t; got: %t", tt.want, got)
+			have := Binary(tt.in)
+			if have != tt.want {
+				t.Errorf("want: %t; have: %t", tt.want, have)
 			}
 		})
 	}
@@ -38,9 +37,9 @@ func TestElideLeft(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
-			got := ElideLeft(tt.in, tt.n)
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("want: %s; got: %s", tt.want, got)
+			have := ElideLeft(tt.in, tt.n)
+			if string(have) != string(have) {
+				t.Errorf("want: %s; have: %s", tt.want, have)
 			}
 		})
 	}
@@ -59,9 +58,9 @@ func TestElideRight(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
-			got := ElideRight(tt.in, tt.n)
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("want: %s; got: %s", tt.want, got)
+			have := ElideRight(tt.in, tt.n)
+			if string(have) != string(have) {
+				t.Errorf("want: %s; have: %s", tt.want, have)
 			}
 		})
 	}

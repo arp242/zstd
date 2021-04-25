@@ -295,7 +295,6 @@ func TestToIntSlice(t *testing.T) {
 }
 
 func BenchmarkJoin(b *testing.B) {
-	b.ReportAllocs()
 	l := []int64{213, 52, 6342, 123, 6, 873, 123, 5463, 767, 12312, 1211, 90}
 	for n := 0; n < b.N; n++ {
 		Join(l, "")

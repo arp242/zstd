@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"go/ast"
 	"os"
-	"reflect"
 	"strings"
 	"testing"
 )
@@ -23,7 +22,7 @@ func TestModuleRoot(t *testing.T) {
 }
 
 func TestTag(t *testing.T) {
-	cases := []struct {
+	tests := []struct {
 		in, inName, want string
 		wantAttr         []string
 	}{
@@ -47,19 +46,19 @@ func TestTag(t *testing.T) {
 			"-", nil},
 	}
 
-	for _, tc := range cases {
-		t.Run(fmt.Sprintf("%v", tc.in), func(t *testing.T) {
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("%v", tt.in), func(t *testing.T) {
 			f := &ast.Field{
 				Names: []*ast.Ident{&ast.Ident{Name: "Original"}},
-				Tag:   &ast.BasicLit{Value: fmt.Sprintf("`%v`", tc.in)}}
+				Tag:   &ast.BasicLit{Value: fmt.Sprintf("`%v`", tt.in)}}
 
-			out, attr := Tag(f, tc.inName)
-			if out != tc.want {
-				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
+			out, attr := Tag(f, tt.inName)
+			if out != tt.want {
+				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tt.want)
 			}
 
-			if !reflect.DeepEqual(attr, tc.wantAttr) {
-				t.Errorf("\nout:  %#v\nwant: %#v\n", attr, tc.wantAttr)
+			if !cmp(attr, tt.wantAttr) {
+				t.Errorf("\nout:  %#v\nwant: %#v\n", attr, tt.wantAttr)
 			}
 		})
 	}
@@ -93,7 +92,7 @@ func TestTag(t *testing.T) {
 	})
 
 	t.Run("embed", func(t *testing.T) {
-		cases := []struct {
+		tests := []struct {
 			name string
 			in   *ast.Field
 			want string
@@ -132,14 +131,26 @@ func TestTag(t *testing.T) {
 			},
 		}
 
-		for _, tc := range cases {
-			t.Run(tc.name, func(t *testing.T) {
-				out := TagName(tc.in, "a")
-				if out != tc.want {
-					t.Errorf("\nout:  %#v\nwant: %#v\n", out, tc.want)
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
+				out := TagName(tt.in, "a")
+				if out != tt.want {
+					t.Errorf("\nout:  %#v\nwant: %#v\n", out, tt.want)
 				}
 			})
 		}
 
 	})
+}
+
+func cmp(a, b []string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
 }

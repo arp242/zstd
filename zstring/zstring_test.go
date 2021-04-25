@@ -106,7 +106,6 @@ func TestReverse(t *testing.T) {
 }
 func BenchmarkReverse(b *testing.B) {
 	s := strings.Repeat("H€łø🖖", 20)
-	b.ReportAllocs()
 
 	var c string
 	for n := 0; n < b.N; n++ {
@@ -277,7 +276,6 @@ func TestGetLine(t *testing.T) {
 
 func BenchmarkSub(b *testing.B) {
 	text := strings.Repeat("Hello, world, it's a sentences!\n", 200)
-	b.ReportAllocs()
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
 		Sub(text, 50, 250)
@@ -286,7 +284,6 @@ func BenchmarkSub(b *testing.B) {
 
 func BenchmarkElideLeft(b *testing.B) {
 	text := strings.Repeat("Hello, world, it's a sentences!\n", 200)
-	b.ReportAllocs()
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
 		ElideLeft(text, 250)
@@ -295,7 +292,6 @@ func BenchmarkElideLeft(b *testing.B) {
 
 func BenchmarkRemoveUnprintable(b *testing.B) {
 	text := strings.Repeat("Hello, world, it's a sentences!\n", 20000)
-	b.ReportAllocs()
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
 		GetLine(text, 200)
@@ -533,7 +529,6 @@ func TestIndexPairs(t *testing.T) {
 }
 func BenchmarkIndexPairs(b *testing.B) {
 	text := "Hello {world}, {asc}\n"
-	b.ReportAllocs()
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
 		IndexPairs(text, "{", "}")

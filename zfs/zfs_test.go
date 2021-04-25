@@ -86,10 +86,10 @@ func TestEmbedOrDir(t *testing.T) {
 			gotDev, errDev := fs.ReadFile(fsys, "zfs_test.go")
 
 			if tt.dev && (errDev != nil || errProd == nil || gotProd != nil) {
-				t.Fatal()
+				t.Fatalf("dev failed: errDev: %s; errProd: %s; gotProd: %s", errDev, errProd, gotProd)
 			}
 			if !tt.dev && (errDev == nil || errProd != nil || gotDev != nil) {
-				t.Fatal()
+				t.Fatalf("!dev failed: errDev: %s; errProd: %s; gotProd: %s", errDev, errProd, gotProd)
 			}
 
 			if tt.dev && !bytes.HasPrefix(gotDev, []byte("package zfs\n")) {
