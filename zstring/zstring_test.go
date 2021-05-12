@@ -694,3 +694,34 @@ func TestIsASCII(t *testing.T) {
 		})
 	}
 }
+
+func TestRemove(t *testing.T) {
+	tests := []struct {
+		in        []string
+		rm        string
+		want      bool
+		wantSlice []string
+	}{
+		{nil, "xx", false, nil},
+		{[]string{}, "xx", false, []string{}},
+
+		{[]string{"xx"}, "xx", true, []string{}},
+		{[]string{"xx", "a"}, "xx", true, []string{"a"}},
+		{[]string{"a", "xx"}, "xx", true, []string{"a"}},
+		{[]string{"xx", "a", "xx"}, "xx", true, []string{"a"}},
+		{[]string{"xx", "a", "xx", "b"}, "xx", true, []string{"a", "b"}},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			have := Remove(&tt.in, tt.rm)
+			if have != tt.want {
+				t.Errorf("\nhave: %t\nwant: %t", have, tt.want)
+			}
+			if !reflect.DeepEqual(tt.in, tt.wantSlice) {
+				fmt.Println(len(tt.in), cap(tt.in))
+				t.Errorf("\nhave: %v\nwant: %v", tt.in, tt.wantSlice)
+			}
+		})
+	}
+}

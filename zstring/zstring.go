@@ -556,3 +556,19 @@ func IsASCII(s string) bool {
 	}
 	return true
 }
+
+// Remove all values from a list.
+//
+// The return value indicates if this value was found at all.
+func Remove(l *[]string, name string) bool {
+	found := false
+	ll := *l
+	for i := len(ll) - 1; i >= 0; i-- {
+		if ll[i] == name {
+			ll = append(ll[:i], ll[i+1:]...)
+			found = true
+		}
+	}
+	*l = ll
+	return found
+}

@@ -77,6 +77,35 @@ func TestFilter(t *testing.T) {
 
 func TestJoin(t *testing.T) {
 	cases := []struct {
+		in       []int
+		expected string
+	}{
+		{
+			[]int{1, 2, 3, 4, 4, 5, 6, 6, 6, 6, 7, 8, 8, 8},
+			"1, 2, 3, 4, 4, 5, 6, 6, 6, 6, 7, 8, 8, 8",
+		},
+		{
+			[]int{-1, -2, -3, -4, -4, -5, -6, -6, -6, -6, -7, -8, -8, -8},
+			"-1, -2, -3, -4, -4, -5, -6, -6, -6, -6, -7, -8, -8, -8",
+		},
+		{
+			[]int{},
+			"",
+		},
+	}
+
+	for i, tt := range cases {
+		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
+			got := Join(tt.in, ", ")
+			if got != tt.expected {
+				t.Errorf("\nwant: %q\ngot:  %q", tt.expected, got)
+			}
+		})
+	}
+}
+
+func TestJoin64(t *testing.T) {
+	cases := []struct {
 		in       []int64
 		expected string
 	}{
@@ -96,7 +125,7 @@ func TestJoin(t *testing.T) {
 
 	for i, tt := range cases {
 		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
-			got := Join(tt.in, ", ")
+			got := Join64(tt.in, ", ")
 			if got != tt.expected {
 				t.Errorf("\nwant: %q\ngot:  %q", tt.expected, got)
 			}
@@ -294,9 +323,9 @@ func TestToIntSlice(t *testing.T) {
 	}
 }
 
-func BenchmarkJoin(b *testing.B) {
+func BenchmarkJoin64(b *testing.B) {
 	l := []int64{213, 52, 6342, 123, 6, 873, 123, 5463, 767, 12312, 1211, 90}
 	for n := 0; n < b.N; n++ {
-		Join(l, "")
+		Join64(l, "")
 	}
 }

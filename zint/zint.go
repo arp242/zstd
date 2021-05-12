@@ -18,7 +18,16 @@ func (s Int) Float32() float32 { return float32(s) }
 func (s Int) Float64() float64 { return float64(s) }
 
 // Join a slice of ints to a comma separated string with the given separator.
-func Join(ints []int64, sep string) string {
+func Join(ints []int, sep string) string {
+	s := make([]string, len(ints))
+	for i := range ints {
+		s[i] = strconv.Itoa(ints[i])
+	}
+	return strings.Join(s, sep)
+}
+
+// Join a slice of int64 to a comma separated string with the given separator.
+func Join64(ints []int64, sep string) string {
 	s := make([]string, len(ints))
 	for i := range ints {
 		s[i] = strconv.FormatInt(ints[i], 10)
