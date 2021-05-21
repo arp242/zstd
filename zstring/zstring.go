@@ -8,7 +8,9 @@ package zstring
 
 import (
 	"math/rand"
+	"reflect"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 	"unicode"
@@ -423,6 +425,20 @@ func IndexPairs(str, start, end string) [][]int {
 	return r
 }
 
+// ReplacePairs replaces everything starting with start and ending with end with
+// the return value of the callback.
+func ReplacePairs(str, start, end string, f func(int, string) string) string {
+	pairs := IndexPairs(str, start, end)
+	for i, m := range pairs {
+		if m[0] > 0 && str[m[0]] == str[m[0]-1] {
+			str = str[:m[0]] + str[m[0]+1:]
+			continue
+		}
+		str = str[:m[0]] + f(i, str[m[0]:m[1]+1]) + str[m[1]+1:]
+	}
+	return str
+}
+
 // WordWrap word wraps at n columns and prefixes subsequent lines with "prefix".
 //
 // Note the prefix is excluded from the length calculations; so if you want to
@@ -571,4 +587,99 @@ func Remove(l *[]string, name string) bool {
 	}
 	*l = ll
 	return found
+}
+
+// String converts a value to a string.
+//
+// This works for all built-in primitives, []byte, and values that implement
+// fmt.Stringer.
+func String(v interface{}) string {
+	if v == nil {
+		return ""
+	}
+
+	// Using a type switch like this is a bit ugly, but it avoids allocs and
+	// seems to be the fastest (reflect isn't *that* much slower, but it's a bit
+	// slower and can panic).
+	switch vv := v.(type) {
+	default:
+		return "<zstring.ToString: unsupported type: " + reflect.TypeOf(v).String() + ">"
+
+	case interface{ String() string }:
+		return vv.String()
+
+	case string:
+		return vv
+	case *string:
+		return *vv
+	case []byte:
+		return string(vv)
+	case *[]byte:
+		return string(*vv)
+
+	case bool:
+		return strconv.FormatBool(vv)
+	case *bool:
+		return strconv.FormatBool(*vv)
+
+	case float32:
+		return strconv.FormatFloat(float64(vv), 'f', -1, 32)
+	case *float32:
+		return strconv.FormatFloat(float64(*vv), 'f', -1, 32)
+	case float64:
+		return strconv.FormatFloat(vv, 'f', -1, 64)
+	case *float64:
+		return strconv.FormatFloat(*vv, 'f', -1, 64)
+
+	case complex64:
+		return strconv.FormatComplex(complex128(vv), 'f', -1, 64)
+	case *complex64:
+		return strconv.FormatComplex(complex128(*vv), 'f', -1, 64)
+	case complex128:
+		return strconv.FormatComplex(vv, 'f', -1, 64)
+	case *complex128:
+		return strconv.FormatComplex(*vv, 'f', -1, 64)
+
+	case int:
+		return strconv.FormatInt(int64(vv), 10)
+	case *int:
+		return strconv.FormatInt(int64(*vv), 10)
+	case int8:
+		return strconv.FormatInt(int64(vv), 10)
+	case *int8:
+		return strconv.FormatInt(int64(*vv), 10)
+	case int16:
+		return strconv.FormatInt(int64(vv), 10)
+	case *int16:
+		return strconv.FormatInt(int64(*vv), 10)
+	case int32:
+		return strconv.FormatInt(int64(vv), 10)
+	case *int32:
+		return strconv.FormatInt(int64(*vv), 10)
+	case int64:
+		return strconv.FormatInt(vv, 10)
+	case *int64:
+		return strconv.FormatInt(*vv, 10)
+
+	case uint:
+		return strconv.FormatUint(uint64(vv), 10)
+	case *uint:
+		return strconv.FormatUint(uint64(*vv), 10)
+	case uint8:
+		return strconv.FormatUint(uint64(vv), 10)
+	case *uint8:
+		return strconv.FormatUint(uint64(*vv), 10)
+	case uint16:
+		return strconv.FormatUint(uint64(vv), 10)
+	case *uint16:
+		return strconv.FormatUint(uint64(*vv), 10)
+	case uint32:
+		return strconv.FormatUint(uint64(vv), 10)
+	case *uint32:
+		return strconv.FormatUint(uint64(*vv), 10)
+	case uint64:
+		return strconv.FormatUint(vv, 10)
+	case *uint64:
+		return strconv.FormatUint(*vv, 10)
+	}
 }

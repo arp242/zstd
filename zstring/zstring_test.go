@@ -535,6 +535,33 @@ func BenchmarkIndexPairs(b *testing.B) {
 	}
 }
 
+func TestReplacePairs(t *testing.T) {
+	tests := []struct {
+		in, start, end string
+		f              func(int, string) string
+		want           string
+	}{
+		{"", "{", "}", func(int, string) string { return "X" }, ""},
+		{"xx", "{", "}", func(int, string) string { return "X" }, "xx"},
+
+		{"{xx}", "{", "}", func(int, string) string { return "X" }, "X"},
+		{"{xx} {yyy}", "{", "}", func(i int, s string) string { return strings.Repeat("X", i+1) }, "XX X"},
+
+		// No end mark
+		{"{xx} → {yyy", "{", "}", func(i int, s string) string { return strings.Repeat("X", i+1) }, "X → {yyy"},
+		{"{xx} → {yyy {x}", "{", "}", func(i int, s string) string { return strings.Repeat("X", i+1) }, "XX → X"},
+	}
+
+	for i, tt := range tests {
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			have := ReplacePairs(tt.in, tt.start, tt.end, tt.f)
+			if have != tt.want {
+				t.Errorf("\nhave: %q\nwant: %q", have, tt.want)
+			}
+		})
+	}
+}
+
 func TestUpto(t *testing.T) {
 	tests := []struct {
 		in, sep, upto, from string
@@ -721,6 +748,28 @@ func TestRemove(t *testing.T) {
 			if !reflect.DeepEqual(tt.in, tt.wantSlice) {
 				fmt.Println(len(tt.in), cap(tt.in))
 				t.Errorf("\nhave: %v\nwant: %v", tt.in, tt.wantSlice)
+			}
+		})
+	}
+}
+
+func TestString(t *testing.T) {
+	tests := []struct {
+		in   interface{}
+		want string
+	}{
+		{nil, ""},
+		{"x", "x"},
+		{1, "1"},
+		{NewPtr("X").P, "X"},
+		{NewPtr("X"), "X"},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			have := String(tt.in)
+			if have != tt.want {
+				t.Errorf("\nhave: %q\nwant: %q", have, tt.want)
 			}
 		})
 	}
