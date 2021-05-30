@@ -3,6 +3,7 @@ package zint
 import (
 	"encoding/json"
 	"fmt"
+	"math"
 	"reflect"
 	"testing"
 )
@@ -327,5 +328,30 @@ func BenchmarkJoin64(b *testing.B) {
 	l := []int64{213, 52, 6342, 123, 6, 873, 123, 5463, 767, 12312, 1211, 90}
 	for n := 0; n < b.N; n++ {
 		Join64(l, "")
+	}
+}
+
+func TestRoundToPowerOf2(t *testing.T) {
+	tests := []struct {
+		in, want uint64
+	}{
+		{0, 0},
+		{1, 1},
+		{2, 2},
+		{3, 4},
+		{4, 4},
+		{5, 8},
+		{math.MaxUint32, math.MaxUint32 + 1},
+		{math.MaxUint32 + 2, 8589934592},
+		{math.MaxUint64, 0}, // Overflows and wraps to 0
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			have := RoundToPowerOf2(tt.in)
+			if have != tt.want {
+				t.Errorf("\nhave: %d\nwant: %d", have, tt.want)
+			}
+		})
 	}
 }

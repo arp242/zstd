@@ -322,3 +322,18 @@ func ToUintSlice(v interface{}) ([]uint64, bool) {
 
 	return r, r != nil
 }
+
+// RoundToPowerOf2 rounds up to the nearest power of 2.
+//
+// https://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerOf2
+func RoundToPowerOf2(n uint64) uint64 {
+	n--
+	n |= n >> 1
+	n |= n >> 2
+	n |= n >> 4
+	n |= n >> 8
+	n |= n >> 16
+	n |= n >> 32
+	n++
+	return n
+}
