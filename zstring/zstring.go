@@ -7,6 +7,7 @@
 package zstring
 
 import (
+	"bytes"
 	"math/rand"
 	"reflect"
 	"sort"
@@ -439,55 +440,104 @@ func ReplacePairs(str, start, end string, f func(int, string) string) string {
 	return str
 }
 
+const nbsp = 0xa0
+
 // WordWrap word wraps at n columns and prefixes subsequent lines with "prefix".
 //
 // Note the prefix is excluded from the length calculations; so if you want to
 // wrap at 80 with a prefix of "> ", then you should wrap at 78.
-func WordWrap(text, prefix string, n int) string {
-	l := DisplayWidth(text)
-	if l <= n {
-		return text
-	}
-
-	// TODO: should probably look at http://www.unicode.org/reports/tr29/
-	// But for now this will do.
-
+//
+// Adapted from: https://github.com/mitchellh/go-wordwrap
+func WordWrap(text, prefix string, lim int) string {
 	var (
-		out  strings.Builder
-		line = make([]rune, 0, n)
+		init                             = make([]byte, 0, len(text))
+		buf                              = bytes.NewBuffer(init)
+		wordBuf, spaceBuf                bytes.Buffer
+		current, wordBufLen, spaceBufLen int
 	)
-	for _, c := range text {
-		line = append(line, c)
-
-		if len(line) > 0 && len(line)%n == 0 {
-			next := make([]rune, 0, 8) // Remove part of the last word and carry over to next line.
-			for j := len(line) - 1; j >= 0; j-- {
-				if (unicode.IsSpace(line[j]) || line[j] == '-') && line[j] != 0x00a0 {
-					break
+	for _, char := range text {
+		switch {
+		case char == '\n':
+			if wordBuf.Len() == 0 {
+				if current+spaceBufLen > lim {
+					current = 0
+				} else {
+					current += spaceBufLen
+					spaceBuf.WriteTo(buf)
 				}
-				next = append(next, line[j])
+				spaceBuf.Reset()
+				spaceBufLen = 0
+			} else {
+				current += spaceBufLen + wordBufLen
+				spaceBuf.WriteTo(buf)
+				spaceBuf.Reset()
+				spaceBufLen = 0
+				wordBuf.WriteTo(buf)
+				wordBuf.Reset()
+				wordBufLen = 0
+			}
+			buf.WriteRune(char)
+			current = 0
+		case unicode.IsSpace(char) && char != nbsp:
+			if spaceBuf.Len() == 0 || wordBuf.Len() > 0 {
+				current += spaceBufLen + wordBufLen
+				spaceBuf.WriteTo(buf)
+				spaceBuf.Reset()
+				spaceBufLen = 0
+				wordBuf.WriteTo(buf)
+				wordBuf.Reset()
+				wordBufLen = 0
 			}
 
-			if len(next) == n { // Word is longer than the wrap limit: just write it.
-				continue
+			spaceBuf.WriteRune(char)
+			spaceBufLen++
+		default:
+			wordBuf.WriteRune(char)
+			wordBufLen++
+
+			if current+wordBufLen+spaceBufLen > lim && wordBufLen < lim {
+				buf.WriteRune('\n')
+				buf.WriteString(prefix)
+				current = 0
+				spaceBuf.Reset()
+				spaceBufLen = 0
 			}
-
-			for i, j := 0, len(next)-1; i < j; i, j = i+1, j-1 { // Reverse
-				next[i], next[j] = next[j], next[i]
-			}
-
-			out.WriteString(strings.TrimRight(string(line[:len(line)-len(next)]), " \t\n"))
-			out.WriteRune('\n')
-			out.WriteString(prefix)
-
-			line = append(make([]rune, 0, n), next...)
 		}
 	}
 
-	if len(line) > 0 {
-		out.WriteString(string(line))
+	if wordBuf.Len() == 0 {
+		if current+spaceBufLen <= lim {
+			spaceBuf.WriteTo(buf)
+		}
+	} else {
+		spaceBuf.WriteTo(buf)
+		wordBuf.WriteTo(buf)
 	}
-	return out.String()
+
+	return buf.String()
+}
+
+// Ident adds n spaces of indentation to every line.
+func Indent(s string, n int) string {
+	var (
+		buf    strings.Builder
+		indent = strings.Repeat(" ", n)
+	)
+	buf.Grow(len(s) + n*2)
+	buf.WriteString(indent)
+	for _, c := range s {
+		buf.WriteRune(c)
+		if c == '\n' {
+			buf.WriteString(indent)
+		}
+	}
+
+	// TODO: may be faster with bytes.Buffer? Can set the length on that.
+	if s[len(s)-1] == '\n' {
+		s = buf.String()
+		return s[:len(s)-len(indent)]
+	}
+	return buf.String()
 }
 
 // DisplayWidth gets the display width of a string, taking tabs and escape

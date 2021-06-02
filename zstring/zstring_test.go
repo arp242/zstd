@@ -31,8 +31,8 @@ func TestWordWrap(t *testing.T) {
 			"Click this link yo:\nhttps://github.com/zgoat/zstd/blob/master/README.md"},
 
 		{10, "> ",
-			"> Hello, world! it's a test",
-			"> Hello,\n> world!\n> it's a\n> test"},
+			"Hello, world! it's a test",
+			"Hello,\n> world!\n> it's a\n> test"},
 		{10, "> ",
 			"> H€łłø, ωørłð¿ it’s a ţësţ",
 			"> H€łłø,\n> ωørłð¿\n> it’s a\n> ţësţ"},
@@ -40,9 +40,32 @@ func TestWordWrap(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
-			got := WordWrap(tt.in, tt.prefix, tt.n)
-			if got != tt.want {
-				t.Errorf("\ngot:\n%s\n\nwant:\n%s", got, tt.want)
+			have := WordWrap(tt.in, tt.prefix, tt.n)
+			if have != tt.want {
+				t.Errorf("\nhave:\n%q\n\nwant:\n%q", have, tt.want)
+			}
+		})
+	}
+}
+
+func TestIndent(t *testing.T) {
+	tests := []struct {
+		n    int
+		in   string
+		want string
+	}{
+		{2, "Hello", "  Hello"},
+		{2, "Hello\n", "  Hello\n"},
+		{2, "Hello\nWorld", "  Hello\n  World"},
+		{2, "Hello\nWorld\n", "  Hello\n  World\n"},
+		{2, "Hello\nWorld\n\n", "  Hello\n  World\n  \n"},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			have := Indent(tt.in, tt.n)
+			if have != tt.want {
+				t.Errorf("\nhave:\n%q\n\nwant:\n%q", have, tt.want)
 			}
 		})
 	}
