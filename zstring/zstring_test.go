@@ -48,7 +48,7 @@ func TestWordWrap(t *testing.T) {
 	}
 }
 
-func TestTabWidth(t *testing.T) {
+func TestDisplayWidth(t *testing.T) {
 	tests := []struct {
 		in   string
 		want int
@@ -66,6 +66,7 @@ func TestTabWidth(t *testing.T) {
 		{"\t\t", 16},
 		{"a\ta\t", 16},
 		{"a\ta\ta", 17},
+		{"\x1b123]m asd\x1b0m", 4},
 
 		// Emojis.
 		// {"🧑\u200d🚒", 1},
@@ -74,7 +75,7 @@ func TestTabWidth(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
-			got := TabWidth(tt.in)
+			got := DisplayWidth(tt.in)
 			if got != tt.want {
 				t.Errorf("\ngot:  %d\nwant: %d", got, tt.want)
 			}

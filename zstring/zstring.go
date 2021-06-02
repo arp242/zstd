@@ -444,7 +444,7 @@ func ReplacePairs(str, start, end string, f func(int, string) string) string {
 // Note the prefix is excluded from the length calculations; so if you want to
 // wrap at 80 with a prefix of "> ", then you should wrap at 78.
 func WordWrap(text, prefix string, n int) string {
-	l := TabWidth(text)
+	l := DisplayWidth(text)
 	if l <= n {
 		return text
 	}
@@ -490,20 +490,34 @@ func WordWrap(text, prefix string, n int) string {
 	return out.String()
 }
 
-// Tabwidth gets the display width of a string, taking tabs in to account.
+// DisplayWidth gets the display width of a string, taking tabs and escape
+// sequences in to account.
 //
 // This does *not* handle various unicode aspects (i.e. graphmeme clusters,
 // display width).
-func TabWidth(s string) int {
+func DisplayWidth(s string) int {
 	l := utf8.RuneCountInString(s)
-	if strings.Index(s, "\t") == -1 {
-		return l
-	}
 
+	// Tabs are not a fixed width, but go to the nearest multiple of 8.
 	split := strings.Split(s, "\t")
 	for _, ss := range split[:len(split)-1] {
 		l += 7 - utf8.RuneCountInString(ss)
 	}
+
+	// Escape sequences.
+	for _, esc := range IndexAll(s, "\x1b") {
+		i := 1
+		for _, c := range s[esc:] {
+			if c == 'm' {
+				break
+			}
+			i++
+		}
+		l -= i
+	}
+
+	// TODO: Maybe also find a list of common unprintable things?
+
 	return l
 }
 
