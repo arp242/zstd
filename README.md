@@ -2,8 +2,7 @@
 Go's standard library. There are no external dependencies. The naming scheme is
 `z[type]` or `z[pkgname]`.
 
-[Documentation](https://pkg.go.dev/zgo.at/zstd?tab=subdirectories)
-
+API docs: https://godocs.io/zgo.at/zstd
 
 Other useful packages:
 
