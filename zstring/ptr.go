@@ -41,12 +41,12 @@ func (p Ptr) Val() string {
 // Scan converts the data from the DB.
 func (p *Ptr) Scan(src interface{}) error {
 	if p == nil {
-		return fmt.Errorf("zdb.Ptr: not initialized")
+		return fmt.Errorf("zstring.Ptr: not initialized")
 	}
 
 	switch v := src.(type) {
 	default:
-		return fmt.Errorf("zdb.Ptr: unsupported type %T", src)
+		return fmt.Errorf("zstring.Ptr: unsupported type %T", src)
 	case nil:
 	case []byte:
 		tt := string(v)
@@ -89,7 +89,7 @@ func (p Ptr) MarshalText() ([]byte, error) {
 // UnmarshalText parses text in to the Go data structure.
 func (p *Ptr) UnmarshalText(text []byte) error {
 	if p == nil {
-		return fmt.Errorf("zdb.Ptr: not initialized")
+		return fmt.Errorf("zstring.Ptr: not initialized")
 	}
 
 	tt := string(text)

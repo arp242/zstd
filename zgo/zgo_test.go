@@ -9,7 +9,7 @@ import (
 )
 
 func TestModuleRoot(t *testing.T) {
-	if r := ModuleRoot(); r != "/home/martin/code/zstd" {
+	if r := ModuleRoot(); r != "/home/martin/code/Golib/zstd" {
 		t.Error(r)
 	}
 
