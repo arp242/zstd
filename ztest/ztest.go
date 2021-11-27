@@ -93,24 +93,57 @@ func Read(t *testing.T, paths ...string) []byte {
 	return file
 }
 
+// TempFiles creates multiple temporary files in the same directory.
+//
+// The return value is the temporary directory name.
+//
+// Example:
+//
+//   TempFiles(t, "go.mod", "module test", "name1*.go", "package test")
+func TempFiles(t *testing.T, nameData ...string) string {
+	t.Helper()
+
+	if len(nameData)%2 != 0 {
+		t.Fatal("ztest.TempFiles: not an even amount of nameData arguments")
+	}
+
+	dir := t.TempDir()
+	for i := 0; i < len(nameData); i += 2 {
+		tempFile(t, dir, nameData[i], nameData[i+1])
+	}
+	return dir
+}
+
 // TempFile creates a new temporary file and returns the path.
 //
 // The name is the filename to use; a "*" will be replaced with a random string,
-// with the rules documented in in os.CreateTemp(). If name is empty then it
-// will use "ztest.*".
+// if it doesn't then it will create a file with exactly that name. If name is
+// empty then it will use "ztest.*".
 //
 // The file will be removed when the test ends.
 func TempFile(t *testing.T, name, data string) string {
+	t.Helper()
+	return tempFile(t, t.TempDir(), name, data)
+}
+
+func tempFile(t *testing.T, dir, name, data string) string {
 	t.Helper()
 
 	if name == "" {
 		name = "ztest.*"
 	}
 
-	tmpdir := t.TempDir()
-	fp, err := os.CreateTemp(tmpdir, name)
+	var (
+		fp  *os.File
+		err error
+	)
+	if strings.Contains(name, "*") {
+		fp, err = os.CreateTemp(dir, name)
+	} else {
+		fp, err = os.Create(filepath.Join(dir, name))
+	}
 	if err != nil {
-		t.Fatalf("ztest.TempFile: could not create file in %v: %v", tmpdir, err)
+		t.Fatalf("ztest.TempFile: could not create file in %v: %v", dir, err)
 	}
 
 	defer func() {
