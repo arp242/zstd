@@ -2,6 +2,7 @@
 package zint
 
 import (
+	"fmt"
 	"math"
 	"strconv"
 	"strings"
@@ -336,4 +337,20 @@ func RoundToPowerOf2(n uint64) uint64 {
 	n |= n >> 32
 	n++
 	return n
+}
+
+// Fields splits a strings with strings.Fields() and parses each entry as an
+// integer.
+func Fields(s string) ([]int64, error) {
+	sf := strings.Fields(s)
+	nf := make([]int64, len(sf))
+	for i, f := range sf {
+		n, err := strconv.ParseInt(f, 0, 64)
+		if err != nil {
+			return nil, fmt.Errorf("zint.Fields: parsing entry %d in %q: %w", i, s, err)
+		}
+		nf[i] = n
+	}
+
+	return nf, nil
 }
