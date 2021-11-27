@@ -103,8 +103,12 @@ func Read(t *testing.T, paths ...string) []byte {
 func TempFile(t *testing.T, name, data string) string {
 	t.Helper()
 
+	if name == "" {
+		name = "ztest.*"
+	}
+
 	tmpdir := t.TempDir()
-	fp, err := os.CreateTemp(tmpdir, "ztest.*")
+	fp, err := os.CreateTemp(tmpdir, name)
 	if err != nil {
 		t.Fatalf("ztest.TempFile: could not create file in %v: %v", tmpdir, err)
 	}
