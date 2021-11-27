@@ -94,7 +94,13 @@ func Read(t *testing.T, paths ...string) []byte {
 }
 
 // TempFile creates a new temporary file and returns the path.
-func TempFile(t *testing.T, data string) string {
+//
+// The name is the filename to use; a "*" will be replaced with a random string,
+// with the rules documented in in os.CreateTemp(). If name is empty then it
+// will use "ztest.*".
+//
+// The file will be removed when the test ends.
+func TempFile(t *testing.T, name, data string) string {
 	t.Helper()
 
 	tmpdir := t.TempDir()

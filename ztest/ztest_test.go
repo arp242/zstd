@@ -84,7 +84,7 @@ func TestErrorContains(t *testing.T) {
 func TestTempFile(t *testing.T) {
 	var f string
 	t.Run("", func(t *testing.T) {
-		f = TempFile(t, "hello\nworld")
+		f = TempFile(t, "", "hello\nworld")
 		_, err := os.Stat(f)
 		if err != nil {
 			t.Fatalf("stat failed: %s", err)
