@@ -13,11 +13,83 @@ type Range struct {
 	// TODO: these should not be exported; they're only exported for now to make
 	// migrating to Range a bit easier.
 	Start, End time.Time
+
+	locale RangeLocale
 }
 
 // NewRange creates a new range with the start date set.
 func NewRange(start time.Time) Range {
-	return Range{Start: start}
+	return Range{Start: start, locale: DefaultRangeLocale}
+}
+
+// RangeLocale can be used to translate the output of Range.String().
+//
+// This defaults to DefaultRangeLocale.
+type RangeLocale struct {
+	Today     func() string             // "Today"
+	Yesterday func() string             // "Yesterday"
+	Month     func(m time.Month) string // "January", "December"
+	DayAgo    func(n int) string        // "1 day ago", "5 days ago"
+	WeekAgo   func(n int) string        // "1 week ago", "5 weeks ago"
+	MonthAgo  func(n int) string        // "1 month ago", "5 months ago"
+}
+
+var DefaultRangeLocale = RangeLocale{
+	Today:     func() string { return "Today" },
+	Yesterday: func() string { return "Yesterday" },
+	Month: func(m time.Month) string {
+		return []string{"January", "February", "March", "April", "May", "June",
+			"July", "August", "September", "October", "November", "December"}[m-1]
+	},
+	DayAgo: func(n int) string {
+		if n == 1 {
+			return "1 day ago"
+		}
+		return strconv.Itoa(n) + " days ago"
+	},
+	WeekAgo: func(n int) string {
+		if n == 1 {
+			return "1 week ago"
+		}
+		return strconv.Itoa(n) + " weeks ago"
+	},
+	MonthAgo: func(n int) string {
+		if n == 1 {
+			return "1 month ago"
+		}
+		return strconv.Itoa(n) + " months ago"
+	},
+}
+
+// Locale sets the translated strings to use for this time range.
+//
+// Any of the struct values will default to DefaultRangeLocale if one of the
+// struct values isn't set, so this:
+//
+//     rng = rng.Locale(RangeLocale{Today: func() string { return ".." }})
+//
+// Will work.
+func (r Range) Locale(l RangeLocale) Range {
+	if l.Today == nil {
+		l.Today = DefaultRangeLocale.Today
+	}
+	if l.Yesterday == nil {
+		l.Yesterday = DefaultRangeLocale.Yesterday
+	}
+	if l.Month == nil {
+		l.Month = DefaultRangeLocale.Month
+	}
+	if l.DayAgo == nil {
+		l.DayAgo = DefaultRangeLocale.DayAgo
+	}
+	if l.WeekAgo == nil {
+		l.WeekAgo = DefaultRangeLocale.WeekAgo
+	}
+	if l.MonthAgo == nil {
+		l.MonthAgo = DefaultRangeLocale.MonthAgo
+	}
+	r.locale = l
+	return r
 }
 
 // From returns a copy with the start time set.
@@ -119,7 +191,6 @@ func (r Range) String() string {
 	r.Start, r.End = StartOf(r.Start, Day), StartOf(r.End, Day)
 
 	d := r.Diff(Day, Month)
-	n := strconv.Itoa
 	addYear := func(t time.Time, s string) string {
 		if t.Year() != today.Year() {
 			return s + " 2006"
@@ -138,37 +209,30 @@ func (r Range) String() string {
 	}
 
 	if d.Months == 0 && d.Days == 0 && StartOf(r.End.AddDate(0, 0, 1), Day).Equal(today) {
-		return "Yesterday"
+		return r.locale.Yesterday()
 	}
 
 	if r.End.Equal(today) {
 		if d.Months == 0 {
 			if d.Days == 0 {
-				return "Today"
+				return r.locale.Today()
 			}
 			if d.Days == 1 {
-				return "Yesterday–Today"
+				return r.locale.Yesterday() + "–" + r.locale.Today()
 			}
 		}
 
 		if r.Start.Day() == r.End.Day() {
-			if d.Months == 1 {
-				return n(d.Months) + " month ago–Today"
-			}
-			return n(d.Months) + " months ago–Today"
+			return r.locale.MonthAgo(d.Months) + "–" + r.locale.Today()
 		}
 		if d.Days%7 == 0 {
-			w := n(d.Days / 7)
-			if w == "1" {
-				return w + " week ago–Today"
-			}
-			return w + " weeks ago–Today"
+			return r.locale.WeekAgo(d.Days/7) + "–" + r.locale.Today()
 		}
 		if d.Months > 0 {
-			return r.Start.Format("Jan 2") + "–Today"
+			return r.Start.Format("Jan 2") + "–" + r.locale.Today()
 		}
 
-		return n(d.Days) + " days ago–Today"
+		return r.locale.DayAgo(d.Days) + "–" + r.locale.Today()
 	}
 
 	if d.Months == 0 && d.Days == 0 {
