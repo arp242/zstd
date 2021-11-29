@@ -318,7 +318,10 @@ func CopyTree(src, dst string, options *CopyTreeOptions) error {
 	}
 	_, err = os.Open(dst)
 	if !os.IsNotExist(err) {
-		return &ErrExists{dst}
+		ls, err := os.ReadDir(dst)
+		if err != nil || len(ls) > 0 {
+			return &ErrExists{dst}
+		}
 	}
 
 	entries, err := os.ReadDir(src)
