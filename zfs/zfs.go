@@ -64,3 +64,19 @@ func SubIfExists(fsys fs.FS, dir string) (fs.FS, error) {
 	}
 	return fsys, nil
 }
+
+type overlayFS struct{ base, overlay fs.FS }
+
+func (o overlayFS) Open(name string) (fs.File, error) {
+	f, err := o.overlay.Open(name)
+	if err == nil {
+		return f, err
+	}
+	return o.base.Open(name)
+}
+
+// OverlayFS returns a filesystem which reads from overlay, falling back to base
+// if that fails.
+func OverlayFS(base, overlay fs.FS) fs.FS {
+	return overlayFS{base: base, overlay: overlay}
+}

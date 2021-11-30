@@ -101,3 +101,38 @@ func TestEmbedOrDir(t *testing.T) {
 		})
 	}
 }
+
+func TestOverlayFS(t *testing.T) {
+	base := fstest.MapFS{
+		"both":      &fstest.MapFile{Data: []byte("both-base")},
+		"base-only": &fstest.MapFile{Data: []byte("base-only")},
+	}
+	overlay := fstest.MapFS{
+		"both":         &fstest.MapFile{Data: []byte("both-overlay")},
+		"overlay-only": &fstest.MapFile{Data: []byte("overlay-only")},
+	}
+
+	fsys := OverlayFS(base, overlay)
+	both, err := fs.ReadFile(fsys, "both")
+	if err != nil {
+		t.Fatal(err)
+	}
+	baseOnly, err := fs.ReadFile(fsys, "base-only")
+	if err != nil {
+		t.Fatal(err)
+	}
+	overlayOnly, err := fs.ReadFile(fsys, "overlay-only")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if string(both) != "both-overlay" {
+		t.Errorf("both: %q", string(both))
+	}
+	if string(baseOnly) != "base-only" {
+		t.Errorf("base-only: %q", string(baseOnly))
+	}
+	if string(overlayOnly) != "overlay-only" {
+		t.Errorf("overlay-only: %q", string(overlayOnly))
+	}
+}
