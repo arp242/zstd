@@ -3,8 +3,10 @@ package zfs
 
 import (
 	"embed"
+	"fmt"
 	"io/fs"
 	"os"
+	"sort"
 	"strings"
 
 	"zgo.at/zstd/zgo"
@@ -73,6 +75,40 @@ func (o overlayFS) Open(name string) (fs.File, error) {
 		return f, err
 	}
 	return o.base.Open(name)
+}
+
+func (o overlayFS) ReadDir(name string) ([]fs.DirEntry, error) {
+	var ls []fs.DirEntry
+
+	if rd, ok := o.base.(fs.ReadDirFS); ok {
+		l, err := rd.ReadDir(name)
+		if err != nil {
+			return nil, fmt.Errorf("overlayFS: base: %w", err)
+		}
+		ls = l
+	}
+
+	if rd, ok := o.overlay.(fs.ReadDirFS); ok {
+		l, err := rd.ReadDir(name)
+		if err != nil {
+			return nil, fmt.Errorf("overlayFS: overlay: %w", err)
+		}
+
+		merge := make(map[string]fs.DirEntry)
+		for _, f := range ls {
+			merge[f.Name()] = f
+		}
+		for _, f := range l {
+			merge[f.Name()] = f
+		}
+		ls = make([]fs.DirEntry, 0, len(merge))
+		for _, f := range merge {
+			ls = append(ls, f)
+		}
+		sort.Slice(ls, func(i, j int) bool { return ls[i].Name() < ls[j].Name() })
+	}
+
+	return ls, nil
 }
 
 // OverlayFS returns a filesystem which reads from overlay, falling back to base
