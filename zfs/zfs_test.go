@@ -104,7 +104,7 @@ func TestEmbedOrDir(t *testing.T) {
 }
 
 func TestOverlayFS(t *testing.T) {
-	fsys := OverlayFS(
+	fsys := NewOverlayFS(
 		fstest.MapFS{
 			"both":      &fstest.MapFile{Data: []byte("both-base")},
 			"base-only": &fstest.MapFile{Data: []byte("base-only")},
@@ -140,6 +140,26 @@ func TestOverlayFS(t *testing.T) {
 		files = append(files, l.Name())
 	}
 	if !reflect.DeepEqual(files, []string{"base-only", "both", "overlay-only"}) {
+		t.Error()
+	}
+
+	if !fsys.InOverlay("both") {
+		t.Error()
+	}
+	if fsys.InOverlay("base-only") {
+		t.Error()
+	}
+	if !fsys.InOverlay("overlay-only") {
+		t.Error()
+	}
+
+	if !fsys.InBase("both") {
+		t.Error()
+	}
+	if !fsys.InBase("base-only") {
+		t.Error()
+	}
+	if fsys.InBase("overlay-only") {
 		t.Error()
 	}
 }

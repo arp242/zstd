@@ -67,9 +67,10 @@ func SubIfExists(fsys fs.FS, dir string) (fs.FS, error) {
 	return fsys, nil
 }
 
-type overlayFS struct{ base, overlay fs.FS }
+type OverlayFS struct{ base, overlay fs.FS }
 
-func (o overlayFS) Open(name string) (fs.File, error) {
+// Open implements the fs.FS interface.
+func (o OverlayFS) Open(name string) (fs.File, error) {
 	f, err := o.overlay.Open(name)
 	if err == nil {
 		return f, err
@@ -77,13 +78,14 @@ func (o overlayFS) Open(name string) (fs.File, error) {
 	return o.base.Open(name)
 }
 
-func (o overlayFS) ReadDir(name string) ([]fs.DirEntry, error) {
+// ReadDir implements the fs.ReadDirFS interface.
+func (o OverlayFS) ReadDir(name string) ([]fs.DirEntry, error) {
 	var ls []fs.DirEntry
 
 	if rd, ok := o.base.(fs.ReadDirFS); ok {
 		l, err := rd.ReadDir(name)
 		if err != nil {
-			return nil, fmt.Errorf("overlayFS: base: %w", err)
+			return nil, fmt.Errorf("OverlayFS: base: %w", err)
 		}
 		ls = l
 	}
@@ -91,7 +93,7 @@ func (o overlayFS) ReadDir(name string) ([]fs.DirEntry, error) {
 	if rd, ok := o.overlay.(fs.ReadDirFS); ok {
 		l, err := rd.ReadDir(name)
 		if err != nil {
-			return nil, fmt.Errorf("overlayFS: overlay: %w", err)
+			return nil, fmt.Errorf("OverlayFS: overlay: %w", err)
 		}
 
 		merge := make(map[string]fs.DirEntry)
@@ -111,8 +113,17 @@ func (o overlayFS) ReadDir(name string) ([]fs.DirEntry, error) {
 	return ls, nil
 }
 
+// InOverlay reports if this filename exists in the overlay part. It may or may
+// not exist in the base part.
+func (o OverlayFS) InOverlay(name string) bool { _, err := o.overlay.Open(name); return err == nil }
+
+// InBase reports if this filename exists in the base part. It may or may
+// not exist in the overlay part.
+func (o OverlayFS) InBase(name string) bool { _, err := o.base.Open(name); return err == nil }
+
 // OverlayFS returns a filesystem which reads from overlay, falling back to base
 // if that fails.
-func OverlayFS(base, overlay fs.FS) fs.FS {
-	return overlayFS{base: base, overlay: overlay}
+//func OverlayFS(base, overlay fs.FS) fs.FS {
+func NewOverlayFS(base, overlay fs.FS) OverlayFS {
+	return OverlayFS{base: base, overlay: overlay}
 }
