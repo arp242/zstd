@@ -22,45 +22,6 @@ func NewRange(start time.Time) Range {
 	return Range{Start: start, locale: DefaultRangeLocale}
 }
 
-// RangeLocale can be used to translate the output of Range.String().
-//
-// This defaults to DefaultRangeLocale.
-type RangeLocale struct {
-	Today     func() string             // "Today"
-	Yesterday func() string             // "Yesterday"
-	Month     func(m time.Month) string // "January", "December"
-	DayAgo    func(n int) string        // "1 day ago", "5 days ago"
-	WeekAgo   func(n int) string        // "1 week ago", "5 weeks ago"
-	MonthAgo  func(n int) string        // "1 month ago", "5 months ago"
-}
-
-var DefaultRangeLocale = RangeLocale{
-	Today:     func() string { return "Today" },
-	Yesterday: func() string { return "Yesterday" },
-	Month: func(m time.Month) string {
-		return []string{"January", "February", "March", "April", "May", "June",
-			"July", "August", "September", "October", "November", "December"}[m-1]
-	},
-	DayAgo: func(n int) string {
-		if n == 1 {
-			return "1 day ago"
-		}
-		return strconv.Itoa(n) + " days ago"
-	},
-	WeekAgo: func(n int) string {
-		if n == 1 {
-			return "1 week ago"
-		}
-		return strconv.Itoa(n) + " weeks ago"
-	},
-	MonthAgo: func(n int) string {
-		if n == 1 {
-			return "1 month ago"
-		}
-		return strconv.Itoa(n) + " months ago"
-	},
-}
-
 // Locale sets the translated strings to use for this time range.
 //
 // Any of the struct values will default to DefaultRangeLocale if one of the
@@ -131,6 +92,34 @@ func (r Range) In(loc *time.Location) Range {
 	return r
 }
 
+// Equal reports whether this range equals the given time range with
+// time.Time.Equal().
+func (r Range) Equal(cmp Range) bool {
+	return r.Start.Equal(cmp.Start) && r.End.Equal(cmp.End)
+}
+
+// IsZero reports whether both the start and end date represent the zero time
+// instant with time.Time.Equal().
+func (r Range) IsZero() bool {
+	return r.Start.IsZero() && r.End.IsZero()
+}
+
+// Round returns the result of rounding the start and end dates to the nearest
+// multiple of the given duration with time.Time.Round().
+func (r Range) Round(d time.Duration) Range {
+	r.Start = r.Start.Round(d)
+	r.End = r.End.Round(d)
+	return r
+}
+
+// Truncate returns the result of rounding the start and end dates down to a
+// multiple of the given duration with time.Time.Truncate().
+func (r Range) Truncate(d time.Duration) Range {
+	r.Start = r.Start.Truncate(d)
+	r.End = r.End.Truncate(d)
+	return r
+}
+
 // Current returns a copy with the start and end times set the current Period p.
 //
 // This uses the value of the start time. Any value in the end time is ignored.
@@ -140,10 +129,9 @@ func (r Range) In(loc *time.Location) Range {
 //   Current(Month)       2020-06-01 00:00:00       → 2020-06-30 23:59:59
 //   Current(WeekMonday)  2020-06-15 00:00:00 (Mon) → 2020-06-21 23:59:59 (Sun)
 func (r Range) Current(p Period) Range {
-	return Range{
-		Start: StartOf(r.Start, p),
-		End:   EndOf(r.Start, p),
-	}
+	r.Start = StartOf(r.Start, p)
+	r.End = EndOf(r.Start, p)
+	return r
 }
 
 // Last returns a copy with the start and end times set to the last Period p.
@@ -175,10 +163,9 @@ func (r Range) Last(p Period) Range {
 		Year:       Day,
 	}[p]
 
-	return Range{
-		Start: StartOf(Add(r.Start, -1, p), pp),
-		End:   EndOf(r.Start, pp),
-	}
+	r.Start = StartOf(Add(r.Start, -1, p), pp)
+	r.End = EndOf(r.Start, pp)
+	return r
 }
 
 // String shows the range from start to end as a human-readable representation;
