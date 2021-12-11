@@ -163,8 +163,9 @@ func (r Range) Last(p Period) Range {
 		Year:       Day,
 	}[p]
 
-	r.Start = StartOf(Add(r.Start, -1, p), pp)
-	r.End = EndOf(r.Start, pp)
+	s := r.Start
+	r.Start = StartOf(Add(s, -1, p), pp)
+	r.End = EndOf(s, pp)
 	return r
 }
 
@@ -173,6 +174,8 @@ func (r Range) Last(p Period) Range {
 //
 // It falls back to "Mon Jan 2–Mon Jan 2" if there's no clear way to describe
 // it.
+//
+// TODO: i18n for months names; should really use CLDR for "short" format too.
 func (r Range) String() string {
 	today := StartOf(Now().In(r.Start.Location()), Day)
 	r.Start, r.End = StartOf(r.Start, Day), StartOf(r.End, Day)
@@ -338,6 +341,7 @@ type Diff struct {
 	Hours, Mins, Secs          int
 }
 
+// TODO: i18n this.
 func (d Diff) String() string {
 	n := strconv.Itoa
 
