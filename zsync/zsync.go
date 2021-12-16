@@ -66,3 +66,33 @@ func NewAtomicInt64(value int64) *AtomicInt64 {
 func (i *AtomicInt64) Set(value int64)   { atomic.StoreInt64((*int64)(i), value) }
 func (i *AtomicInt64) Add(n int64) int64 { return atomic.AddInt64((*int64)(i), n) }
 func (i *AtomicInt64) Value() int64      { return atomic.LoadInt64((*int64)(i)) }
+
+// AtMost runs at most a certain number of goroutines in parallel.
+type AtMost struct {
+	ch chan struct{}
+	wg sync.WaitGroup
+}
+
+// NewAtMost creates a new AtMost instance.
+func NewAtMost(max int) AtMost {
+	return AtMost{ch: make(chan struct{}, max)}
+
+}
+
+// Wait for all jobs to finish.
+func (a *AtMost) Wait() {
+	a.wg.Wait()
+}
+
+// Run a function. Blocks if the job queue is full.
+func (a *AtMost) Run(f func()) {
+	a.ch <- struct{}{}
+	a.wg.Add(1)
+	go func() {
+		defer func() {
+			<-a.ch
+			a.wg.Done()
+		}()
+		f()
+	}()
+}

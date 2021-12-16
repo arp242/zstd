@@ -2,6 +2,8 @@ package zsync
 
 import (
 	"context"
+	"reflect"
+	"sort"
 	"sync"
 	"testing"
 	"time"
@@ -105,4 +107,32 @@ func TestWithLock(t *testing.T) {
 	_ = s
 	mu.Unlock()
 	time.Sleep(10 * time.Millisecond)
+}
+
+func TestAtMost(t *testing.T) {
+	r := NewAtMost(3)
+
+	var (
+		list1, list2 []int
+		mu           sync.Mutex
+	)
+	for i := 1; i <= 20; i++ {
+		list1 = append(list1, i)
+		func(i int) {
+			r.Run(func() {
+				time.Sleep(10 * time.Millisecond)
+				mu.Lock()
+				list2 = append(list2, i)
+				mu.Unlock()
+			})
+		}(i)
+	}
+	r.Wait()
+
+	sort.Ints(list1)
+	sort.Ints(list2)
+
+	if !reflect.DeepEqual(list1, list2) {
+		t.Error()
+	}
 }
