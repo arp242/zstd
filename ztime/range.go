@@ -129,8 +129,9 @@ func (r Range) Truncate(d time.Duration) Range {
 //   Current(Month)       2020-06-01 00:00:00       → 2020-06-30 23:59:59
 //   Current(WeekMonday)  2020-06-15 00:00:00 (Mon) → 2020-06-21 23:59:59 (Sun)
 func (r Range) Current(p Period) Range {
-	r.Start = StartOf(r.Start, p)
+	s := StartOf(r.Start, p)
 	r.End = EndOf(r.Start, p)
+	r.Start = s
 	return r
 }
 

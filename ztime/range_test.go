@@ -50,6 +50,11 @@ func TestRangeCurrent(t *testing.T) {
 			New("2020-01-01 00:00:00.0"),
 			New("2020-12-31 23:59:59." + ns),
 		},
+
+		{time.Date(2020, 1, 1, 14, 49, 20, 666, time.UTC), WeekMonday,
+			New("2019-12-30 00:00:00.0"),
+			New("2020-01-05 23:59:59." + ns),
+		},
 	}
 
 	for _, tt := range tests {
