@@ -1,6 +1,7 @@
 package ztime
 
 import (
+	"fmt"
 	"math"
 	"sort"
 	"sync"
@@ -35,6 +36,19 @@ func NewDurations(max int) Durations {
 		data:     make(map[int]interface{}),
 		maxSize:  max,
 	}
+}
+
+func (d Durations) String() string {
+	return fmt.Sprintf("%d durations, from %s to %s", d.Len(), d.Min(), d.Max())
+}
+
+// List returns a copy of all durations.
+func (d Durations) List() []time.Duration {
+	d.mu.Lock()
+	cpy := make([]time.Duration, len(d.list))
+	copy(cpy, d.list)
+	d.mu.Unlock()
+	return cpy
 }
 
 // Grow the list of durations for another n durations.
