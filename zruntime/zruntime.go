@@ -73,6 +73,8 @@ func Callers(filterFun ...string) []runtime.Frame {
 
 	filterFun = append(filterFun, []string{
 		"runtime.goexit",
+		"runtime.gopanic",
+		"runtime.panicdottypeE",
 		"testing.tRunner",
 		"zgo.at/zstd/zdebug.Stack",
 		"zgo.at/zstd/zdebug.PrintStack",
@@ -84,6 +86,9 @@ func Callers(filterFun ...string) []runtime.Frame {
 			continue
 		}
 		ret = append(ret, f)
+	}
+	if len(ret) == 0 && len(filterFun) > 0 { // Everything was filtered: re-run without filter.
+		return Callers()
 	}
 	return ret
 }
