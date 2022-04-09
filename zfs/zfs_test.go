@@ -10,6 +10,43 @@ import (
 	"zgo.at/zstd/zfs/testdata"
 )
 
+func TestExists(t *testing.T) {
+	tests := []struct {
+		fsys fs.FS
+		in   string
+		want bool
+	}{
+		{fstest.MapFS{
+			"file": {Data: []byte{}},
+		}, "file", true},
+		{fstest.MapFS{
+			"file": {Data: []byte{}},
+		}, "filex", false},
+
+		{fstest.MapFS{
+			"dir1/dir2/file": {Data: []byte{}},
+		}, "dir1", true},
+		{fstest.MapFS{
+			"dir1/dir2/file": {Data: []byte{}},
+		}, "dir1/dir2", true},
+		{fstest.MapFS{
+			"dir1/dir2/file": {Data: []byte{}},
+		}, "dir1/dir2/file", true},
+		{fstest.MapFS{
+			"dir1/dir2/file": {Data: []byte{}},
+		}, "dir1/dir2/file/file", false},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			have := Exists(tt.fsys, tt.in)
+			if have != tt.want {
+				t.Errorf("\ngot:  %t\nwant: %t", have, tt.want)
+			}
+		})
+	}
+}
+
 func TestSubIfExists(t *testing.T) {
 	tests := []struct {
 		fsys fs.FS

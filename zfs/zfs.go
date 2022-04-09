@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 
@@ -39,6 +40,23 @@ func EmbedOrDir(e embed.FS, dir string, dev bool) (fs.FS, error) {
 		return fsys, nil
 	}
 	return SubIfExists(fsys, dir)
+}
+
+// Exists reports if this file or directory exists in the given fs.
+func Exists(fsys fs.FS, name string) bool {
+	ls, err := fs.ReadDir(fsys, filepath.Dir(name))
+	if err != nil {
+		return false
+	}
+
+	base := filepath.Base(name)
+	for _, l := range ls {
+		if l.Name() == base {
+			return true
+		}
+	}
+
+	return false
 }
 
 // SubIfExists will fs.Sub() to a directory only if it exists.
