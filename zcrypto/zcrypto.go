@@ -4,6 +4,7 @@ package zcrypto
 import (
 	"crypto/rand"
 	"crypto/sha256"
+	"crypto/subtle"
 	"fmt"
 	"io"
 	"math/big"
@@ -35,7 +36,7 @@ func VerifyHash(filename, hash string) (bool, error) {
 	if err != nil {
 		return false, fmt.Errorf("zcrypto.VerifyHash: %w", err)
 	}
-	return ver == hash, nil
+	return subtle.ConstantTimeCompare([]byte(ver), []byte(hash))
 }
 
 // Secret number of 256 bits formatted in base36 (~48 bytes).
