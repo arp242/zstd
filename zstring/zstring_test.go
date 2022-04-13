@@ -5,6 +5,8 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+
+	"zgo.at/zstd"
 )
 
 func TestWordWrap(t *testing.T) {
@@ -785,8 +787,8 @@ func TestString(t *testing.T) {
 		{nil, ""},
 		{"x", "x"},
 		{1, "1"},
-		{NewPtr("X").P, "X"},
-		{NewPtr("X"), "X"},
+		{zstd.Ptr("X"), "X"},
+		{zstd.Ptr("X"), "X"},
 	}
 
 	for _, tt := range tests {

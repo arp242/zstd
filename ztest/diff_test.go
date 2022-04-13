@@ -147,7 +147,7 @@ func TestDiffMatch(t *testing.T) {
 		{"Hello", "He%(ANY)", ""},
 
 		{"Hello " + year + "!", "Hello %(YEAR)!", ""},
-		{"Hello " + year + "!", "Hello %(YEAR)", "\n--- output\n+++ want\n@@ -1 +1 @@\n- Hello 2021!\n+ Hello 2021\n"},
+		{"Hello " + year + "!", "Hello %(YEAR)", "\n--- output\n+++ want\n@@ -1 +1 @@\n- Hello 2022!\n+ Hello 2022\n"},
 
 		{"Hello xy", "Hello %(ANY 2)", ""},
 		{"Hello xy", "Hello %(ANY 2,)", ""},
