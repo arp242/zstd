@@ -36,6 +36,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"zgo.at/zstd/zjson"
 )
 
 type DiffOpt int
@@ -44,6 +46,9 @@ const (
 	// Normalize whitespace: remove all whitespace at the start and end of every
 	// line.
 	DiffNormalizeWhitespace DiffOpt = iota + 1
+
+	// Treat arguments are JSON: format them before diffing.
+	DiffJSON
 )
 
 // Diff two strings and format as a unified diff.
@@ -61,18 +66,34 @@ func Diff(have, want string, opt ...DiffOpt) string {
 	return "\n" + d
 }
 
+// DiffJSON compares two JSON strings.
+func DiffJSON2(have, want string) string {
+	var h map[string]any
+	haveJ, err := zjson.Indent([]byte(have), &h, "", "    ")
+	if err != nil {
+	}
+	var w map[string]any
+	wantJ, err := zjson.Indent([]byte(want), &w, "", "    ")
+	if err != nil {
+	}
+
+	return Diff(string(haveJ), string(wantJ))
+}
+
 // DiffMatch formats a unified diff, but accepts various patterns in the want
 // string:
 //
 // 	 %(YEAR)      current year in UTC
 // 	 %(MONTH)     current month in UTC
 // 	 %(DAY)       current day in UTC
+// 	 %(UUID)      UUID format (any version).
 //
 // 	 %(ANY)       any text: .+?
 // 	 %(ANY 5)     any text of exactly 5 characters: .{5}?
 // 	 %(ANY 5,)    any text of at least 5 characters: .{5,}?
 // 	 %(ANY 5,10)  any text between 5 and 10 characters: .{5,10}?
 // 	 %(ANY 10)    any text at most 10 characters: .{,10}?
+// 	 %(NUMBER)    any number; also allows length like ANY.
 //
 //   %(..)        any regular expression, but \ is not allowed.
 func DiffMatch(have, want string, opt ...DiffOpt) string {
@@ -88,18 +109,23 @@ func DiffMatch(have, want string, opt ...DiffOpt) string {
 	wantRe := regexp.MustCompile(`%\\\(.+?\\\)`).ReplaceAllStringFunc(
 		regexp.QuoteMeta(r.Replace(want)),
 		func(m string) string {
-			if m == `%\(ANY\)` {
+			switch {
+			case m == `%\(UUID\)`:
+				return `[[:xdigit:]]{8}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{12}`
+			case m == `%\(ANY\)`:
 				return `.+?`
-			}
-
-			if strings.HasPrefix(m, `%\(ANY `) {
+			case m == `%\(NUMBER\)`:
+				return `\d+?`
+			case strings.HasPrefix(m, `%\(ANY `):
 				return fmt.Sprintf(`.{%s}?`, m[7:len(m)-2])
+			case strings.HasPrefix(m, `%\(NUMBER `):
+				return fmt.Sprintf(`\d{%s}?`, m[10:len(m)-2])
+			default:
+				// TODO: we need to undo the \ from QuoteMeta() here, but this
+				// means we won't be allowed to use \. Be a bit smarter about
+				// this. TODO: doesn't quite seem to work?
+				return strings.ReplaceAll(m[3:len(m)-2], `\`, ``)
 			}
-
-			// TODO: we need to undo the \ from QuoteMeta() here, but this means
-			// we won't be allowed to use \. Be a bit smarter about this.
-			// TODO: doesn't quite seem to work?
-			return strings.ReplaceAll(m[3:len(m)-2], `\`, ``)
 		})
 
 	// Quick check for exact match.
@@ -130,12 +156,28 @@ var (
 
 func applyOpt(have, want string, opt ...DiffOpt) (string, string) {
 	for _, o := range opt {
-		if o == DiffNormalizeWhitespace {
+		switch o {
+		case DiffNormalizeWhitespace:
 			reNormalizeWhitespaceOnce.Do(func() {
 				reNormalizeWhitespace = regexp.MustCompile(`(?m)(^\s+|\s+$)`)
 			})
 			have = reNormalizeWhitespace.ReplaceAllString(have, "")
 			want = reNormalizeWhitespace.ReplaceAllString(want, "")
+		case DiffJSON:
+			var h map[string]any
+			haveJ, err := zjson.Indent([]byte(have), &h, "", "    ")
+			if err != nil {
+				have = fmt.Sprintf("ztest.Diff: ERROR formatting have: %s", err)
+			} else {
+				have = string(haveJ)
+			}
+			var w map[string]any
+			wantJ, err := zjson.Indent([]byte(want), &w, "", "    ")
+			if err != nil {
+				want = fmt.Sprintf("ztest.Diff: ERROR formatting want: %s", err)
+			} else {
+				want = string(wantJ)
+			}
 		}
 	}
 	return have, want
