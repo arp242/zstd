@@ -51,6 +51,30 @@ func Secret128() string { return secret(2) }
 // Secret number of 64 bits formatted in base36 (~12 bytes).
 func Secret64() string { return secret(1) }
 
+const alphabet = "0123456789abcdefghijklmnopqrstuvwxyz"
+
+// Secret string of size  characters selected from sel.
+//
+// If sel is "" it will use [a-z0-9].
+func SecretString(size int, sel string) string {
+	if sel == "" {
+		sel = alphabet
+	}
+
+	var (
+		b = make([]byte, size)
+		m = big.NewInt(int64(len(sel)))
+	)
+	for i := range b {
+		n, err := rand.Int(rand.Reader, m)
+		if err != nil {
+			panic(fmt.Errorf("zcrypto.Secret: %w", err))
+		}
+		b[i] = sel[n.Int64()]
+	}
+	return string(b)
+}
+
 var max = big.NewInt(0).SetUint64(1e19)
 
 func secret(n int) string {
@@ -58,7 +82,7 @@ func secret(n int) string {
 	for i := 0; i < n; i++ {
 		n, err := rand.Int(rand.Reader, max)
 		if err != nil {
-			panic(fmt.Errorf("zhttp.Secret: %w", err))
+			panic(fmt.Errorf("zcrypto.Secret: %w", err))
 		}
 		_, _ = key.WriteString(strconv.FormatUint(n.Uint64(), 36))
 	}
