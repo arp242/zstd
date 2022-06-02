@@ -3,7 +3,9 @@ package zjson
 import (
 	"encoding/json"
 	"fmt"
+	"net/mail"
 	"reflect"
+	"strings"
 	"testing"
 	"time"
 )
@@ -175,4 +177,45 @@ func TestMustUnmarshal(t *testing.T) {
 		MustUnmarshal([]byte(`{"hello":"world"}`), &out)
 	})
 
+}
+
+func TestUnmarshalto(t *testing.T) {
+	tests := []struct {
+		json    string
+		target  reflect.Type
+		want    interface{}
+		wantErr string
+	}{
+		{"", nil, nil, "target is nil"},
+
+		{`{}`, reflect.TypeOf(&mail.Address{}), &mail.Address{}, ""},
+		{`{"Name": "Martin"}`, reflect.TypeOf(&mail.Address{}), &mail.Address{Name: "Martin"}, ""},
+
+		{`{}`, reflect.TypeOf(mail.Address{}), &mail.Address{}, ""},
+		{`{"Name": "Martin"}`, reflect.TypeOf(mail.Address{}), &mail.Address{Name: "Martin"}, ""},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			have, err := UnmarshalTo([]byte(tt.json), tt.target)
+			if !ErrorContains(err, tt.wantErr) {
+				t.Fatalf("wrong error\nhave: %v\nwant: %v\n", err, tt.wantErr)
+			}
+
+			if !reflect.DeepEqual(have, tt.want) {
+				t.Errorf("\nhave: %#v\nwant: %#v", have, tt.want)
+			}
+		})
+	}
+}
+
+// Import cycle
+func ErrorContains(have error, want string) bool {
+	if have == nil {
+		return want == ""
+	}
+	if want == "" {
+		return false
+	}
+	return strings.Contains(have.Error(), want)
 }

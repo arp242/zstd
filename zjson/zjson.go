@@ -4,7 +4,9 @@ package zjson
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"reflect"
 	"strconv"
 	"time"
 )
@@ -49,6 +51,31 @@ func (t *Timestamp) UnmarshalJSON(v []byte) error {
 		t.Time = time.Unix(n, 0).UTC()
 	}
 	return nil
+}
+
+// UnmarshalTo unmarshals the JSON in data to a new instance of target.
+//
+// Target can be any type that json.Unmarshal can unmarshal to, and doesn't need
+// to be a pointer. The returned value is always a pointer.
+func UnmarshalTo(data []byte, target reflect.Type) (interface{}, error) {
+	if target == nil {
+		return nil, errors.New("zjson.UnmarshalTo: target is nil")
+	}
+	for target.Kind() == reflect.Ptr {
+		target = target.Elem()
+	}
+
+	t := reflect.New(target).Interface()
+	return t, json.Unmarshal(data, t)
+}
+
+// MustUnmarshalTo behaves like UnmarshalTo but will panic on errors.
+func MustUnmarshalTo(data []byte, target reflect.Type) interface{} {
+	t, err := UnmarshalTo(data, target)
+	if err != nil {
+		panic(err)
+	}
+	return t
 }
 
 // MustMarshal behaves like json.Marshal but will panic on errors.
