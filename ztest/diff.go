@@ -31,13 +31,12 @@
 package ztest
 
 import (
+	"encoding/json"
 	"fmt"
 	"regexp"
 	"strings"
 	"sync"
 	"time"
-
-	"zgo.at/zstd/zjson"
 )
 
 type DiffOpt int
@@ -69,11 +68,11 @@ func Diff(have, want string, opt ...DiffOpt) string {
 // DiffJSON compares two JSON strings.
 func DiffJSON2(have, want string) string {
 	var h map[string]any
-	haveJ, err := zjson.Indent([]byte(have), &h, "", "    ")
+	haveJ, err := indentJSON([]byte(have), &h, "", "    ")
 	if err != nil {
 	}
 	var w map[string]any
-	wantJ, err := zjson.Indent([]byte(want), &w, "", "    ")
+	wantJ, err := indentJSON([]byte(want), &w, "", "    ")
 	if err != nil {
 	}
 
@@ -97,6 +96,9 @@ func DiffJSON2(have, want string) string {
 //
 //   %(..)        any regular expression, but \ is not allowed.
 func DiffMatch(have, want string, opt ...DiffOpt) string {
+	// TODO: %(..) syntax is somewhat unfortunate, as it conflicts with fmt
+	// formatting strings. Would be better to use $(..), #(..), @(..), or
+	// anything else really.
 	have, want = applyOpt(have, want, opt...)
 
 	now := time.Now().UTC()
@@ -165,14 +167,14 @@ func applyOpt(have, want string, opt ...DiffOpt) (string, string) {
 			want = reNormalizeWhitespace.ReplaceAllString(want, "")
 		case DiffJSON:
 			var h map[string]any
-			haveJ, err := zjson.Indent([]byte(have), &h, "", "    ")
+			haveJ, err := indentJSON([]byte(have), &h, "", "    ")
 			if err != nil {
 				have = fmt.Sprintf("ztest.Diff: ERROR formatting have: %s", err)
 			} else {
 				have = string(haveJ)
 			}
 			var w map[string]any
-			wantJ, err := zjson.Indent([]byte(want), &w, "", "    ")
+			wantJ, err := indentJSON([]byte(want), &w, "", "    ")
 			if err != nil {
 				want = fmt.Sprintf("ztest.Diff: ERROR formatting want: %s", err)
 			} else {
@@ -544,4 +546,12 @@ func splitLines(s string) []string {
 	lines := strings.SplitAfter(s, "\n")
 	lines[len(lines)-1] += "\n"
 	return lines
+}
+
+func indentJSON(data []byte, v interface{}, prefix, indent string) ([]byte, error) {
+	err := json.Unmarshal(data, v)
+	if err != nil {
+		return nil, err
+	}
+	return json.MarshalIndent(v, prefix, indent)
 }

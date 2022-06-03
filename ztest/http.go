@@ -8,8 +8,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	"zgo.at/zstd/zstring"
 )
 
 // Code checks if the error code in the recoder matches the desired one, and
@@ -20,7 +18,7 @@ func Code(t *testing.T, recorder *httptest.ResponseRecorder, want int) {
 		t.Errorf("wrong response code\nhave: %d %s\nwant: %d %s\nbody: %v",
 			recorder.Code, http.StatusText(recorder.Code),
 			want, http.StatusText(want),
-			zstring.ElideLeft(recorder.Body.String(), 500))
+			elideLeft(recorder.Body.String(), 500))
 	}
 }
 
@@ -126,4 +124,32 @@ func MultipartForm(params ...map[string]string) (b *bytes.Buffer, contentType st
 	}
 
 	return b, w.FormDataContentType(), nil
+}
+
+func elideLeft(s string, n int) string {
+	ss := sub(s, 0, n)
+	if len(s) != len(ss) {
+		return ss + "…"
+	}
+	return s
+}
+
+func sub(s string, start, end int) string {
+	var (
+		nchars    int
+		startbyte = -1
+	)
+	for bytei := range s {
+		if nchars == start {
+			startbyte = bytei
+		}
+		if nchars == end {
+			return s[startbyte:bytei]
+		}
+		nchars++
+	}
+	if startbyte == -1 {
+		return ""
+	}
+	return s[startbyte:]
 }
