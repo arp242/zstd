@@ -653,6 +653,16 @@ func Remove(l *[]string, name string) bool {
 	return found
 }
 
+// HasUpper reports if s has at least one upper-case character.
+func HasUpper(s string) bool {
+	for _, c := range s {
+		if unicode.IsUpper(c) {
+			return true
+		}
+	}
+	return false
+}
+
 // String converts a value to a string.
 //
 // This works for all built-in primitives, []byte, and values that implement
