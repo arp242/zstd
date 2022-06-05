@@ -1,6 +1,9 @@
 package ztime
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 // Period to adjust or align a time by.
 type Period uint8
@@ -48,8 +51,8 @@ func (p Period) String() string {
 		return "half year"
 	case Year:
 		return "year"
-	default:
-		return ""
+	default: // Should never happen.
+		panic(fmt.Sprintf("ztime.Period: invalid period constant %d", p))
 	}
 }
 
@@ -93,7 +96,7 @@ func LastInMonth(t time.Time) bool {
 // For example StartOf(t, QuarterHour) with "15:19" will adjust the time to
 // "15:15".
 func StartOf(t time.Time, p Period) time.Time {
-	y, m, d, h, min, s, _, l := t.Year(), int(t.Month()), t.Day(), t.Hour(), t.Minute(), t.Second(), t.Nanosecond(), t.Location()
+	y, m, d, h, min, s, _, l := Unpack(t)
 	ns := 0
 	switch p {
 	case Second:
@@ -133,7 +136,7 @@ func StartOf(t time.Time, p Period) time.Time {
 // For example EndOf(t, QuarterHour) with "15:19" will adjust the time to
 // "15:30".
 func EndOf(t time.Time, p Period) time.Time {
-	y, m, d, h, min, s, _, l := t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second(), t.Nanosecond(), t.Location()
+	y, m, d, h, min, s, _, l := Unpack(t)
 	ns := 999999999
 	switch p {
 	case Second:
@@ -185,7 +188,7 @@ func EndOf(t time.Time, p Period) time.Time {
 // entire concept is silly and most programs should just pretend they don't
 // exist.
 func Add(t time.Time, n int, p Period) time.Time {
-	y, m, d, h, min, s, ns, l := t.Year(), int(t.Month()), t.Day(), t.Hour(), t.Minute(), t.Second(), t.Nanosecond(), t.Location()
+	y, m, d, h, min, s, ns, l := t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second(), t.Nanosecond(), t.Location()
 	switch p {
 	case Second:
 		s += n
@@ -202,7 +205,7 @@ func Add(t time.Time, n int, p Period) time.Time {
 	case WeekMonday, WeekSunday:
 		d += 7 * n
 	case Month:
-		m += n
+		m += time.Month(n)
 		if x := DaysInMonth(time.Date(y, time.Month(m), 1, h, min, s, ns, l)); d > x {
 			d = x
 		}

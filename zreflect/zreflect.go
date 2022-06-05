@@ -38,7 +38,7 @@ import "reflect"
 //     }
 func Simplify(value interface{}) (reflect.Value, reflect.Kind) {
 	v := reflect.ValueOf(value)
-	// Actually, this cases problems with some types, like time.Time
+	// Actually, this causes problems with some types, like time.Time
 	//
 	// We should probably make this easier/simpler anyway:
 	//

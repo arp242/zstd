@@ -2,8 +2,6 @@ package ztime
 
 import (
 	"context"
-	"fmt"
-	"os"
 	"time"
 )
 
@@ -12,16 +10,6 @@ func Takes(f func()) time.Duration {
 	s := time.Now()
 	f()
 	return time.Since(s)
-}
-
-// TimeFunc prints how long it took for this function to end to stderr.
-//
-// You usually want to use this from defer:
-//
-//   defer ztime.TimeFunc()()
-func TimeFunc() func() {
-	s := time.Now()
-	return func() { fmt.Fprintln(os.Stderr, time.Since(s)) }
 }
 
 // Sleep for d duration, or until the context times out.

@@ -6,8 +6,8 @@ import (
 	"time"
 )
 
-// Time wraps time.Time to add {Start,End}Of and Add(). To make it a bit more
-// convenient to run several operations.
+// Time wraps time.Time to add {Start,End}Of, Add(), and Unpack(). To make it a
+// bit more convenient to run several operations.
 //
 // time.Time's Add() is renamed to AddTime() here.
 type Time struct{ time.Time }
@@ -29,6 +29,9 @@ func (t Time) UTC() Time                            { return Time{t.Time.UTC()} 
 func (t Time) StartOf(p Period) Time    { return Time{StartOf(t.Time, p)} }
 func (t Time) EndOf(p Period) Time      { return Time{EndOf(t.Time, p)} }
 func (t Time) Add(n int, p Period) Time { return Time{Add(t.Time, n, p)} }
+func (t Time) Unpack() (year int, month time.Month, day, hour, minute, second, nanosecond int, loc *time.Location) {
+	return t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second(), t.Nanosecond(), t.Location()
+}
 
 // MustParse is like time.Parse, but will panic on errors.
 func MustParse(layout, value string) time.Time {
@@ -71,4 +74,9 @@ func New(s string) time.Time {
 		layout += " MST"
 	}
 	return MustParse(layout, s)
+}
+
+// Unpack a time to its individual components.
+func Unpack(t time.Time) (year int, month time.Month, day, hour, minute, second, nanosecond int, loc *time.Location) {
+	return t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second(), t.Nanosecond(), t.Location()
 }

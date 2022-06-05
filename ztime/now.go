@@ -8,6 +8,8 @@ import (
 // Now returns the current time as UTC.
 //
 // This can be swapped out in tests with SetNow()
+//
+// TODO: this shouldn't use .UTC(), at least not by default.
 var Now = func() time.Time { return time.Now().UTC() }
 
 // SetNow sets Now() and restores it when the test finishes.
