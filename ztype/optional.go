@@ -1,4 +1,3 @@
-// Package ztype adds extra types.
 package ztype
 
 import (
@@ -53,6 +52,8 @@ func (o *Optional[Value]) Set(v Value) {
 
 // Unset this optional.
 func (o *Optional[Value]) Unset() {
+	var v Value
+	o.v = v
 	o.ok = false
 }
 
