@@ -9,47 +9,6 @@ import (
 	"zgo.at/zstd/ztype"
 )
 
-func TestWordWrap(t *testing.T) {
-	tests := []struct {
-		n      int
-		prefix string
-		in     string
-		want   string
-	}{
-		{10, "",
-			"Hello",
-			"Hello"},
-		{3, "", "Hello",
-			"Hello"},
-
-		{10, "",
-			"Hello, world!",
-			"Hello,\nworld!"},
-		{10, "",
-			"Hello, world! it's a test",
-			"Hello,\nworld!\nit's a\ntest"},
-		{30, "",
-			"Click this link yo: https://github.com/zgoat/zstd/blob/master/README.md",
-			"Click this link yo:\nhttps://github.com/zgoat/zstd/blob/master/README.md"},
-
-		{10, "> ",
-			"Hello, world! it's a test",
-			"Hello,\n> world!\n> it's a\n> test"},
-		{10, "> ",
-			"> H€łłø, ωørłð¿ it’s a ţësţ",
-			"> H€łłø,\n> ωørłð¿\n> it’s a\n> ţësţ"},
-	}
-
-	for _, tt := range tests {
-		t.Run("", func(t *testing.T) {
-			have := WordWrap(tt.in, tt.prefix, tt.n)
-			if have != tt.want {
-				t.Errorf("\nhave:\n%q\n\nwant:\n%q", have, tt.want)
-			}
-		})
-	}
-}
-
 func TestIndent(t *testing.T) {
 	tests := []struct {
 		n    int
@@ -68,41 +27,6 @@ func TestIndent(t *testing.T) {
 			have := Indent(tt.in, tt.n)
 			if have != tt.want {
 				t.Errorf("\nhave:\n%q\n\nwant:\n%q", have, tt.want)
-			}
-		})
-	}
-}
-
-func TestDisplayWidth(t *testing.T) {
-	tests := []struct {
-		in   string
-		want int
-	}{
-		{"", 0},
-		{"a", 1},
-
-		// Tabs.
-		{"\t", 8},
-		{"\ta", 9},
-		{"a\t", 8},
-		{"aaaa\tx", 9},
-		{"aaaaaaa\tx", 9},
-
-		{"\t\t", 16},
-		{"a\ta\t", 16},
-		{"a\ta\ta", 17},
-		{"\x1b123]m asd\x1b0m", 4},
-
-		// Emojis.
-		// {"🧑\u200d🚒", 1},
-		// {"🧑🏽\u200d🚒", 1},
-	}
-
-	for _, tt := range tests {
-		t.Run("", func(t *testing.T) {
-			got := DisplayWidth(tt.in)
-			if got != tt.want {
-				t.Errorf("\ngot:  %d\nwant: %d", got, tt.want)
 			}
 		})
 	}

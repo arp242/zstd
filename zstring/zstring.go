@@ -7,7 +7,6 @@
 package zstring
 
 import (
-	"bytes"
 	"math/rand"
 	"reflect"
 	"sort"
@@ -440,83 +439,6 @@ func ReplacePairs(str, start, end string, f func(int, string) string) string {
 	return str
 }
 
-const nbsp = 0xa0
-
-// WordWrap word wraps at n columns and prefixes subsequent lines with "prefix".
-//
-// Note the prefix is excluded from the length calculations; so if you want to
-// wrap at 80 with a prefix of "> ", then you should wrap at 78.
-//
-// Adapted from: https://github.com/mitchellh/go-wordwrap
-func WordWrap(text, prefix string, lim int) string {
-	var (
-		init                             = make([]byte, 0, len(text))
-		buf                              = bytes.NewBuffer(init)
-		wordBuf, spaceBuf                bytes.Buffer
-		current, wordBufLen, spaceBufLen int
-	)
-	for _, char := range text {
-		switch {
-		case char == '\n':
-			if wordBuf.Len() == 0 {
-				if current+spaceBufLen > lim {
-					current = 0
-				} else {
-					current += spaceBufLen
-					spaceBuf.WriteTo(buf)
-				}
-				spaceBuf.Reset()
-				spaceBufLen = 0
-			} else {
-				current += spaceBufLen + wordBufLen
-				spaceBuf.WriteTo(buf)
-				spaceBuf.Reset()
-				spaceBufLen = 0
-				wordBuf.WriteTo(buf)
-				wordBuf.Reset()
-				wordBufLen = 0
-			}
-			buf.WriteRune(char)
-			current = 0
-		case unicode.IsSpace(char) && char != nbsp:
-			if spaceBuf.Len() == 0 || wordBuf.Len() > 0 {
-				current += spaceBufLen + wordBufLen
-				spaceBuf.WriteTo(buf)
-				spaceBuf.Reset()
-				spaceBufLen = 0
-				wordBuf.WriteTo(buf)
-				wordBuf.Reset()
-				wordBufLen = 0
-			}
-
-			spaceBuf.WriteRune(char)
-			spaceBufLen++
-		default:
-			wordBuf.WriteRune(char)
-			wordBufLen++
-
-			if current+wordBufLen+spaceBufLen > lim && wordBufLen < lim {
-				buf.WriteRune('\n')
-				buf.WriteString(prefix)
-				current = 0
-				spaceBuf.Reset()
-				spaceBufLen = 0
-			}
-		}
-	}
-
-	if wordBuf.Len() == 0 {
-		if current+spaceBufLen <= lim {
-			spaceBuf.WriteTo(buf)
-		}
-	} else {
-		spaceBuf.WriteTo(buf)
-		wordBuf.WriteTo(buf)
-	}
-
-	return buf.String()
-}
-
 // Ident adds n spaces of indentation to every line.
 func Indent(s string, n int) string {
 	var (
@@ -538,37 +460,6 @@ func Indent(s string, n int) string {
 		return s[:len(s)-len(indent)]
 	}
 	return buf.String()
-}
-
-// DisplayWidth gets the display width of a string, taking tabs and escape
-// sequences in to account.
-//
-// This does *not* handle various unicode aspects (i.e. graphmeme clusters,
-// display width).
-func DisplayWidth(s string) int {
-	l := utf8.RuneCountInString(s)
-
-	// Tabs are not a fixed width, but go to the nearest multiple of 8.
-	split := strings.Split(s, "\t")
-	for _, ss := range split[:len(split)-1] {
-		l += 7 - utf8.RuneCountInString(ss)
-	}
-
-	// Escape sequences.
-	for _, esc := range IndexAll(s, "\x1b") {
-		i := 1
-		for _, c := range s[esc:] {
-			if c == 'm' {
-				break
-			}
-			i++
-		}
-		l -= i
-	}
-
-	// TODO: Maybe also find a list of common unprintable things?
-
-	return l
 }
 
 // HasSuffixes tests whether the string s ends with any of the suffixes.
