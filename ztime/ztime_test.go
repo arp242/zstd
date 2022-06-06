@@ -9,7 +9,7 @@ import (
 	"zgo.at/zstd/ztest"
 )
 
-func TestNew(t *testing.T) {
+func TestFromString(t *testing.T) {
 	tz, err := time.LoadLocation("Asia/Makassar")
 	_ = tz
 	if err != nil {
@@ -40,7 +40,7 @@ func TestNew(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
-			have := New(tt.in)
+			have := FromString(tt.in)
 			if !have.Equal(tt.want) {
 				t.Errorf("\nhave: %s\nwant: %s", have, tt.want)
 			}
@@ -60,9 +60,9 @@ func TestStartOf(t *testing.T) {
 		pad := strings.Repeat(" ", 14-len(p.String()))
 		fmt.Fprintln(h, p.String(), pad,
 			tt.StartOf(p).Format(f),
-			"", tt.StartOf(p).AddTime(-1).StartOf(p).Format(f),
-			"", tt.StartOf(p).AddTime(-1).StartOf(p).AddTime(-1).StartOf(p).Format(f),
-			"", tt.StartOf(p).AddTime(-1).StartOf(p).AddTime(-1).StartOf(p).AddTime(-1).StartOf(p).Format(f))
+			"", tt.StartOf(p).Add(-1).StartOf(p).Format(f),
+			"", tt.StartOf(p).Add(-1).StartOf(p).Add(-1).StartOf(p).Format(f),
+			"", tt.StartOf(p).Add(-1).StartOf(p).Add(-1).StartOf(p).Add(-1).StartOf(p).Format(f))
 	}
 
 	have := h.String()
@@ -97,9 +97,9 @@ func TestEndOf(t *testing.T) {
 		pad := strings.Repeat(" ", 14-len(p.String()))
 		fmt.Fprintln(h, p.String(), pad,
 			tt.EndOf(p).Format(f),
-			"", tt.EndOf(p).AddTime(1).EndOf(p).Format(f),
-			"", tt.EndOf(p).AddTime(1).EndOf(p).AddTime(1).EndOf(p).Format(f),
-			"", tt.EndOf(p).AddTime(1).EndOf(p).AddTime(1).EndOf(p).AddTime(1).EndOf(p).Format(f))
+			"", tt.EndOf(p).Add(1).EndOf(p).Format(f),
+			"", tt.EndOf(p).Add(1).EndOf(p).Add(1).EndOf(p).Format(f),
+			"", tt.EndOf(p).Add(1).EndOf(p).Add(1).EndOf(p).Add(1).EndOf(p).Format(f))
 	}
 
 	have := h.String()
@@ -132,15 +132,15 @@ func TestWeek(t *testing.T) {
 
 	h.WriteString("Monday:\n")
 	for i := 0; i < 7; i++ {
-		fmt.Fprintf(h, "%d  %s → %s %s\n", i, mon.Add(i, Day).Format(f),
-			mon.Add(i, Day).StartOf(Week(false)).Format(f),
-			mon.Add(i, Day).EndOf(Week(false)).Format(f))
+		fmt.Fprintf(h, "%d  %s → %s %s\n", i, mon.AddPeriod(i, Day).Format(f),
+			mon.AddPeriod(i, Day).StartOf(Week(false)).Format(f),
+			mon.AddPeriod(i, Day).EndOf(Week(false)).Format(f))
 	}
 	h.WriteString("\nSunday:\n")
 	for i := 0; i < 7; i++ {
-		fmt.Fprintf(h, "%d  %s → %s %s\n", i, sun.Add(i, Day).Format(f),
-			sun.Add(i, Day).StartOf(Week(true)).Format(f),
-			sun.Add(i, Day).EndOf(Week(true)).Format(f))
+		fmt.Fprintf(h, "%d  %s → %s %s\n", i, sun.AddPeriod(i, Day).Format(f),
+			sun.AddPeriod(i, Day).StartOf(Week(true)).Format(f),
+			sun.AddPeriod(i, Day).EndOf(Week(true)).Format(f))
 	}
 
 	have := h.String()
@@ -225,8 +225,8 @@ func TestAdd(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("%+d %s", tt.n, tt.p), func(t *testing.T) {
-			have := Add(New(tt.in), tt.n, tt.p)
-			want := New(tt.want)
+			have := AddPeriod(FromString(tt.in), tt.n, tt.p)
+			want := FromString(tt.want)
 			if !have.Equal(want) {
 				t.Errorf("\nhave: %s\nwant: %s", have, want)
 			}

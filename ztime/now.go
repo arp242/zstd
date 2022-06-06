@@ -14,11 +14,11 @@ var Now = func() time.Time { return time.Now().UTC() }
 
 // SetNow sets Now() and restores it when the test finishes.
 //
-// The date is parsed with New().
+// The date is parsed with FromString().
 func SetNow(t *testing.T, s string) {
 	t.Helper()
 
-	d := New(s)
+	d := FromString(s)
 	Now = func() time.Time { return d }
 	t.Cleanup(func() {
 		Now = func() time.Time { return time.Now().UTC() }

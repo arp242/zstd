@@ -168,7 +168,7 @@ func EndOf(t time.Time, p Period) time.Time {
 	return time.Date(y, m, d, h, min, s, ns, l)
 }
 
-// Add a time period.
+// AddPeriod adds time period.
 //
 // This matches common understanding of what things like "next month" mean;
 // adding or subtracting months will always end up in the expected month,
@@ -187,7 +187,7 @@ func EndOf(t time.Time, p Period) time.Time {
 // Since leap seconds are irregular and unpredictable they are not handled. The
 // entire concept is silly and most programs should just pretend they don't
 // exist.
-func Add(t time.Time, n int, p Period) time.Time {
+func AddPeriod(t time.Time, n int, p Period) time.Time {
 	y, m, d, h, min, s, ns, l := t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second(), t.Nanosecond(), t.Location()
 	switch p {
 	case Second:
@@ -210,9 +210,9 @@ func Add(t time.Time, n int, p Period) time.Time {
 			d = x
 		}
 	case Quarter:
-		return Add(t, n*3, Month)
+		return AddPeriod(t, n*3, Month)
 	case HalfYear:
-		return Add(t, n*6, Month)
+		return AddPeriod(t, n*6, Month)
 	case Year:
 		y += n
 		if n := DaysInMonth(time.Date(y, time.Month(m), 1, h, min, s, ns, l)); DaysInMonth(t) > n {

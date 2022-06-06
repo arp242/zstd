@@ -1,3 +1,4 @@
+// Package zreflect implements functions for reflection.
 package zreflect
 
 import (

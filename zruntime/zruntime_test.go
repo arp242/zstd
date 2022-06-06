@@ -25,7 +25,7 @@ func TestSizeOf(t *testing.T) {
 		{true, 1},
 
 		{[]byte{}, 24},
-		{new([]byte), 32}, // 23 for byte, 8 for ptr
+		{new([]byte), 32}, // 24 for byte, 8 for ptr
 		{[]string{}, 24},
 		{[]string{""}, 40},
 		{[]string{"aa"}, 42},

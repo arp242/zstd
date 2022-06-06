@@ -72,9 +72,9 @@ func (r Range) To(end time.Time) Range {
 
 // Period returns a copy withh the end time set to n Period from the start time.
 //
-// This uses ztime.Add() and its "common sense" understanding of months.
+// This uses ztime.AddPeriod() and its "common sense" understanding of months.
 func (r Range) Period(n int, p Period) Range {
-	r.End = Add(r.Start, n, p)
+	r.End = AddPeriod(r.Start, n, p)
 	return r
 }
 
@@ -165,7 +165,7 @@ func (r Range) Last(p Period) Range {
 	}[p]
 
 	s := r.Start
-	r.Start = StartOf(Add(s, -1, p), pp)
+	r.Start = StartOf(AddPeriod(s, -1, p), pp)
 	r.End = EndOf(s, pp)
 	return r
 }
@@ -311,7 +311,7 @@ func (r Range) Diff(periods ...Period) Diff {
 		t := r.Start
 		for ; d.Months > 0; d.Months-- {
 			d.Days += DaysInMonth(t)
-			t = Add(t, 1, Month)
+			t = AddPeriod(t, 1, Month)
 		}
 	}
 	if hasW {

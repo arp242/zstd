@@ -6,19 +6,13 @@ import (
 	"time"
 )
 
-// Time wraps time.Time to add {Start,End}Of, Add(), and Unpack(). To make it a
-// bit more convenient to run several operations.
-//
-// time.Time's Add() is renamed to AddTime() here.
+// Time wraps time.Time to add {Start,End}Of, AddPeriod(), and Unpack(). It also
+// wraps operations that return time.Time to return ztime.Time.
 type Time struct{ time.Time }
 
-// Proxy to time.Time
-//
-// TODO: maybe make this a drop-in replacement? That would mean copying all top-level
-// time.* functions/constants, as well as proxy all time.Time methods (including
-// not renaming AddTime(). Not sure if it's worth it?
+// Proxy to time.Time, returning ztime.Time.
 
-func (t Time) AddTime(d time.Duration) Time         { return Time{t.Time.Add(d)} }
+func (t Time) Add(d time.Duration) Time             { return Time{t.Time.Add(d)} }
 func (t Time) AddDate(years, months, days int) Time { return Time{t.Time.AddDate(years, months, days)} }
 func (t Time) In(loc *time.Location) Time           { return Time{t.Time.In(loc)} }
 func (t Time) Local() Time                          { return Time{t.Time.Local()} }
@@ -26,9 +20,11 @@ func (t Time) Round(d time.Duration) Time           { return Time{t.Time.Round(d
 func (t Time) Truncate(d time.Duration) Time        { return Time{t.Time.Truncate(d)} }
 func (t Time) UTC() Time                            { return Time{t.Time.UTC()} }
 
-func (t Time) StartOf(p Period) Time    { return Time{StartOf(t.Time, p)} }
-func (t Time) EndOf(p Period) Time      { return Time{EndOf(t.Time, p)} }
-func (t Time) Add(n int, p Period) Time { return Time{Add(t.Time, n, p)} }
+// Our new methods.
+
+func (t Time) StartOf(p Period) Time          { return Time{StartOf(t.Time, p)} }
+func (t Time) EndOf(p Period) Time            { return Time{EndOf(t.Time, p)} }
+func (t Time) AddPeriod(n int, p Period) Time { return Time{AddPeriod(t.Time, n, p)} }
 func (t Time) Unpack() (year int, month time.Month, day, hour, minute, second, nanosecond int, loc *time.Location) {
 	return t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second(), t.Nanosecond(), t.Location()
 }
@@ -42,21 +38,19 @@ func MustParse(layout, value string) time.Time {
 	return t
 }
 
-// New creates a new date from a string according to the layout:
+// FromString creates a new date from a string according to the layout:
 //
 //  2006-01-02 15:04:05 MST
 //
-// Any part on the right can be omitted; for example New("2020-01-01") will
-// create a new date without any time, or New("2020-01-01 13") will create a
-// date with the hour set.
+// Any part on the right can be omitted; for example "2020-01-01" will create a
+// new date without any time, or "2020-01-01 13" will create a date with the
+// hour set.
 //
-// A timezone can always be added, for example New("2020-01-01 13 CET").
+// A timezone can always be added, for example "2020-01-01 13 CET".
 //
 // This will panic on errors. This is mostly useful in tests to quickly create a
 // date without too much ceremony.
-func New(s string) time.Time {
-	// TODO: rename to something else; maybe FromString()? Quick()?
-	// And add a New(time.Time) ztime.Time
+func FromString(s string) time.Time {
 	tz := strings.LastIndexByte(s, ' ')
 	if tz > -1 && strings.ContainsAny(s[tz:], "0123456789") {
 		tz = -1

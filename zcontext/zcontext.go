@@ -1,3 +1,4 @@
+// Package zcontext implements context functions.
 package zcontext
 
 import (
