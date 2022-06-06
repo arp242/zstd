@@ -5,8 +5,6 @@ import (
 	"reflect"
 	"strings"
 	"testing"
-
-	"zgo.at/zstd/ztype"
 )
 
 func TestIndent(t *testing.T) {
@@ -698,28 +696,6 @@ func TestRemove(t *testing.T) {
 			if !reflect.DeepEqual(tt.in, tt.wantSlice) {
 				fmt.Println(len(tt.in), cap(tt.in))
 				t.Errorf("\nhave: %v\nwant: %v", tt.in, tt.wantSlice)
-			}
-		})
-	}
-}
-
-func TestString(t *testing.T) {
-	tests := []struct {
-		in   interface{}
-		want string
-	}{
-		{nil, ""},
-		{"x", "x"},
-		{1, "1"},
-		{ztype.Ptr("X"), "X"},
-		{ztype.Ptr("X"), "X"},
-	}
-
-	for _, tt := range tests {
-		t.Run("", func(t *testing.T) {
-			have := String(tt.in)
-			if have != tt.want {
-				t.Errorf("\nhave: %q\nwant: %q", have, tt.want)
 			}
 		})
 	}
