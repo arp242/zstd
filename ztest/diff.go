@@ -82,17 +82,17 @@ func DiffJSON2(have, want string) string {
 // DiffMatch formats a unified diff, but accepts various patterns in the want
 // string:
 //
-// 	 %(YEAR)      current year in UTC
-// 	 %(MONTH)     current month in UTC
-// 	 %(DAY)       current day in UTC
-// 	 %(UUID)      UUID format (any version).
+//   %(YEAR)      current year in UTC
+//   %(MONTH)     current month in UTC
+//   %(DAY)       current day in UTC
+//   %(UUID)      UUID format (any version).
 //
-// 	 %(ANY)       any text: .+?
-// 	 %(ANY 5)     any text of exactly 5 characters: .{5}?
-// 	 %(ANY 5,)    any text of at least 5 characters: .{5,}?
-// 	 %(ANY 5,10)  any text between 5 and 10 characters: .{5,10}?
-// 	 %(ANY 10)    any text at most 10 characters: .{,10}?
-// 	 %(NUMBER)    any number; also allows length like ANY.
+//   %(ANY)       any text: .+?
+//   %(ANY 5)     any text of exactly 5 characters: .{5}?
+//   %(ANY 5,)    any text of at least 5 characters: .{5,}?
+//   %(ANY 5,10)  any text between 5 and 10 characters: .{5,10}?
+//   %(ANY 10)    any text at most 10 characters: .{,10}?
+//   %(NUMBER)    any number; also allows length like ANY.
 //
 //   %(..)        any regular expression, but \ is not allowed.
 func DiffMatch(have, want string, opt ...DiffOpt) string {

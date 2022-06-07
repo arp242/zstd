@@ -143,6 +143,8 @@ func LowerFirst(s string) string {
 }
 
 // GetLine gets the nth line \n-denoted line from a string.
+//
+// Line indexing starts at 1.
 func GetLine(in string, n int) string {
 	// Would probably be faster to use []byte and find the Nth \n character, but
 	// this is "fast enough"™ for now.
