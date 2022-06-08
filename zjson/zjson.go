@@ -126,3 +126,24 @@ func MustIndent(data []byte, v interface{}, prefix, indent string) []byte {
 	}
 	return b
 }
+
+// MustMarshalString is like MustMarshal, but returns a string.
+func MustMarshalString(v interface{}) string {
+	return string(MustMarshal(v))
+}
+
+// MustMarshalIndentString is like MustMarshalIndent, but returns a string.
+func MustMarshalIndentString(v interface{}, prefix, indent string) string {
+	return string(MustMarshalIndent(v, prefix, indent))
+}
+
+// IndentString is like Indent, but returns a string.
+func IndentString(data []byte, v interface{}, prefix, indent string) (string, error) {
+	b, err := Indent(data, v, prefix, indent)
+	return string(b), err
+}
+
+// MustIndentString is like MustIndent, but returns a string.
+func MustIndentString(data []byte, v interface{}, prefix, indent string) string {
+	return string(MustIndent(data, v, prefix, indent))
+}
