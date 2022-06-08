@@ -65,20 +65,6 @@ func Diff(have, want string, opt ...DiffOpt) string {
 	return "\n" + d
 }
 
-// DiffJSON compares two JSON strings.
-func DiffJSON2(have, want string) string {
-	var h map[string]any
-	haveJ, err := indentJSON([]byte(have), &h, "", "    ")
-	if err != nil {
-	}
-	var w map[string]any
-	wantJ, err := indentJSON([]byte(want), &w, "", "    ")
-	if err != nil {
-	}
-
-	return Diff(string(haveJ), string(wantJ))
-}
-
 // DiffMatch formats a unified diff, but accepts various patterns in the want
 // string:
 //
