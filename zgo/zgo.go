@@ -31,12 +31,12 @@ func ModuleRoot() string {
 		pdir = dir
 		dir = filepath.Dir(dir)
 
+		/// Parent directory is identical: we reached the top of the filesystem
+		/// hierarchy and didn't find anything.
 		if dir == pdir {
-			break
+			return ""
 		}
-
 	}
-	return ""
 }
 
 // Tag gets the tag name for a struct field and all attributes.

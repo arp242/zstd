@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"crypto/subtle"
+	"errors"
 	"fmt"
 	"io"
 	"math/big"
@@ -32,6 +33,14 @@ func HashFile(filename string) (string, error) {
 
 // VerifyHash verifies a file with a hash from HashFile().
 func VerifyHash(filename, hash string) (bool, error) {
+	m, _, ok := strings.Cut(hash)
+	if !ok {
+		return false, errors.New("zcrypto.VerifyHash: no hash algorithm in hash string")
+	}
+	if m != "sha256-" {
+		return false, fmt.Errorf("zcrypto.VerifyHash: unknown hash algorithm: %q", m)
+	}
+
 	ver, err := HashFile(filename)
 	if err != nil {
 		return false, fmt.Errorf("zcrypto.VerifyHash: %w", err)

@@ -76,7 +76,6 @@ type AtMost struct {
 // NewAtMost creates a new AtMost instance.
 func NewAtMost(max int) AtMost {
 	return AtMost{ch: make(chan struct{}, max)}
-
 }
 
 // Wait for all jobs to finish.

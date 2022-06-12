@@ -75,6 +75,8 @@ func Callers(filterFun ...string) []runtime.Frame {
 		"runtime.goexit",
 		"runtime.gopanic",
 		"runtime.panicdottypeE",
+		"runtime.goPanicIndex",
+		"runtime.main",
 		"testing.tRunner",
 		"zgo.at/zstd/zdebug.Stack",
 		"zgo.at/zstd/zdebug.PrintStack",
