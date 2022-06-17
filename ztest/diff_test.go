@@ -233,3 +233,48 @@ func TestDiffMatch(t *testing.T) {
 		})
 	}
 }
+
+func TestDiffJSON(t *testing.T) {
+	tests := []struct {
+		inHave, inWant, want string
+	}{
+		{`{}`, ``, ``},
+		{``, `{}`, ``},
+
+		{``, `{"x": "x"}`, `
+--- output
++++ want
+@@ -1 +1,3 @@
+- {}
++ {
++     "x": "x"
++ }
+`},
+
+		{`[1]`, `[1]`, ``},
+		{`"a"`, `"a"`, ``},
+		{`{"a": "x"}`, `{  "a":   "x"}`, ``},
+
+		{`{"a": "x"}`, `{  "a":   "y"}`, `
+--- output
++++ want
+@@ -1,3 +1,3 @@
+  {
+-     "a": "x"
++     "a": "y"
+  }
+`},
+	}
+
+	for i, tt := range tests {
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			tt.inHave = strings.ReplaceAll(tt.inHave, "\t", "")
+			tt.inWant = strings.ReplaceAll(tt.inWant, "\t", "")
+
+			have := Diff(tt.inHave, tt.inWant, DiffJSON)
+			if have != tt.want {
+				t.Errorf("\nhave: %q\nwant: %q", have, tt.want)
+			}
+		})
+	}
+}

@@ -33,7 +33,7 @@ func HashFile(filename string) (string, error) {
 
 // VerifyHash verifies a file with a hash from HashFile().
 func VerifyHash(filename, hash string) (bool, error) {
-	m, _, ok := strings.Cut(hash)
+	m, _, ok := strings.Cut(hash, "-")
 	if !ok {
 		return false, errors.New("zcrypto.VerifyHash: no hash algorithm in hash string")
 	}

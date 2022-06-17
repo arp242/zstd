@@ -152,17 +152,24 @@ func applyOpt(have, want string, opt ...DiffOpt) (string, string) {
 			have = reNormalizeWhitespace.ReplaceAllString(have, "")
 			want = reNormalizeWhitespace.ReplaceAllString(want, "")
 		case DiffJSON:
-			var h map[string]any
+			if have == "" {
+				have = "{}"
+			}
+			if want == "" {
+				want = "{}"
+			}
+
+			var h any
 			haveJ, err := indentJSON([]byte(have), &h, "", "    ")
 			if err != nil {
-				have = fmt.Sprintf("ztest.Diff: ERROR formatting have: %s", err)
+				have = fmt.Sprintf("ztest.Diff: ERROR formatting have: %s\ntext: %s", err, have)
 			} else {
 				have = string(haveJ)
 			}
-			var w map[string]any
+			var w any
 			wantJ, err := indentJSON([]byte(want), &w, "", "    ")
 			if err != nil {
-				want = fmt.Sprintf("ztest.Diff: ERROR formatting want: %s", err)
+				want = fmt.Sprintf("ztest.Diff: ERROR formatting want: %s\ntext: %s", err, want)
 			} else {
 				want = string(wantJ)
 			}
