@@ -3,6 +3,9 @@ package ztest
 import (
 	"errors"
 	"os"
+	"reflect"
+	"sort"
+	"sync"
 	"testing"
 )
 
@@ -155,6 +158,33 @@ func TestDiff(t *testing.T) {
 			if have != tt.want {
 				t.Errorf("\nhave:\n%s\nwant:\n%s\nout:  %[1]q\nwant: %[2]q", have, tt.want)
 			}
+		})
+	}
+}
+
+func TestParallel(t *testing.T) {
+	tests := []string{"one", "two", "three"}
+
+	var (
+		have []string
+		lock sync.Mutex
+	)
+	t.Cleanup(func() {
+		sort.Strings(have)
+		want := []string{"one", "three", "two"}
+
+		if !reflect.DeepEqual(have, want) {
+			t.Errorf("\nhave: %#v\nwant: %#v", have, want)
+		}
+	})
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			tt := Parallel(t, tt)
+
+			lock.Lock()
+			have = append(have, tt)
+			lock.Unlock()
 		})
 	}
 }

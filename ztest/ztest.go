@@ -27,6 +27,32 @@ func ErrorContains(have error, want string) bool {
 	return strings.Contains(have.Error(), want)
 }
 
+// Parallel signals that this test is to be run in parallel.
+//
+// This is identical to testing.T.Parallel() but also returns the table test to
+// capture it in the loop:
+//
+//    tests := []struct {
+//       ...
+//    }
+//
+//    for _, tt := range tests {
+//       t.Run("", func(t *testing.T) {
+//         tt := ztest.Parallel(t, tt)
+//       })
+//    }
+//
+// Just saves one line vs.
+//
+//       t.Run("", func(t *testing.T) {
+//         tt := tt
+//         t.Parallel()
+//       })
+func Parallel[TT any](t *testing.T, tt TT) TT {
+	t.Parallel()
+	return tt
+}
+
 // Replace pieces of text with a placeholder string.
 //
 // This is use to test output which isn't stable, for example because it
