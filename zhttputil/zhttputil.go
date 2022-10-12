@@ -191,3 +191,9 @@ func Save(url string, dir string, filename string) (string, error) {
 
 	return path, nil
 }
+
+// NopWriter is a http.ResponseWriter that doesn't write any body content.
+type NopWriter struct{ http.ResponseWriter }
+
+// Write is a no-op.
+func (nop *NopWriter) Write(in []byte) (int, error) { return len(in), nil }
