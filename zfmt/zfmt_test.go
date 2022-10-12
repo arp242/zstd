@@ -7,7 +7,7 @@ type typ int8
 func TestBinary(t *testing.T) {
 	i := int8(7)
 	tests := []struct {
-		in   interface{}
+		in   any
 		want string
 	}{
 		{int8(0), "0000_0000"},

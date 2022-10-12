@@ -21,7 +21,7 @@ import (
 type Bool bool
 
 // Scan converts the data from the DB.
-func (b *Bool) Scan(src interface{}) error {
+func (b *Bool) Scan(src any) error {
 	if b == nil {
 		return fmt.Errorf("zdb.Bool: not initialized")
 	}

@@ -65,7 +65,7 @@ func TestDurationsAppend(t *testing.T) {
 	d.appendWithData(4, "four")
 	cmpDurations(t, d, Durations{
 		list: []time.Duration{1, 2, 3, 4},
-		data: map[int]interface{}{
+		data: map[int]any{
 			1: "two",
 			3: "four",
 		},
@@ -75,7 +75,7 @@ func TestDurationsAppend(t *testing.T) {
 	d.appendWithData(6, "six")
 	cmpDurations(t, d, Durations{
 		list: []time.Duration{3, 4, 5, 6},
-		data: map[int]interface{}{
+		data: map[int]any{
 			3: "four",
 			4: "five",
 			5: "six",
@@ -103,7 +103,7 @@ func TestDurationsTop(t *testing.T) {
 
 	cmpDurations(t, d.Top(-50), Durations{
 		list: []time.Duration{1, 4, 3, 2},
-		data: map[int]interface{}{1: "four", 3: "two"},
+		data: map[int]any{1: "four", 3: "two"},
 	})
 	cmpDurations(t, d.Top(-20), Durations{list: []time.Duration{1}})
 }

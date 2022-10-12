@@ -68,3 +68,9 @@ func (nopCloser) Close() error { return nil }
 
 // NopCloser returns a WriteCloser with a no-op Close method.
 func NopCloser(r io.Writer) io.WriteCloser { return nopCloser{r} }
+
+// NopWriter is an io.Writer that does nothing.
+type NopWriter struct{}
+
+// Write is a stub.
+func (w *NopWriter) Write(b []byte) (int, error) { return len(b), nil }

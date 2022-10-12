@@ -6,6 +6,8 @@ import (
 	"math"
 	"strconv"
 	"strings"
+
+	"golang.org/x/exp/constraints"
 )
 
 // Int with various methods to make conversions easier; useful especially in
@@ -19,34 +21,12 @@ func (s Int) Float32() float32 { return float32(s) }
 func (s Int) Float64() float64 { return float64(s) }
 
 // Join a slice of ints to a comma separated string with the given separator.
-func Join(ints []int, sep string) string {
+func Join[T constraints.Integer](ints []T, sep string) string {
 	s := make([]string, len(ints))
 	for i := range ints {
-		s[i] = strconv.Itoa(ints[i])
+		s[i] = strconv.FormatInt(int64(ints[i]), 10)
 	}
 	return strings.Join(s, sep)
-}
-
-// Join a slice of int64 to a comma separated string with the given separator.
-func Join64(ints []int64, sep string) string {
-	s := make([]string, len(ints))
-	for i := range ints {
-		s[i] = strconv.FormatInt(ints[i], 10)
-	}
-	return strings.Join(s, sep)
-}
-
-// Uniq removes duplicate entries from the list. The list will be sorted.
-func Uniq(list []int64) []int64 {
-	var unique []int64
-	seen := make(map[int64]struct{})
-	for _, l := range list {
-		if _, ok := seen[l]; !ok {
-			seen[l] = struct{}{}
-			unique = append(unique, l)
-		}
-	}
-	return unique
 }
 
 // Split a string to a slice of []int64.
@@ -69,26 +49,6 @@ func Split(s string, sep string) ([]int64, error) {
 	return ret, nil
 }
 
-// Contains reports whether i is within the list.
-func Contains(list []int, i int) bool {
-	for _, item := range list {
-		if item == i {
-			return true
-		}
-	}
-	return false
-}
-
-// Contains64 reports whether i is within the list.
-func Contains64(list []int64, i int64) bool {
-	for _, item := range list {
-		if item == i {
-			return true
-		}
-	}
-	return false
-}
-
 // Range creates an []int counting at "start" up to (and including) "end".
 func Range(start, end int) []int {
 	rng := make([]int, end-start+1)
@@ -98,26 +58,8 @@ func Range(start, end int) []int {
 	return rng
 }
 
-// Fiter a list.
-//
-// The function will be called for every item and those that return false will
-// not be included in the return value.
-func Filter(list []int64, fun func(int64) bool) []int64 {
-	var ret []int64
-	for _, e := range list {
-		if fun(e) {
-			ret = append(ret, e)
-		}
-	}
-
-	return ret
-}
-
-// FilterEmpty is a filter for Filter() to remove empty entries.
-func FilterEmpty(e int64) bool { return e != 0 }
-
 // Min gets the lowest of two numbers.
-func Min(a, b int64) int64 {
+func Min[T constraints.Integer](a, b T) T {
 	if a > b {
 		return b
 	}
@@ -125,23 +67,7 @@ func Min(a, b int64) int64 {
 }
 
 // Max gets the highest of two numbers.
-func Max(a, b int64) int64 {
-	if a < b {
-		return b
-	}
-	return a
-}
-
-// MinInt gets the lowest of two numbers.
-func MinInt(a, b int) int {
-	if a > b {
-		return b
-	}
-	return a
-}
-
-// MaxInt gets the highest of two numbers.
-func MaxInt(a, b int) int {
+func Max[T constraints.Integer](a, b T) T {
 	if a < b {
 		return b
 	}
@@ -171,29 +97,8 @@ func DivideCeil(count int64, pageSize int64) int64 {
 	return int64(math.Ceil(float64(count) / float64(pageSize)))
 }
 
-// Differencereturns a new slice with elements that are in "set" but not in
-// "others".
-func Difference(set []int64, others ...[]int64) []int64 {
-	out := []int64{}
-	for _, setItem := range set {
-		found := false
-		for _, o := range others {
-			if Contains64(o, setItem) {
-				found = true
-				break
-			}
-		}
-
-		if !found {
-			out = append(out, setItem)
-		}
-	}
-
-	return out
-}
-
 // ToIntSlice converts any []int type to an []int64.
-func ToIntSlice(v interface{}) ([]int64, bool) {
+func ToIntSlice(v any) ([]int64, bool) {
 	var r []int64
 	switch vv := v.(type) {
 	case []int64:
@@ -259,7 +164,7 @@ func ToIntSlice(v interface{}) ([]int64, bool) {
 }
 
 // ToUintSlice converts any []int type to an []uint64.
-func ToUintSlice(v interface{}) ([]uint64, bool) {
+func ToUintSlice(v any) ([]uint64, bool) {
 	var r []uint64
 	switch vv := v.(type) {
 	case []int64:
@@ -354,3 +259,21 @@ func Fields(s string) ([]int64, error) {
 
 	return nf, nil
 }
+
+// Fiter a list.
+//
+// The function will be called for every item and those that return false will
+// not be included in the return value.
+func Filter(list []int64, fun func(int64) bool) []int64 {
+	var ret []int64
+	for _, e := range list {
+		if fun(e) {
+			ret = append(ret, e)
+		}
+	}
+
+	return ret
+}
+
+// FilterEmpty is a filter for Filter() to remove empty entries.
+func FilterEmpty(e int64) bool { return e != 0 }

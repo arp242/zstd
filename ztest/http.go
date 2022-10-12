@@ -46,7 +46,7 @@ func NewRequest(method, target string, body io.Reader) *http.Request {
 //   NewRequest("POST", "/", ztest.Body(someStruct{
 //       Foo: "bar",
 //   }))
-func Body(a interface{}) *bytes.Reader {
+func Body(a any) *bytes.Reader {
 	j, err := json.Marshal(a)
 	if err != nil {
 		panic(err)

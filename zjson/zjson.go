@@ -57,7 +57,7 @@ func (t *Timestamp) UnmarshalJSON(v []byte) error {
 //
 // Target can be any type that json.Unmarshal can unmarshal to, and doesn't need
 // to be a pointer. The returned value is always a pointer.
-func UnmarshalTo(data []byte, target reflect.Type) (interface{}, error) {
+func UnmarshalTo(data []byte, target reflect.Type) (any, error) {
 	if target == nil {
 		return nil, errors.New("zjson.UnmarshalTo: target is nil")
 	}
@@ -70,7 +70,7 @@ func UnmarshalTo(data []byte, target reflect.Type) (interface{}, error) {
 }
 
 // MustUnmarshalTo behaves like UnmarshalTo but will panic on errors.
-func MustUnmarshalTo(data []byte, target reflect.Type) interface{} {
+func MustUnmarshalTo(data []byte, target reflect.Type) any {
 	t, err := UnmarshalTo(data, target)
 	if err != nil {
 		panic(err)
@@ -79,7 +79,7 @@ func MustUnmarshalTo(data []byte, target reflect.Type) interface{} {
 }
 
 // MustMarshal behaves like json.Marshal but will panic on errors.
-func MustMarshal(v interface{}) []byte {
+func MustMarshal(v any) []byte {
 	b, err := json.Marshal(v)
 	if err != nil {
 		panic(err)
@@ -88,7 +88,7 @@ func MustMarshal(v interface{}) []byte {
 }
 
 // MustMarshalIndent behaves like json.MarshalIndent but will panic on errors.
-func MustMarshalIndent(v interface{}, prefix, indent string) []byte {
+func MustMarshalIndent(v any, prefix, indent string) []byte {
 	b, err := json.MarshalIndent(v, prefix, indent)
 	if err != nil {
 		panic(err)
@@ -97,7 +97,7 @@ func MustMarshalIndent(v interface{}, prefix, indent string) []byte {
 }
 
 // MustUnmarshal behaves like json.Unmarshal but will panic on errors.
-func MustUnmarshal(data []byte, v interface{}) {
+func MustUnmarshal(data []byte, v any) {
 	err := json.Unmarshal(data, v)
 	if err != nil {
 		panic(err)
@@ -110,7 +110,7 @@ func MustUnmarshal(data []byte, v interface{}) {
 // The data will be unmarshalled in to v, which must be a pointer. Example:
 //
 //   Indent(`{"a": "b"}`, &map[string]string{}, "", "  ")
-func Indent(data []byte, v interface{}, prefix, indent string) ([]byte, error) {
+func Indent(data []byte, v any, prefix, indent string) ([]byte, error) {
 	err := json.Unmarshal(data, v)
 	if err != nil {
 		return nil, err
@@ -119,7 +119,7 @@ func Indent(data []byte, v interface{}, prefix, indent string) ([]byte, error) {
 }
 
 // MustIndent behaves like Indent but will panic on errors.
-func MustIndent(data []byte, v interface{}, prefix, indent string) []byte {
+func MustIndent(data []byte, v any, prefix, indent string) []byte {
 	b, err := Indent(data, v, prefix, indent)
 	if err != nil {
 		panic(err)
@@ -128,22 +128,22 @@ func MustIndent(data []byte, v interface{}, prefix, indent string) []byte {
 }
 
 // MustMarshalString is like MustMarshal, but returns a string.
-func MustMarshalString(v interface{}) string {
+func MustMarshalString(v any) string {
 	return string(MustMarshal(v))
 }
 
 // MustMarshalIndentString is like MustMarshalIndent, but returns a string.
-func MustMarshalIndentString(v interface{}, prefix, indent string) string {
+func MustMarshalIndentString(v any, prefix, indent string) string {
 	return string(MustMarshalIndent(v, prefix, indent))
 }
 
 // IndentString is like Indent, but returns a string.
-func IndentString(data []byte, v interface{}, prefix, indent string) (string, error) {
+func IndentString(data []byte, v any, prefix, indent string) (string, error) {
 	b, err := Indent(data, v, prefix, indent)
 	return string(b), err
 }
 
 // MustIndentString is like MustIndent, but returns a string.
-func MustIndentString(data []byte, v interface{}, prefix, indent string) string {
+func MustIndentString(data []byte, v any, prefix, indent string) string {
 	return string(MustIndent(data, v, prefix, indent))
 }

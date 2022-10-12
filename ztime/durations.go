@@ -18,7 +18,7 @@ type Durations struct {
 	mu      *sync.Mutex
 	list    []time.Duration
 	maxSize int
-	data    map[int]interface{}
+	data    map[int]any
 	off     int
 
 	modified      bool
@@ -33,7 +33,7 @@ func NewDurations(max int) Durations {
 	return Durations{
 		modified: true,
 		mu:       new(sync.Mutex),
-		data:     make(map[int]interface{}),
+		data:     make(map[int]any),
 		maxSize:  max,
 	}
 }
@@ -91,7 +91,7 @@ func (d *Durations) Append(add ...time.Duration) {
 //
 // Grouping by data is probably a common use case, so storing it a bit different
 // (map[string][]int, as data → indexes) might be a good idea(?)
-func (d *Durations) appendWithData(add time.Duration, data interface{}) {
+func (d *Durations) appendWithData(add time.Duration, data any) {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 

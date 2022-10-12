@@ -35,7 +35,7 @@ func TestVerbose() bool {
 }
 
 // FuncName gets the name of a function.
-func FuncName(f interface{}) string {
+func FuncName(f any) string {
 	return runtime.FuncForPC(reflect.ValueOf(f).Pointer()).Name()
 }
 
@@ -114,7 +114,7 @@ func Callers(filterFun ...string) []runtime.Frame {
 // This is adapted from: https://github.com/creachadair/misctools/blob/master/sizeof/size.go
 //
 // Also see: https://github.com/golang/go/issues/34561
-func SizeOf(v interface{}) int64 {
+func SizeOf(v any) int64 {
 	return int64(sizeOf(reflect.ValueOf(v), make(map[uintptr]bool)))
 
 	// Copyright (c) 2016, Michael J. Fromberger

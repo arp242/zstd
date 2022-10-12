@@ -10,7 +10,7 @@ import (
 )
 
 // Binary returns a nicely formatted binary representation of a number.
-func Binary(c interface{}) string {
+func Binary(c any) string {
 	t := reflect.TypeOf(c)
 	if t.Kind() == reflect.Ptr {
 		t = t.Elem()

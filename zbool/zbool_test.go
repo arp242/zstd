@@ -47,7 +47,7 @@ func TestBool(t *testing.T) {
 
 	t.Run("scan", func(t *testing.T) {
 		cases := []struct {
-			in      interface{}
+			in      any
 			want    Bool
 			wantErr string
 		}{

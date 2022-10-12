@@ -15,7 +15,7 @@ func TestGoroutineID(t *testing.T) {
 func TestSizeOf(t *testing.T) {
 	n := int64(123)
 	tests := []struct {
-		in   interface{}
+		in   any
 		want int64
 	}{
 		{"", 16},

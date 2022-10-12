@@ -34,7 +34,7 @@ func TestDumpBody(t *testing.T) {
 
 	tests := []struct {
 		Req  http.Request
-		Body interface{} // optional []byte or func() io.ReadCloser to populate Req.Body
+		Body any // optional []byte or func() io.ReadCloser to populate Req.Body
 
 		WantDump string
 		ReadN    int64

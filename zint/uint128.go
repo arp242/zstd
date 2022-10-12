@@ -97,7 +97,7 @@ func (i Uint128) Bytes() []byte {
 func (i Uint128) Value() (driver.Value, error) { return i.Bytes(), nil }
 
 // Scan converts the data from the DB.
-func (i *Uint128) Scan(v interface{}) error {
+func (i *Uint128) Scan(v any) error {
 	if v == nil {
 		return nil
 	}

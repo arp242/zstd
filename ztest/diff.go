@@ -541,7 +541,7 @@ func splitLines(s string) []string {
 	return lines
 }
 
-func indentJSON(data []byte, v interface{}, prefix, indent string) ([]byte, error) {
+func indentJSON(data []byte, v any, prefix, indent string) ([]byte, error) {
 	err := json.Unmarshal(data, v)
 	if err != nil {
 		return nil, err

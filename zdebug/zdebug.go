@@ -20,7 +20,7 @@ import (
 func Stack(filterFun ...string) []byte {
 	var (
 		callers = zruntime.Callers(filterFun...)
-		rows    = make([][]interface{}, 0, len(callers))
+		rows    = make([][]any, 0, len(callers))
 		width   = 0
 	)
 	for _, f := range callers {
@@ -28,7 +28,7 @@ func Stack(filterFun ...string) []byte {
 		if len(loc) > width {
 			width = len(loc)
 		}
-		rows = append(rows, []interface{}{loc, f.Function})
+		rows = append(rows, []any{loc, f.Function})
 	}
 
 	buf := new(bytes.Buffer)

@@ -297,7 +297,7 @@ func TestInt(t *testing.T) {
 
 func TestToIntSlice(t *testing.T) {
 	tests := []struct {
-		in   interface{}
+		in   any
 		ok   bool
 		want []int64
 	}{

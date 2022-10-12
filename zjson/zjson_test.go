@@ -183,7 +183,7 @@ func TestUnmarshalto(t *testing.T) {
 	tests := []struct {
 		json    string
 		target  reflect.Type
-		want    interface{}
+		want    any
 		wantErr string
 	}{
 		{"", nil, nil, "target is nil"},
