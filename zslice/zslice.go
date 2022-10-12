@@ -1,5 +1,5 @@
-// Package zslices implements functions for collections.
-package zslices
+// Package zslice implements generic functions for slices.
+package zslice
 
 import (
 	"crypto/rand"

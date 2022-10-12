@@ -1,4 +1,4 @@
-package zslices
+package zslice
 
 import (
 	"fmt"
