@@ -37,7 +37,7 @@ func VerifyHash(filename, hash string) (bool, error) {
 	if !ok {
 		return false, errors.New("zcrypto.VerifyHash: no hash algorithm in hash string")
 	}
-	if m != "sha256-" {
+	if m != "sha256" {
 		return false, fmt.Errorf("zcrypto.VerifyHash: unknown hash algorithm: %q", m)
 	}
 
@@ -60,11 +60,12 @@ func Secret128() string { return secret(2) }
 // Secret number of 64 bits formatted in base36 (~12 bytes).
 func Secret64() string { return secret(1) }
 
-const alphabet = "0123456789abcdefghijklmnopqrstuvwxyz"
+const alphabet = "23456789abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ"
 
 // Secret string of size  characters selected from sel.
 //
-// If sel is "" it will use [a-z0-9].
+// If sel is "" it will use [0-9a-zA-Z], excluding some easily confused
+// characters: 0, 1, i, l, o, I, and O.
 func SecretString(size int, sel string) string {
 	if sel == "" {
 		sel = alphabet

@@ -28,7 +28,6 @@ func ModuleRoot() string {
 		if _, err := os.Stat(filepath.Join(dir, "go.mod")); err == nil {
 			return dir
 		}
-		pdir = dir
 		dir = filepath.Dir(dir)
 
 		/// Parent directory is identical: we reached the top of the filesystem
@@ -36,6 +35,7 @@ func ModuleRoot() string {
 		if dir == pdir {
 			return ""
 		}
+		pdir = dir
 	}
 }
 

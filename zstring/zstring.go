@@ -198,6 +198,8 @@ func Repeat(s string, n int) (r []string) {
 }
 
 // Choose chooses a random item from the list.
+//
+// Deprecated: use zcollect.Choose.
 func Choose(l []string) string {
 	if len(l) == 0 {
 		return ""
