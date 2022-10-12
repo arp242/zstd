@@ -1,4 +1,4 @@
-package zcollect
+package zslices
 
 import (
 	"fmt"

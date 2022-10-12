@@ -1,5 +1,5 @@
-// Package zcollect implements functions for collections.
-package zcollect
+// Package zslices implements functions for collections.
+package zslices
 
 import (
 	"crypto/rand"
