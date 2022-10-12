@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"golang.org/x/exp/constraints"
+	"zgo.at/zstd/internal/exp/constraints"
 )
 
 // Int with various methods to make conversions easier; useful especially in

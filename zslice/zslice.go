@@ -10,8 +10,8 @@ import (
 	"time"
 
 	// Exception to the "stdlib-only" rule, since this should be in stdlib soon.
-	"golang.org/x/exp/constraints"
-	"golang.org/x/exp/slices"
+	"zgo.at/zstd/internal/exp/constraints"
+	"zgo.at/zstd/internal/exp/slices"
 )
 
 // Choose a random item from the list.
