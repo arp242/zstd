@@ -5,6 +5,9 @@ import (
 	"crypto/rand"
 	"fmt"
 	"math/big"
+	mrand "math/rand"
+	"sync"
+	"time"
 
 	// Exception to the "stdlib-only" rule, since this should be in stdlib soon.
 	"golang.org/x/exp/constraints"
@@ -24,6 +27,26 @@ func Choose[T any](list []T) T {
 		panic(fmt.Errorf("zcollect.Choose: %w", err))
 	}
 	return list[n.Int64()]
+}
+
+var (
+	randSource     *mrand.Rand
+	randSourceOnce sync.Once
+)
+
+// Shuffle randomizes the order of values.
+//
+// This uses math/rand, and is not "true random".
+func Shuffle[T any](list []T) {
+	if len(list) < 2 {
+		return
+	}
+
+	randSourceOnce.Do(func() {
+		randSource = mrand.New(mrand.NewSource(time.Now().UnixNano()))
+	})
+
+	randSource.Shuffle(len(list), func(i, j int) { list[i], list[j] = list[j], list[i] })
 }
 
 // ContainsAny reports whether any of the strings are in the list
@@ -64,6 +87,11 @@ func Uniq[T comparable](list []T) []T {
 		}
 	}
 	return unique
+}
+
+// IsUniq reports if the list contains unique values.
+func IsUniq[T constraints.Ordered](list []T) bool {
+	return len(list) == len(UniqSort(list))
 }
 
 // Repeat returns a slice with the value v repeated n times.
@@ -141,4 +169,21 @@ func Intersect[T comparable](a, b []T) []T {
 		}
 	}
 	return c
+}
+
+// SameElements reports if the two slices have the same elements.
+//
+// This is similar to slices.Equal, but don't take order in to account.
+func SameElements[T constraints.Ordered](a, b []T) bool {
+	if len(a) != len(b) {
+		return false
+	}
+
+	// TODO: there is probably a better way of doing this; dropping the sort
+	//       would also allow constraints.Ordered to be comparable.
+	aCp := slices.Clone(a)
+	bCp := slices.Clone(b)
+	slices.Sort(aCp)
+	slices.Sort(bCp)
+	return slices.Equal(aCp, bCp)
 }

@@ -48,6 +48,57 @@ func TestChoose(t *testing.T) {
 	}
 }
 
+func TestShuffle(t *testing.T) {
+	{
+		var l []int
+		Shuffle(l)
+		if l != nil {
+			t.Fatal()
+		}
+	}
+
+	{
+		l := []int{1}
+		Shuffle(l)
+		if !reflect.DeepEqual(l, []int{1}) {
+			t.Fatal()
+		}
+	}
+
+	{
+		var (
+			rnd = make([]int, 0, 100)
+		)
+		for i := 0; i < 100; i++ {
+			l := []int{1, 2, 3}
+			Shuffle(l)
+			rnd = append(rnd, l[0])
+		}
+
+		var one, two, three []int
+		for _, r := range rnd {
+			switch r {
+			case 1:
+				one = append(one, r)
+			case 2:
+				two = append(two, r)
+			case 3:
+				three = append(three, r)
+			}
+		}
+
+		if len(one) < 10 {
+			t.Error("one", one)
+		}
+		if len(two) < 10 {
+			t.Error("two", two)
+		}
+		if len(three) < 10 {
+			t.Error("three", three)
+		}
+	}
+}
+
 func TestContainsAny(t *testing.T) {
 	t.Run("string", func(t *testing.T) {
 		tests := []struct {
@@ -137,6 +188,26 @@ func TestUniq(t *testing.T) {
 			have := Uniq(tt.in)
 			if !reflect.DeepEqual(have, tt.want) {
 				t.Errorf("\nwant: %q\nhave: %q", tt.want, have)
+			}
+		})
+	}
+}
+
+func TestIsUniq(t *testing.T) {
+	tests := []struct {
+		in   []string
+		want bool
+	}{
+		{[]string{}, true},
+		{[]string{"a", "b", "c"}, true},
+		{[]string{"a", "b", "c", "a", "b", "n", "a", "aaa", "n", "x"}, false},
+	}
+
+	for i, tt := range tests {
+		t.Run(fmt.Sprintf("test-%v", i), func(t *testing.T) {
+			have := IsUniq(tt.in)
+			if have != tt.want {
+				t.Errorf("\nwant: %v\nhave: %v", tt.want, have)
 			}
 		})
 	}
@@ -279,6 +350,26 @@ func TestIntersect(t *testing.T) {
 			out := Intersect(tt.inA, tt.inB)
 			if !reflect.DeepEqual(tt.want, out) {
 				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tt.want)
+			}
+		})
+	}
+}
+
+func TestSameElements(t *testing.T) {
+	tests := []struct {
+		a    []string
+		b    []string
+		want bool
+	}{
+		{[]string{}, []string{}, true},
+		{[]string{"a", "b"}, []string{"b", "a"}, true},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			have := SameElements(tt.a, tt.b)
+			if have != tt.want {
+				t.Errorf("\nhave: %v\nwant: %v", have, tt.want)
 			}
 		})
 	}
