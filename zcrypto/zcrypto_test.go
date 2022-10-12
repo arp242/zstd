@@ -1,8 +1,19 @@
 package zcrypto
 
 import (
+	"crypto/sha1"
 	"testing"
 )
+
+func TestHash(t *testing.T) {
+	if h := Hash(sha1.New(), "ASD"); h != "5271593ca406362d7a2701e331408ab77d5b5b88" {
+		t.Error(h)
+	}
+
+	if h := Hash(sha1.New(), "XXX"); h != "a9674b19f8c56f785c91a555d0a144522bb318e6" {
+		t.Error(h)
+	}
+}
 
 func TestHashFile(t *testing.T) {
 	f := "../zio/testdata/file1"

@@ -5,14 +5,25 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"crypto/subtle"
+	"encoding/hex"
 	"errors"
 	"fmt"
+	"hash"
 	"io"
 	"math/big"
 	"os"
 	"strconv"
 	"strings"
 )
+
+// Hash returns the base-16 encoded string of value hashed with h.
+func Hash(h hash.Hash, value string) string {
+	if value == "" {
+		return ""
+	}
+	h.Write([]byte(value))
+	return hex.EncodeToString(h.Sum(nil))
+}
 
 // HashFile creates a SHA-256 hash for a file, as "sha256-hash".
 func HashFile(filename string) (string, error) {
