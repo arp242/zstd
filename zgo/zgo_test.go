@@ -6,9 +6,14 @@ import (
 	"os"
 	"strings"
 	"testing"
+
+	"zgo.at/zstd/zio"
 )
 
 func TestModuleRoot(t *testing.T) {
+	if !zio.Exists("/home/martin/code/Golib/zstd") {
+		t.Skip() // Only works on my laptop; need to write a better test for this.
+	}
 	if r := ModuleRoot(); r != "/home/martin/code/Golib/zstd" {
 		t.Error(r)
 	}
