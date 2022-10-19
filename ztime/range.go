@@ -10,9 +10,8 @@ import (
 // The timezone is always taken from the start time. The end's timezone will be
 // adjusted if it differs.
 type Range struct {
-	// TODO: these should not be exported; they're only exported for now to make
-	// migrating to Range a bit easier.
-	Start, End time.Time
+	Start time.Time `json:"start"`
+	End   time.Time `json:"end"`
 
 	locale RangeLocale
 }
