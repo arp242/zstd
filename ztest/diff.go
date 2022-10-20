@@ -488,7 +488,7 @@ func makeUnifiedDiff(diff unifiedDiff) string {
 	for _, g := range diff.Matcher.GetGroupedOpCodes(diff.Context) {
 		if !started {
 			started = true
-			out.WriteString("--- output\n")
+			out.WriteString("--- have\n")
 			out.WriteString("+++ want\n")
 		}
 

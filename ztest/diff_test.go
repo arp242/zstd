@@ -147,18 +147,18 @@ func TestDiffMatch(t *testing.T) {
 		{"Hello", "He%(ANY)", ""},
 
 		{"Hello " + year + "!", "Hello %(YEAR)!", ""},
-		{"Hello " + year + "!", "Hello %(YEAR)", "\n--- output\n+++ want\n@@ -1 +1 @@\n- Hello 2022!\n+ Hello 2022\n"},
+		{"Hello " + year + "!", "Hello %(YEAR)", "\n--- have\n+++ want\n@@ -1 +1 @@\n- Hello 2022!\n+ Hello 2022\n"},
 
 		{"Hello xy", "Hello %(ANY 2)", ""},
 		{"Hello xy", "Hello %(ANY 2,)", ""},
 		{"Hello xy", "Hello %(ANY 2,4)", ""},
 
-		{"Hello xy", "Hello %(ANY 3)", "\n--- output\n+++ want\n@@ -1 +1 @@\n- Hello xy\n+ Hello .{3}?\n"},
-		{"Hello xy", "Hello %(ANY ,1)", "\n--- output\n+++ want\n@@ -1 +1 @@\n- Hello xy\n+ Hello .{,1}?\n"},
+		{"Hello xy", "Hello %(ANY 3)", "\n--- have\n+++ want\n@@ -1 +1 @@\n- Hello xy\n+ Hello .{3}?\n"},
+		{"Hello xy", "Hello %(ANY ,1)", "\n--- have\n+++ want\n@@ -1 +1 @@\n- Hello xy\n+ Hello .{,1}?\n"},
 
 		{"Hello xy", "Hello%([a-z ]+)", ""},
 
-		{"Hello 5xy", "Hello%([a-z ]+)", "\n--- output\n+++ want\n@@ -1 +1 @@\n- Hello 5xy\n+ Hello[a-z ]+\n"},
+		{"Hello 5xy", "Hello%([a-z ]+)", "\n--- have\n+++ want\n@@ -1 +1 @@\n- Hello 5xy\n+ Hello[a-z ]+\n"},
 
 		{
 			`{
@@ -217,7 +217,7 @@ func TestDiffMatch(t *testing.T) {
 				"Hash": "sha256-%(ANY)",
 				"Error": null
 			}`,
-			"\n--- output\n+++ want\n@@ -6,7 +6,7 @@\n  \"Path\": \"/tmp/goatcounter-export-test-20200630T00:25:05Z-0.csv.gz\",\n  \"CreatedAt\": \"2020-06-30T00:25:05.855750823Z\",\n  \"FinishedAt\": null,\n- \"NumRows\": 5,\n+ \"NumRows\": 3,\n  \"Size\": \"0.0\",\n  \"Hash\": \"sha256-7b756b6dd4d908eff7f7febad0fbdf59f2d7657d8fd09c8ff5133b45f86b1fbf\",\n  \"Error\": null\n",
+			"\n--- have\n+++ want\n@@ -6,7 +6,7 @@\n  \"Path\": \"/tmp/goatcounter-export-test-20200630T00:25:05Z-0.csv.gz\",\n  \"CreatedAt\": \"2020-06-30T00:25:05.855750823Z\",\n  \"FinishedAt\": null,\n- \"NumRows\": 5,\n+ \"NumRows\": 3,\n  \"Size\": \"0.0\",\n  \"Hash\": \"sha256-7b756b6dd4d908eff7f7febad0fbdf59f2d7657d8fd09c8ff5133b45f86b1fbf\",\n  \"Error\": null\n",
 		},
 	}
 
@@ -242,7 +242,7 @@ func TestDiffJSON(t *testing.T) {
 		{``, `{}`, ``},
 
 		{``, `{"x": "x"}`, `
---- output
+--- have
 +++ want
 @@ -1 +1,3 @@
 - {}
@@ -256,7 +256,7 @@ func TestDiffJSON(t *testing.T) {
 		{`{"a": "x"}`, `{  "a":   "x"}`, ``},
 
 		{`{"a": "x"}`, `{  "a":   "y"}`, `
---- output
+--- have
 +++ want
 @@ -1,3 +1,3 @@
   {
