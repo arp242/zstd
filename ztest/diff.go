@@ -48,16 +48,21 @@ const (
 
 	// Treat arguments are JSON: format them before diffing.
 	DiffJSON
+
+	// Instead of using "-" and "+" before every line use "- have" and "+want",
+	// which is a bit clearer.
+	DiffVerbose
 )
 
 // Diff two strings and format as a unified diff.
 func Diff(have, want string, opt ...DiffOpt) string {
-	have, want = applyOpt(have, want, opt...)
+	verbose, have, want := applyOpt(have, want, opt...)
 
 	d := makeUnifiedDiff(unifiedDiff{
 		A:       splitLines(strings.TrimSpace(have)),
 		B:       splitLines(strings.TrimSpace(want)),
 		Context: 3,
+		verbose: verbose,
 	})
 	if len(d) == 0 {
 		return ""
@@ -85,7 +90,7 @@ func DiffMatch(have, want string, opt ...DiffOpt) string {
 	// TODO: %(..) syntax is somewhat unfortunate, as it conflicts with fmt
 	// formatting strings. Would be better to use $(..), #(..), @(..), or
 	// anything else really.
-	have, want = applyOpt(have, want, opt...)
+	verbose, have, want := applyOpt(have, want, opt...)
 
 	now := time.Now().UTC()
 	r := strings.NewReplacer(
@@ -125,6 +130,7 @@ func DiffMatch(have, want string, opt ...DiffOpt) string {
 		A:       splitLines(strings.TrimSpace(have)),
 		B:       splitLines(strings.TrimSpace(wantRe)),
 		Context: 3,
+		verbose: verbose,
 	}
 	m := newMatcher(diff.A, diff.B)
 	m.cmp = func(a, b string) bool { return regexp.MustCompile(b).MatchString(a) }
@@ -142,9 +148,12 @@ var (
 	reNormalizeWhitespaceOnce sync.Once
 )
 
-func applyOpt(have, want string, opt ...DiffOpt) (string, string) {
+func applyOpt(have, want string, opt ...DiffOpt) (bool, string, string) {
+	v := false
 	for _, o := range opt {
 		switch o {
+		case DiffVerbose:
+			v = true
 		case DiffNormalizeWhitespace:
 			reNormalizeWhitespaceOnce.Do(func() {
 				reNormalizeWhitespace = regexp.MustCompile(`(?m)(^\s+|\s+$)`)
@@ -175,7 +184,7 @@ func applyOpt(have, want string, opt ...DiffOpt) (string, string) {
 			}
 		}
 	}
-	return have, want
+	return v, have, want
 }
 
 type match struct{ A, B, Size int }
@@ -455,6 +464,7 @@ type unifiedDiff struct {
 	A, B    []string
 	Context int
 	Matcher *sequenceMatcher
+	verbose bool
 }
 
 // Compare two sequences of lines; generate the delta as a unified diff.
@@ -501,20 +511,32 @@ func makeUnifiedDiff(diff unifiedDiff) string {
 			i1, i2, j1, j2 := c.I1, c.I2, c.J1, c.J2
 			if c.Tag == 'e' {
 				for _, line := range diff.A[i1:i2] {
-					out.WriteString("  " + line)
+					if diff.verbose {
+						out.WriteString("      " + line)
+					} else {
+						out.WriteString("  " + line)
+					}
 				}
 				continue
 			}
 
 			if c.Tag == 'r' || c.Tag == 'd' {
 				for _, line := range diff.A[i1:i2] {
-					out.WriteString("- " + line)
+					if diff.verbose {
+						out.WriteString("-have " + line)
+					} else {
+						out.WriteString("- " + line)
+					}
 				}
 			}
 
 			if c.Tag == 'r' || c.Tag == 'i' {
 				for _, line := range diff.B[j1:j2] {
-					out.WriteString("+ " + line)
+					if diff.verbose {
+						out.WriteString("+want " + line)
+					} else {
+						out.WriteString("+ " + line)
+					}
 				}
 			}
 		}

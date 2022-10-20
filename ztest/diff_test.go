@@ -278,3 +278,29 @@ func TestDiffJSON(t *testing.T) {
 		})
 	}
 }
+
+func TestDiffVerbose(t *testing.T) {
+	tests := []struct {
+		inOut, inWant string
+		want          string
+	}{
+		{"", "", ""},
+		//{nil, nil, ""},
+
+		{"a", "a", ""},
+		{"a", "a", ""},
+		{"a", "b",
+			"\n--- have\n+++ want\n@@ -1 +1 @@\n-have a\n+want b\n"},
+		{"hello\nworld\nxxx", "hello\nmars\nxxx",
+			"\n--- have\n+++ want\n@@ -1,3 +1,3 @@\n      hello\n-have world\n+want mars\n      xxx\n"},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			have := Diff(tt.inOut, tt.inWant, DiffVerbose)
+			if have != tt.want {
+				t.Errorf("\nhave:\n%s\nwant:\n%s\nhave: %[1]q\nwant: %[2]q", have, tt.want)
+			}
+		})
+	}
+}
