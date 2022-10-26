@@ -211,9 +211,9 @@ func AlignCenter(s string, n int) string {
 // Upto slices the string up to the first occurrence of sep. This is a shortcut
 // for:
 //
-//   if i := strings.Index(s, sep); i > -1 {
-//     s = s[:i]
-//   }
+//	if i := strings.Index(s, sep); i > -1 {
+//	  s = s[:i]
+//	}
 func Upto(s string, sep string) string {
 	i := strings.Index(s, sep)
 	if i == -1 {
@@ -224,9 +224,9 @@ func Upto(s string, sep string) string {
 
 // From slices the string from first occurrence of sep. This is a shortcut for:
 //
-//   if i := strings.Index(s, sep); i > -1 {
-//     s = s[i+len(sep):]
-//   }
+//	if i := strings.Index(s, sep); i > -1 {
+//	  s = s[i+len(sep):]
+//	}
 func From(s string, sep string) string {
 	i := strings.Index(s, sep)
 	if i == -1 {
@@ -356,7 +356,7 @@ func Indent(s string, n int) string {
 //
 // Identical to:
 //
-//   strings.HasSuffix(s, "one") || strings.HasSuffix(s, "two")
+//	strings.HasSuffix(s, "one") || strings.HasSuffix(s, "two")
 func HasSuffixes(s string, suffixes ...string) bool {
 	for _, suf := range suffixes {
 		h := strings.HasSuffix(s, suf)
@@ -371,7 +371,7 @@ func HasSuffixes(s string, suffixes ...string) bool {
 //
 // Identical to:
 //
-//   strings.HasPrefix(s, "one") || strings.HasPrefix(s, "two")
+//	strings.HasPrefix(s, "one") || strings.HasPrefix(s, "two")
 func HasPrefixes(s string, prefixes ...string) bool {
 	for _, pre := range prefixes {
 		h := strings.HasPrefix(s, pre)
@@ -386,8 +386,8 @@ func HasPrefixes(s string, prefixes ...string) bool {
 //
 // Identical to:
 //
-//   s = strings.TrimSuffix(s, "one")
-//   s = strings.TrimSuffix(s, "two")
+//	s = strings.TrimSuffix(s, "one")
+//	s = strings.TrimSuffix(s, "two")
 func TrimSuffixes(s string, suffixes ...string) string {
 	for _, suf := range suffixes {
 		s = strings.TrimSuffix(s, suf)
@@ -399,8 +399,8 @@ func TrimSuffixes(s string, suffixes ...string) string {
 //
 // Identical to:
 //
-//   s = strings.TrimPrefix(s, "one")
-//   s = strings.TrimPrefix(s, "two")
+//	s = strings.TrimPrefix(s, "one")
+//	s = strings.TrimPrefix(s, "two")
 func TrimPrefixes(s string, prefixes ...string) string {
 	for _, pre := range prefixes {
 		s = strings.TrimPrefix(s, pre)

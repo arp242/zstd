@@ -141,7 +141,6 @@ func (o OverlayFS) InBase(name string) bool { _, err := o.base.Open(name); retur
 
 // OverlayFS returns a filesystem which reads from overlay, falling back to base
 // if that fails.
-//func OverlayFS(base, overlay fs.FS) fs.FS {
 func NewOverlayFS(base, overlay fs.FS) OverlayFS {
 	return OverlayFS{base: base, overlay: overlay}
 }

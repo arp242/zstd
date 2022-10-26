@@ -94,7 +94,8 @@ func StarExpr(e ast.Expr) (ast.Expr, bool) {
 }
 
 // Embedded struct:
-//  Foo `json:"foo"`
+//
+//	Foo `json:"foo"`
 func getEmbedName(f ast.Expr) string {
 start:
 	switch t := f.(type) {

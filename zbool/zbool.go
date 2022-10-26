@@ -14,10 +14,10 @@ import (
 //
 // Supported types:
 //
-//   bool
-//   int* and float*     0 or 1
-//   []byte and string   "1", "true", "on", "0", "false", "off"
-//   nil                 defaults to false
+//	bool
+//	int* and float*     0 or 1
+//	[]byte and string   "1", "true", "on", "0", "false", "off"
+//	nil                 defaults to false
 type Bool bool
 
 // Scan converts the data from the DB.

@@ -95,7 +95,7 @@ func Difference(set []string, others ...[]string) []string {
 //
 // This makes some string splits a bit more elegant:
 //
-//   key, value := zstring.Split2(line, "=")
+//	key, value := zstring.Split2(line, "=")
 //
 // Deprecated: use strings.Cut
 func Split2(str, sep string) (string, string) {

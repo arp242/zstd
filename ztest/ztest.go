@@ -32,22 +32,22 @@ func ErrorContains(have error, want string) bool {
 // This is identical to testing.T.Parallel() but also returns the table test to
 // capture it in the loop:
 //
-//    tests := []struct {
-//       ...
-//    }
+//	tests := []struct {
+//	   ...
+//	}
 //
-//    for _, tt := range tests {
-//       t.Run("", func(t *testing.T) {
-//         tt := ztest.Parallel(t, tt)
-//       })
-//    }
+//	for _, tt := range tests {
+//	   t.Run("", func(t *testing.T) {
+//	     tt := ztest.Parallel(t, tt)
+//	   })
+//	}
 //
 // Just saves one line vs.
 //
-//       t.Run("", func(t *testing.T) {
-//         tt := tt
-//         t.Parallel()
-//       })
+//	t.Run("", func(t *testing.T) {
+//	  tt := tt
+//	  t.Parallel()
+//	})
 func Parallel[TT any](t *testing.T, tt TT) TT {
 	t.Parallel()
 	return tt
@@ -58,7 +58,7 @@ func Parallel[TT any](t *testing.T, tt TT) TT {
 // This is use to test output which isn't stable, for example because it
 // contains times:
 //
-//   ztest.Replace("Time: 1161 seconds", `Time: (\d+) s`)
+//	ztest.Replace("Time: 1161 seconds", `Time: (\d+) s`)
 //
 // Will result in "Time: AAAA seconds".
 //
@@ -125,7 +125,7 @@ func Read(t *testing.T, paths ...string) []byte {
 //
 // Example:
 //
-//   TempFiles(t, "go.mod", "module test", "name1*.go", "package test")
+//	TempFiles(t, "go.mod", "module test", "name1*.go", "package test")
 func TempFiles(t *testing.T, nameData ...string) string {
 	t.Helper()
 
@@ -198,14 +198,14 @@ func tempFile(t *testing.T, dir, name, data string) string {
 //
 // This is useful for "inline" multiline strings:
 //
-//   cases := []struct {
-//       string in
-//   }{
-//       `
-//	 	    Hello,
-//	 	    world!
-//       `,
-//   }
+//	  cases := []struct {
+//	      string in
+//	  }{
+//	      `
+//		 	    Hello,
+//		 	    world!
+//	      `,
+//	  }
 //
 // This is nice and readable, but the downside is that every line will now have
 // two extra tabs. This will remove those two tabs from every line.
@@ -235,22 +235,22 @@ func NormalizeIndent(in string) string {
 // Subtests are run in their own goroutine, so those aren't called on regular
 // panics. For example:
 //
-//   func TestX(t *testing.T) {
-//       clean := someSetup()
-//       defer clean()
+//	func TestX(t *testing.T) {
+//	    clean := someSetup()
+//	    defer clean()
 //
-//       t.Run("sub", func(t *testing.T) {
-//           panic("oh noes")
-//       })
-//   }
+//	    t.Run("sub", func(t *testing.T) {
+//	        panic("oh noes")
+//	    })
+//	}
 //
 // The defer is never called here. To fix it, call this function in all
 // subtests:
 //
-//   t.Run("sub", func(t *testing.T) {
-//       defer test.R(t)
-//       panic("oh noes")
-//   })
+//	t.Run("sub", func(t *testing.T) {
+//	    defer test.R(t)
+//	    panic("oh noes")
+//	})
 //
 // See: https://github.com/golang/go/issues/20394
 func R(t *testing.T) {
@@ -278,9 +278,9 @@ var inlines map[string]struct {
 // The first argument must the the full package name (i.e. "zgo.at/zstd/zint"),
 // and the rest are function names to test:
 //
-//   ParseUint128         Regular function
-//   Uint128.IsZero       Method call
-//   (*Uint128).Parse     Pointer method
+//	ParseUint128         Regular function
+//	Uint128.IsZero       Method call
+//	(*Uint128).Parse     Pointer method
 //
 // The results are cached, so running it multiple times is fine.
 //

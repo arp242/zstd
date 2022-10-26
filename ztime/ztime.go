@@ -40,7 +40,7 @@ func MustParse(layout, value string) time.Time {
 
 // FromString creates a new date from a string according to the layout:
 //
-//  2006-01-02 15:04:05 MST
+//	2006-01-02 15:04:05 MST
 //
 // Any part on the right can be omitted; for example "2020-01-01" will create a
 // new date without any time, or "2020-01-01 13" will create a date with the

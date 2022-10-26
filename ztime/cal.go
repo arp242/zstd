@@ -176,8 +176,8 @@ func EndOf(t time.Time, p Period) time.Time {
 //
 // For example:
 //
-//   Jan 31 + 1 month  = Feb 28 (or Feb 29, if it's a leap year)
-//   Dec 31 - 3 months = Sep 30
+//	Jan 31 + 1 month  = Feb 28 (or Feb 29, if it's a leap year)
+//	Dec 31 - 3 months = Sep 30
 //
 // This is done for Month, Quarter, and HalfYear.
 //

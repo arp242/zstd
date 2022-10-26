@@ -99,17 +99,17 @@ func Callers(filterFun ...string) []runtime.Frame {
 //
 // This recurses struct fields and pointers, but there are a few limitations:
 //
-// 1) Space occupied by code and data reachable through variables captured in
-//    the closure of a function pointer are not counted. A value of function
-//    type is counted only as a pointer.
+//  1. Space occupied by code and data reachable through variables captured in
+//     the closure of a function pointer are not counted. A value of function
+//     type is counted only as a pointer.
 //
-// 2) Unused buckets of a map cannot be inspected by the reflect package. Their
-//    size is estimated by assuming unfilled slots contain zeroes of their type.
+//  2. Unused buckets of a map cannot be inspected by the reflect package. Their
+//     size is estimated by assuming unfilled slots contain zeroes of their type.
 //
-// 3) Unused capacity of the array underlying a slice is estimated by assuming
-//    the unused slots contain zeroes of their type. It is possible they contain
-//    non zero values from sharing or reslicing, but without explicitly
-//    reslicing the reflect package cannot touch them.
+//  3. Unused capacity of the array underlying a slice is estimated by assuming
+//     the unused slots contain zeroes of their type. It is possible they contain
+//     non zero values from sharing or reslicing, but without explicitly
+//     reslicing the reflect package cannot touch them.
 //
 // This is adapted from: https://github.com/creachadair/misctools/blob/master/sizeof/size.go
 //

@@ -1,3 +1,4 @@
+//go:build testhttp
 // +build testhttp
 
 package zhttputil

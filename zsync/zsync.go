@@ -9,9 +9,9 @@ import (
 
 // WithLock locks the passed mutex, runs the function, and unlocks.
 //
-//   WithLock(mu, func() {
-//       // .. stuff ..
-//   })
+//	WithLock(mu, func() {
+//	    // .. stuff ..
+//	})
 //
 // This is convenient especially in cases where you don't want to defer the
 // Unlock(), but also want to ensure the Unlock() is always called, regardless

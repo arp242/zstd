@@ -73,19 +73,19 @@ func Diff(have, want string, opt ...DiffOpt) string {
 // DiffMatch formats a unified diff, but accepts various patterns in the want
 // string:
 //
-//   %(YEAR)      current year in UTC
-//   %(MONTH)     current month in UTC
-//   %(DAY)       current day in UTC
-//   %(UUID)      UUID format (any version).
+//	%(YEAR)      current year in UTC
+//	%(MONTH)     current month in UTC
+//	%(DAY)       current day in UTC
+//	%(UUID)      UUID format (any version).
 //
-//   %(ANY)       any text: .+?
-//   %(ANY 5)     any text of exactly 5 characters: .{5}?
-//   %(ANY 5,)    any text of at least 5 characters: .{5,}?
-//   %(ANY 5,10)  any text between 5 and 10 characters: .{5,10}?
-//   %(ANY 10)    any text at most 10 characters: .{,10}?
-//   %(NUMBER)    any number; also allows length like ANY.
+//	%(ANY)       any text: .+?
+//	%(ANY 5)     any text of exactly 5 characters: .{5}?
+//	%(ANY 5,)    any text of at least 5 characters: .{5,}?
+//	%(ANY 5,10)  any text between 5 and 10 characters: .{5,10}?
+//	%(ANY 10)    any text at most 10 characters: .{,10}?
+//	%(NUMBER)    any number; also allows length like ANY.
 //
-//   %(..)        any regular expression, but \ is not allowed.
+//	%(..)        any regular expression, but \ is not allowed.
 func DiffMatch(have, want string, opt ...DiffOpt) string {
 	// TODO: %(..) syntax is somewhat unfortunate, as it conflicts with fmt
 	// formatting strings. Would be better to use $(..), #(..), @(..), or
@@ -220,12 +220,15 @@ func newMatcher(a, b []string) *sequenceMatcher {
 // Find longest matching block in a[alo:ahi] and b[blo:bhi].
 //
 // Return (i,j,k) such that a[i:i+k] is equal to b[j:j+k], where
-//     alo <= i <= i+k <= ahi
-//     blo <= j <= j+k <= bhi
+//
+//	alo <= i <= i+k <= ahi
+//	blo <= j <= j+k <= bhi
+//
 // and for all (i',j',k') meeting those conditions,
-//     k >= k'
-//     i <= i'
-//     and if i == i', j <= j'
+//
+//	k >= k'
+//	i <= i'
+//	and if i == i', j <= j'
 //
 // In other words, of all maximal matching blocks, return one that
 // starts earliest in a, and of all those maximal matching blocks that

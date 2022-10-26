@@ -109,7 +109,7 @@ func MustUnmarshal(data []byte, v any) {
 //
 // The data will be unmarshalled in to v, which must be a pointer. Example:
 //
-//   Indent(`{"a": "b"}`, &map[string]string{}, "", "  ")
+//	Indent(`{"a": "b"}`, &map[string]string{}, "", "  ")
 func Indent(data []byte, v any, prefix, indent string) ([]byte, error) {
 	err := json.Unmarshal(data, v)
 	if err != nil {

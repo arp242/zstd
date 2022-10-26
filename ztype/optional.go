@@ -10,15 +10,15 @@ import (
 //
 // The zero value represents a non-existent value.
 //
-//   type Strukt struct {
-//       Value zstd.Optional[int]
-//   }
+//	type Strukt struct {
+//	    Value zstd.Optional[int]
+//	}
 //
-//   s := Struct{
-//     Value: zstd.NewOptional[]
-//   }
-//   if v, ok := s.Value.Get(); ok {
-//   }
+//	s := Struct{
+//	  Value: zstd.NewOptional[]
+//	}
+//	if v, ok := s.Value.Get(); ok {
+//	}
 type Optional[Value any] struct {
 	v  Value
 	ok bool

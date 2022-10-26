@@ -43,9 +43,9 @@ func NewRequest(method, target string, body io.Reader) *http.Request {
 // Body returns the JSON representation as an io.Reader. This is useful for
 // creating a request body. For example:
 //
-//   NewRequest("POST", "/", ztest.Body(someStruct{
-//       Foo: "bar",
-//   }))
+//	NewRequest("POST", "/", ztest.Body(someStruct{
+//	    Foo: "bar",
+//	}))
 func Body(a any) *bytes.Reader {
 	j, err := json.Marshal(a)
 	if err != nil {
@@ -58,15 +58,15 @@ func Body(a any) *bytes.Reader {
 //
 // For example:
 //
-//   rr := ztest.HTTP(t, nil, MyHandler)
+//	rr := ztest.HTTP(t, nil, MyHandler)
 //
 // Or for a POST request:
 //
-//   r, err := zhttp.NewRequest("POST", "/v1/email", nil)
-//   if err != nil {
-//       t.Fatal(err)
-//   }
-//   rr := ztest.HTTP(t, r, MyHandler)
+//	r, err := zhttp.NewRequest("POST", "/v1/email", nil)
+//	if err != nil {
+//	    t.Fatal(err)
+//	}
+//	rr := ztest.HTTP(t, r, MyHandler)
 func HTTP(t *testing.T, r *http.Request, h http.Handler) *httptest.ResponseRecorder {
 	t.Helper()
 
@@ -90,7 +90,7 @@ func HTTP(t *testing.T, r *http.Request, h http.Handler) *httptest.ResponseRecor
 //
 // Don't forget to set the Content-Type from the return value:
 //
-//   r.Header.Set("Content-Type", contentType)
+//	r.Header.Set("Content-Type", contentType)
 func MultipartForm(params ...map[string]string) (b *bytes.Buffer, contentType string, err error) {
 	b = &bytes.Buffer{}
 	w := multipart.NewWriter(b)
