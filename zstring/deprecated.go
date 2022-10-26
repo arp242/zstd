@@ -71,7 +71,7 @@ func Choose(l []string) string {
 // Difference returns a new slice with elements that are in "set" but not in
 // "others".
 //
-// Deprecated: use zslices.Diff
+// Deprecated: use zslices.Difference
 func Difference(set []string, others ...[]string) []string {
 	out := []string{}
 	for _, setItem := range set {

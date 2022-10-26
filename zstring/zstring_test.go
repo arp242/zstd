@@ -427,22 +427,35 @@ func TestAlign(t *testing.T) {
 		{"Hello", 9, "Hello    ", "    Hello", "  Hello  "},
 		{"Hello", 10, "Hello     ", "     Hello", "  Hello   "},
 		{"Hello", 11, "Hello      ", "      Hello", "   Hello   "},
+
+		// {
+		// 	"2022-10-13 – http://goatcounter.goatcounter.localhost:8081",
+		// 	77,
+		// 	"2022-10-13 – http://goatcounter.goatcounter.localhost:8081                   ",
+		// 	"                   2022-10-13 – http://goatcounter.goatcounter.localhost:8081",
+		// 	"          2022-10-13 – http://goatcounter.goatcounter.localhost:8081         ",
+		// },
+
+		{
+			"2022-10-13 – http://goatcounter.goatcounter.localhost:8081",
+			78,
+			"2022-10-13 – http://goatcounter.goatcounter.localhost:8081                    ",
+			"                    2022-10-13 – http://goatcounter.goatcounter.localhost:8081",
+			"          2022-10-13 – http://goatcounter.goatcounter.localhost:8081          ",
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("%s_%d", tt.in, tt.n), func(t *testing.T) {
-			left := AlignLeft(tt.in, tt.n)
-			right := AlignRight(tt.in, tt.n)
-			center := AlignCenter(tt.in, tt.n)
-
+			left, right, center := AlignLeft(tt.in, tt.n), AlignRight(tt.in, tt.n), AlignCenter(tt.in, tt.n)
 			if left != tt.left {
-				t.Errorf("left wrong\ngot:  %q\nwant: %q", left, tt.left)
+				t.Errorf("left wrong\nhave: %q\nwant: %q", left, tt.left)
 			}
 			if right != tt.right {
-				t.Errorf("right wrong\ngot:  %q\nwant: %q", right, tt.right)
+				t.Errorf("right wrong\nhave: %q\nwant: %q", right, tt.right)
 			}
 			if center != tt.center {
-				t.Errorf("center wrong\ngot:  %q\nwant: %q", center, tt.center)
+				t.Errorf("center wrong\nhave: %q\nwant: %q", center, tt.center)
 			}
 		})
 	}

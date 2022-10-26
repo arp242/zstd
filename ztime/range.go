@@ -26,7 +26,7 @@ func NewRange(start time.Time) Range {
 // Any of the struct values will default to DefaultRangeLocale if one of the
 // struct values isn't set, so this:
 //
-//     rng = rng.Locale(RangeLocale{Today: func() string { return ".." }})
+//	rng = rng.Locale(RangeLocale{Today: func() string { return ".." }})
 //
 // Will work.
 func (r Range) Locale(l RangeLocale) Range {
@@ -125,8 +125,8 @@ func (r Range) Truncate(d time.Duration) Range {
 //
 // For example with NewRange("2020-06-18 14:00:00"):
 //
-//   Current(Month)       2020-06-01 00:00:00       → 2020-06-30 23:59:59
-//   Current(WeekMonday)  2020-06-15 00:00:00 (Mon) → 2020-06-21 23:59:59 (Sun)
+//	Current(Month)       2020-06-01 00:00:00       → 2020-06-30 23:59:59
+//	Current(WeekMonday)  2020-06-15 00:00:00 (Mon) → 2020-06-21 23:59:59 (Sun)
 func (r Range) Current(p Period) Range {
 	s := StartOf(r.Start, p)
 	r.End = EndOf(r.Start, p)
@@ -140,8 +140,8 @@ func (r Range) Current(p Period) Range {
 //
 // For example with NewRange("2020-06-18 14:00:00") (Thursday):
 //
-//   Last(Month)       2020-05-18 00:00:00       → 2020-06-18 23:59:59
-//   Last(WeekMonday)  2020-06-11 00:00:00 (Wed) → 2020-06-18 23:59:59 (Thu)
+//	Last(Month)       2020-05-18 00:00:00       → 2020-06-18 23:59:59
+//	Last(WeekMonday)  2020-06-11 00:00:00 (Wed) → 2020-06-18 23:59:59 (Thu)
 func (r Range) Last(p Period) Range {
 	// TODO: are we sure this is what we want? Wouldn't make e.g. Thursday to
 	// Thursday make more sense?
@@ -177,6 +177,9 @@ func (r Range) Last(p Period) Range {
 //
 // TODO: i18n for months names; should really use CLDR for "short" format too.
 func (r Range) String() string {
+	if r.locale.Today == nil {
+		r.locale = DefaultRangeLocale
+	}
 	today := StartOf(Now().In(r.Start.Location()), Day)
 	r.Start, r.End = StartOf(r.Start, Day), StartOf(r.End, Day)
 

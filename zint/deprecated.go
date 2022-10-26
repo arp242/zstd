@@ -78,7 +78,7 @@ func MaxInt(a, b int) int {
 // Difference returns a new slice with elements that are in "set" but not in
 // "others".
 //
-// Deprecated: use zslices.Diff
+// Deprecated: use zslices.Difference
 func Difference(set []int64, others ...[]int64) []int64 {
 	out := []int64{}
 	for _, setItem := range set {

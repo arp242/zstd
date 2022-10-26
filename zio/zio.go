@@ -49,6 +49,14 @@ func Exists(path string) bool {
 
 // Newer reports if the file's mtime is more recent than base.
 func ChangedFrom(file, base string) bool {
+	// TODO: change the arguments to:
+	//
+	//    ChangedFrom(base, file string, files ...string)
+	//
+	// Makes it easier to check multiple files:
+	//
+	//  if !zio.ChangedFrom("./handlers/api.go", "./tpl/api.json") &&
+	//      !zio.ChangedFrom("./kommentaar.conf", "./tpl/api.json") {
 	filest, err := os.Stat(file)
 	if err != nil {
 		return true
