@@ -304,3 +304,25 @@ func TestDiffVerbose(t *testing.T) {
 		})
 	}
 }
+
+func TestDiffXML(t *testing.T) {
+	tests := []struct {
+		inHave, inWant, want string
+	}{
+		{``, ``, ``},
+		{`<?xml?><elem>aa</elem>`, `<?xml?><elem>bb</elem>`,
+			"\n--- have\n+++ want\n@@ -1,2 +1,2 @@\n  <?xml?>\n- <elem>aa</elem>\n+ <elem>bb</elem>\n"},
+	}
+
+	for i, tt := range tests {
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			tt.inHave = strings.ReplaceAll(tt.inHave, "\t", "")
+			tt.inWant = strings.ReplaceAll(tt.inWant, "\t", "")
+
+			have := Diff(tt.inHave, tt.inWant, DiffXML)
+			if have != tt.want {
+				t.Errorf("\nhave:\n%q\nwant:\n%q", have, tt.want)
+			}
+		})
+	}
+}

@@ -37,6 +37,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"zgo.at/zstd/zxml"
 )
 
 type DiffOpt int
@@ -46,8 +48,11 @@ const (
 	// line.
 	DiffNormalizeWhitespace DiffOpt = iota + 1
 
-	// Treat arguments are JSON: format them before diffing.
+	// Treat arguments as JSON: format them before diffing.
 	DiffJSON
+
+	// Treat arguments as XML: format them before diffing.
+	DiffXML
 
 	// Instead of using "-" and "+" before every line use "- have" and "+want",
 	// which is a bit clearer.
@@ -177,6 +182,19 @@ func applyOpt(have, want string, opt ...DiffOpt) (bool, string, string) {
 			}
 			var w any
 			wantJ, err := indentJSON([]byte(want), &w, "", "    ")
+			if err != nil {
+				want = fmt.Sprintf("ztest.Diff: ERROR formatting want: %s\ntext: %s", err, want)
+			} else {
+				want = string(wantJ)
+			}
+		case DiffXML:
+			haveJ, err := zxml.Format([]byte(have), "", "    ")
+			if err != nil {
+				have = fmt.Sprintf("ztest.Diff: ERROR formatting have: %s\ntext: %s", err, have)
+			} else {
+				have = string(haveJ)
+			}
+			wantJ, err := zxml.Format([]byte(want), "", "    ")
 			if err != nil {
 				want = fmt.Sprintf("ztest.Diff: ERROR formatting want: %s\ntext: %s", err, want)
 			} else {
