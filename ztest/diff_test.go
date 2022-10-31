@@ -147,18 +147,18 @@ func TestDiffMatch(t *testing.T) {
 		{"Hello", "He%(ANY)", ""},
 
 		{"Hello " + year + "!", "Hello %(YEAR)!", ""},
-		{"Hello " + year + "!", "Hello %(YEAR)", "\n--- have\n+++ want\n@@ -1 +1 @@\n- Hello 2022!\n+ Hello 2022\n"},
+		{"Hello " + year + "!", "Hello %(YEAR)", "\n--- have\n+++ want\n@@ -1 +1 @@\n-have Hello 2022!\n+want Hello 2022\n"},
 
 		{"Hello xy", "Hello %(ANY 2)", ""},
 		{"Hello xy", "Hello %(ANY 2,)", ""},
 		{"Hello xy", "Hello %(ANY 2,4)", ""},
 
-		{"Hello xy", "Hello %(ANY 3)", "\n--- have\n+++ want\n@@ -1 +1 @@\n- Hello xy\n+ Hello .{3}?\n"},
-		{"Hello xy", "Hello %(ANY ,1)", "\n--- have\n+++ want\n@@ -1 +1 @@\n- Hello xy\n+ Hello .{,1}?\n"},
+		{"Hello xy", "Hello %(ANY 3)", "\n--- have\n+++ want\n@@ -1 +1 @@\n-have Hello xy\n+want Hello .{3}?\n"},
+		{"Hello xy", "Hello %(ANY ,1)", "\n--- have\n+++ want\n@@ -1 +1 @@\n-have Hello xy\n+want Hello .{,1}?\n"},
 
 		{"Hello xy", "Hello%([a-z ]+)", ""},
 
-		{"Hello 5xy", "Hello%([a-z ]+)", "\n--- have\n+++ want\n@@ -1 +1 @@\n- Hello 5xy\n+ Hello[a-z ]+\n"},
+		{"Hello 5xy", "Hello%([a-z ]+)", "\n--- have\n+++ want\n@@ -1 +1 @@\n-have Hello 5xy\n+want Hello[a-z ]+\n"},
 
 		{
 			`{
@@ -217,7 +217,7 @@ func TestDiffMatch(t *testing.T) {
 				"Hash": "sha256-%(ANY)",
 				"Error": null
 			}`,
-			"\n--- have\n+++ want\n@@ -6,7 +6,7 @@\n  \"Path\": \"/tmp/goatcounter-export-test-20200630T00:25:05Z-0.csv.gz\",\n  \"CreatedAt\": \"2020-06-30T00:25:05.855750823Z\",\n  \"FinishedAt\": null,\n- \"NumRows\": 5,\n+ \"NumRows\": 3,\n  \"Size\": \"0.0\",\n  \"Hash\": \"sha256-7b756b6dd4d908eff7f7febad0fbdf59f2d7657d8fd09c8ff5133b45f86b1fbf\",\n  \"Error\": null\n",
+			"\n--- have\n+++ want\n@@ -6,7 +6,7 @@\n      \"Path\": \"/tmp/goatcounter-export-test-20200630T00:25:05Z-0.csv.gz\",\n      \"CreatedAt\": \"2020-06-30T00:25:05.855750823Z\",\n      \"FinishedAt\": null,\n-have \"NumRows\": 5,\n+want \"NumRows\": 3,\n      \"Size\": \"0.0\",\n      \"Hash\": \"sha256-7b756b6dd4d908eff7f7febad0fbdf59f2d7657d8fd09c8ff5133b45f86b1fbf\",\n      \"Error\": null\n",
 		},
 	}
 
@@ -245,10 +245,10 @@ func TestDiffJSON(t *testing.T) {
 --- have
 +++ want
 @@ -1 +1,3 @@
-- {}
-+ {
-+     "x": "x"
-+ }
+-have {}
++want {
++want     "x": "x"
++want }
 `},
 
 		{`[1]`, `[1]`, ``},
@@ -259,10 +259,10 @@ func TestDiffJSON(t *testing.T) {
 --- have
 +++ want
 @@ -1,3 +1,3 @@
-  {
--     "a": "x"
-+     "a": "y"
-  }
+      {
+-have     "a": "x"
++want     "a": "y"
+      }
 `},
 	}
 
@@ -279,39 +279,13 @@ func TestDiffJSON(t *testing.T) {
 	}
 }
 
-func TestDiffVerbose(t *testing.T) {
-	tests := []struct {
-		inOut, inWant string
-		want          string
-	}{
-		{"", "", ""},
-		//{nil, nil, ""},
-
-		{"a", "a", ""},
-		{"a", "a", ""},
-		{"a", "b",
-			"\n--- have\n+++ want\n@@ -1 +1 @@\n-have a\n+want b\n"},
-		{"hello\nworld\nxxx", "hello\nmars\nxxx",
-			"\n--- have\n+++ want\n@@ -1,3 +1,3 @@\n      hello\n-have world\n+want mars\n      xxx\n"},
-	}
-
-	for _, tt := range tests {
-		t.Run("", func(t *testing.T) {
-			have := Diff(tt.inOut, tt.inWant, DiffVerbose)
-			if have != tt.want {
-				t.Errorf("\nhave:\n%s\nwant:\n%s\nhave: %[1]q\nwant: %[2]q", have, tt.want)
-			}
-		})
-	}
-}
-
 func TestDiffXML(t *testing.T) {
 	tests := []struct {
 		inHave, inWant, want string
 	}{
 		{``, ``, ``},
 		{`<?xml?><elem>aa</elem>`, `<?xml?><elem>bb</elem>`,
-			"\n--- have\n+++ want\n@@ -1,2 +1,2 @@\n  <?xml?>\n- <elem>aa</elem>\n+ <elem>bb</elem>\n"},
+			"\n--- have\n+++ want\n@@ -1,2 +1,2 @@\n      <?xml?>\n-have <elem>aa</elem>\n+want <elem>bb</elem>\n"},
 	}
 
 	for i, tt := range tests {

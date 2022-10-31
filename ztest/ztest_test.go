@@ -147,9 +147,9 @@ func TestDiff(t *testing.T) {
 		{"a", "a", ""},
 		{"a", "a", ""},
 		{"a", "b",
-			"\n--- have\n+++ want\n@@ -1 +1 @@\n- a\n+ b\n"},
+			"\n--- have\n+++ want\n@@ -1 +1 @@\n-have a\n+want b\n"},
 		{"hello\nworld\nxxx", "hello\nmars\nxxx",
-			"\n--- have\n+++ want\n@@ -1,3 +1,3 @@\n  hello\n- world\n+ mars\n  xxx\n"},
+			"\n--- have\n+++ want\n@@ -1,3 +1,3 @@\n      hello\n-have world\n+want mars\n      xxx\n"},
 	}
 
 	for _, tt := range tests {
