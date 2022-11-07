@@ -261,12 +261,6 @@ func R(t *testing.T) {
 	}
 }
 
-// SP makes a new String Pointer.
-func SP(s string) *string { return &s }
-
-// I64P makes a new Int64 Pointer.
-func I64P(i int64) *int64 { return &i }
-
 var inlines map[string]struct {
 	inlined bool
 	line    string
