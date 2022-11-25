@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"strings"
 )
 
 // Format the XML document xmlDoc.
@@ -66,6 +67,13 @@ func Format(xmlDoc []byte, prefix, indent string) ([]byte, error) {
 					return
 				}
 			}
+			if i := strings.LastIndex(ns, ":"); i > -1 {
+				ns = ns[i+1:]
+			}
+			if i := strings.Index(ns, "-"); i > -1 {
+				ns = ns[:i]
+			}
+
 			b.WriteString(ns)
 			b.WriteByte(':')
 		}

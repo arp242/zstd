@@ -84,6 +84,45 @@ func TestFormat(t *testing.T) {
     <f:length>120</f:length>
 </f:table>`,
 		},
+
+		{
+			`<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+    <response>
+        <result code="1000">
+            <msg>Command completed successfully</msg>
+        </result>
+        <resData>
+            <contact:creData xmlns:contact="urn:ietf:params:xml:ns:contact-1.0">
+                <contact:id>testc1-test2</contact:id>
+                <contact:crDate>2022-11-04T05:11:36Z</contact:crDate>
+            </contact:creData>
+        </resData>
+        <trID>
+            <clTRID>SUBREG20221104T051136Z880</clTRID>
+            <svTRID>3d52c1cd-cdec-4fa9-be22-57755993c8e8</svTRID>
+        </trID>
+    </response>
+</epp>`,
+			`<?xml version="1.0" encoding="UTF-8"?>
+<epp xmlns="urn:ietf:params:xml:ns:epp-1.0">
+    <response>
+        <result code="1000">
+            <msg>Command completed successfully</msg>
+        </result>
+        <resData>
+            <contact:creData xmlns:contact="urn:ietf:params:xml:ns:contact-1.0">
+                <contact:id>testc1-test2</contact:id>
+                <contact:crDate>2022-11-04T05:11:36Z</contact:crDate>
+            </contact:creData>
+        </resData>
+        <trID>
+            <clTRID>SUBREG20221104T051136Z880</clTRID>
+            <svTRID>3d52c1cd-cdec-4fa9-be22-57755993c8e8</svTRID>
+        </trID>
+    </response>
+</epp>`,
+		},
 	}
 
 	for _, tt := range tests {
@@ -96,7 +135,7 @@ func TestFormat(t *testing.T) {
 			// Don't use ztest.Diff with ztest.DiffXML, because this uses the
 			// Format(), and we'd just be testing ourselves.
 			if string(have) != string(tt.want) {
-				t.Errorf("\nhave:\n%s\nwant:%s", have, tt.want)
+				t.Errorf("\n\rhave:\n%s\n\rwant:\n%s", have, tt.want)
 			}
 		})
 	}
