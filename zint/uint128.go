@@ -38,6 +38,15 @@ func (i Uint128) Format(base int) string {
 	return strconv.FormatUint(i[0], base) + "-" + strconv.FormatUint(i[1], base)
 }
 
+// UUID formats as a UUID.
+func (i Uint128) UUID() string {
+	a := make([]any, 0, 16)
+	for _, b := range i.Bytes() {
+		a = append(a, b)
+	}
+	return fmt.Sprintf("%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x", a...)
+}
+
 // New sets this uint128 from a [16]byte.
 func (i *Uint128) New(b []byte) error {
 	if len(b) != 16 {

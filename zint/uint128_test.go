@@ -107,3 +107,22 @@ func TestUint128(t *testing.T) {
 		}
 	})
 }
+
+func TestUUID(t *testing.T) {
+	tests := []struct {
+		in   Uint128
+		want string
+	}{
+		{Uint128{}, "00000000-0000-0000-0000-000000000000"},
+		{Uint128{0x11223344556677, 0x8899aabbccddeeff}, "00112233-4455-6677-8899-aabbccddeeff"},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			have := tt.in.UUID()
+			if have != tt.want {
+				t.Errorf("\nhave: %q\nwant: %q", have, tt.want)
+			}
+		})
+	}
+}
