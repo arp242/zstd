@@ -123,6 +123,25 @@ func TestFormat(t *testing.T) {
     </response>
 </epp>`,
 		},
+		{
+			`<?xml version="1.0" encoding="UTF-8"?>
+<extension>
+	<gransy-contact:infData xmlns:gransy-contact="http://www.subreg.cz/epp/gransy-contact-0.1">
+	<gransy-contact:idnum></gransy-contact:idnum>
+	<gransy-contact:vat></gransy-contact:vat>
+	<gransy-contact:birthdate>1970-01-01T00:00:00Z</gransy-contact:birthdate>
+	</gransy-contact:infData>
+</extension>`,
+
+			`<?xml version="1.0" encoding="UTF-8"?>
+<extension>
+    <gransy-contact:infData xmlns:gransy-contact="http://www.subreg.cz/epp/gransy-contact-0.1">
+        <gransy-contact:idnum></gransy-contact:idnum>
+        <gransy-contact:vat></gransy-contact:vat>
+        <gransy-contact:birthdate>1970-01-01T00:00:00Z</gransy-contact:birthdate>
+    </gransy-contact:infData>
+</extension>`,
+		},
 	}
 
 	for _, tt := range tests {

@@ -67,10 +67,13 @@ func Format(xmlDoc []byte, prefix, indent string) ([]byte, error) {
 					return
 				}
 			}
+			if i := strings.LastIndex(ns, "/"); i > -1 {
+				ns = ns[i+1:]
+			}
 			if i := strings.LastIndex(ns, ":"); i > -1 {
 				ns = ns[i+1:]
 			}
-			if i := strings.Index(ns, "-"); i > -1 {
+			if i := strings.LastIndex(ns, "-"); i > -1 {
 				ns = ns[:i]
 			}
 
