@@ -59,6 +59,10 @@ func TestTag(t *testing.T) {
 }
 
 func TestFields(t *testing.T) {
+	type EmbedMe struct {
+		FE string `db:"fe"`
+	}
+
 	i := 6
 	tests := []struct {
 		in         any
@@ -87,6 +91,16 @@ func TestFields(t *testing.T) {
 		{struct {
 			N struct{ I int }
 		}{struct{ I int }{42}}, []string{"N"}, []any{struct{ I int }{42}}},
+
+		{struct {
+			EmbedMe
+			F1 int `db:"f1"`
+		}{EmbedMe{"XXX"}, 666}, []string{"fe", "f1"}, []any{"XXX", 666}},
+
+		{struct {
+			EmbedMe EmbedMe
+			F1      int `db:"f1"`
+		}{EmbedMe{"XXX"}, 666}, []string{"EmbedMe", "f1"}, []any{EmbedMe{"XXX"}, 666}},
 	}
 
 	for _, tt := range tests {

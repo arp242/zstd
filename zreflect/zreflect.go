@@ -70,6 +70,14 @@ func Fields(t any, tagname, skip string) (names []string, vals []any) {
 	vals = make([]any, 0, n)
 	for i := 0; n > i; i++ {
 		t := types.Field(i)
+
+		if t.Type.Kind() == reflect.Struct && t.Anonymous { // Embedded struct
+			en, ev := Fields(values.Field(i).Interface(), tagname, skip)
+			names = append(names, en...)
+			vals = append(vals, ev...)
+			continue
+		}
+
 		name := t.Name
 		if tagname != "" {
 			tag := t.Tag.Get(tagname)
