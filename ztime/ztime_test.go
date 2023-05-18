@@ -49,24 +49,25 @@ func TestFromString(t *testing.T) {
 }
 
 func TestStartOf(t *testing.T) {
-	var (
-		periods = []Period{Second, Minute, QuarterHour, HalfHour, Hour, Day, WeekMonday, WeekSunday, Month, Quarter, HalfYear, Year}
-		f       = "2006-01-02 15:04:05.999999999"
-		tt      = Time{time.Date(2020, 6, 18, 14, 49, 20, 666, time.UTC)}
-		h       = new(strings.Builder)
-	)
-	h.WriteString("       StartOf: " + tt.Format(f) + "\n")
-	for _, p := range periods {
-		pad := strings.Repeat(" ", 14-len(p.String()))
-		fmt.Fprintln(h, p.String(), pad,
-			tt.StartOf(p).Format(f),
-			"", tt.StartOf(p).Add(-1).StartOf(p).Format(f),
-			"", tt.StartOf(p).Add(-1).StartOf(p).Add(-1).StartOf(p).Format(f),
-			"", tt.StartOf(p).Add(-1).StartOf(p).Add(-1).StartOf(p).Add(-1).StartOf(p).Format(f))
-	}
+	t.Run("", func(t *testing.T) {
+		var (
+			periods = []Period{Second, Minute, QuarterHour, HalfHour, Hour, Day, WeekMonday, WeekSunday, Month, Quarter, HalfYear, Year}
+			f       = "2006-01-02 15:04:05.999999999"
+			tt      = Time{time.Date(2020, 6, 18, 14, 49, 20, 666, time.UTC)}
+			h       = new(strings.Builder)
+		)
+		h.WriteString("       StartOf: " + tt.Format(f) + "\n")
+		for _, p := range periods {
+			pad := strings.Repeat(" ", 14-len(p.String()))
+			fmt.Fprintln(h, p.String(), pad,
+				tt.StartOf(p).Format(f),
+				"", tt.StartOf(p).Add(-1).StartOf(p).Format(f),
+				"", tt.StartOf(p).Add(-1).StartOf(p).Add(-1).StartOf(p).Format(f),
+				"", tt.StartOf(p).Add(-1).StartOf(p).Add(-1).StartOf(p).Add(-1).StartOf(p).Format(f))
+		}
 
-	have := h.String()
-	want := `
+		have := h.String()
+		want := `
 		       StartOf: 2020-06-18 14:49:20.000000666
 		second          2020-06-18 14:49:20  2020-06-18 14:49:19  2020-06-18 14:49:18  2020-06-18 14:49:17
 		minute          2020-06-18 14:49:00  2020-06-18 14:48:00  2020-06-18 14:47:00  2020-06-18 14:46:00
@@ -80,30 +81,49 @@ func TestStartOf(t *testing.T) {
 		quarter         2020-04-01 00:00:00  2020-01-01 00:00:00  2019-10-01 00:00:00  2019-07-01 00:00:00
 		half year       2020-01-01 00:00:00  2019-07-01 00:00:00  2019-01-01 00:00:00  2018-07-01 00:00:00
 		year            2020-01-01 00:00:00  2019-01-01 00:00:00  2018-01-01 00:00:00  2017-01-01 00:00:00`
-	if d := ztest.Diff(have, want, ztest.DiffNormalizeWhitespace); d != "" {
-		t.Error(d)
+		if d := ztest.Diff(have, want, ztest.DiffNormalizeWhitespace); d != "" {
+			t.Error(d)
+		}
+	})
+
+	tests := []struct {
+		in   string
+		p    Period
+		want string
+	}{
+		// Last week is in the previous
+		{"2022-01-01 00:00:00 CET", WeekMonday, "2021-12-27 00:00:00 CET"},
+	}
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("%s %s", tt.p, tt.in), func(t *testing.T) {
+			have := StartOf(FromString(tt.in), tt.p)
+			if h := have.Format("2006-01-02 15:04:05.999999999 MST"); h != tt.want {
+				t.Errorf("\nhave: %s\nwant: %s", h, tt.want)
+			}
+		})
 	}
 }
 
 func TestEndOf(t *testing.T) {
-	var (
-		periods = []Period{Second, Minute, QuarterHour, HalfHour, Hour, Day, WeekMonday, WeekSunday, Month, Quarter, HalfYear, Year}
-		f       = "2006-01-02 15:04:05.999999999"
-		tt      = Time{time.Date(2020, 6, 18, 14, 49, 20, 666, time.UTC)}
-		h       = new(strings.Builder)
-	)
-	h.WriteString("\n         EndOf: " + tt.Format(f) + "\n")
-	for _, p := range periods {
-		pad := strings.Repeat(" ", 14-len(p.String()))
-		fmt.Fprintln(h, p.String(), pad,
-			tt.EndOf(p).Format(f),
-			"", tt.EndOf(p).Add(1).EndOf(p).Format(f),
-			"", tt.EndOf(p).Add(1).EndOf(p).Add(1).EndOf(p).Format(f),
-			"", tt.EndOf(p).Add(1).EndOf(p).Add(1).EndOf(p).Add(1).EndOf(p).Format(f))
-	}
+	t.Run("", func(t *testing.T) {
+		var (
+			periods = []Period{Second, Minute, QuarterHour, HalfHour, Hour, Day, WeekMonday, WeekSunday, Month, Quarter, HalfYear, Year}
+			f       = "2006-01-02 15:04:05.999999999"
+			tt      = Time{time.Date(2020, 6, 18, 14, 49, 20, 666, time.UTC)}
+			h       = new(strings.Builder)
+		)
+		h.WriteString("\n         EndOf: " + tt.Format(f) + "\n")
+		for _, p := range periods {
+			pad := strings.Repeat(" ", 14-len(p.String()))
+			fmt.Fprintln(h, p.String(), pad,
+				tt.EndOf(p).Format(f),
+				"", tt.EndOf(p).Add(1).EndOf(p).Format(f),
+				"", tt.EndOf(p).Add(1).EndOf(p).Add(1).EndOf(p).Format(f),
+				"", tt.EndOf(p).Add(1).EndOf(p).Add(1).EndOf(p).Add(1).EndOf(p).Format(f))
+		}
 
-	have := h.String()
-	want := `
+		have := h.String()
+		want := `
 		         EndOf: 2020-06-18 14:49:20.000000666
 		second          2020-06-18 14:49:20.999999999  2020-06-18 14:49:21.999999999  2020-06-18 14:49:22.999999999  2020-06-18 14:49:23.999999999
 		minute          2020-06-18 14:49:59.999999999  2020-06-18 14:50:59.999999999  2020-06-18 14:51:59.999999999  2020-06-18 14:52:59.999999999
@@ -117,8 +137,26 @@ func TestEndOf(t *testing.T) {
 		quarter         2020-06-30 23:59:59.999999999  2020-09-30 23:59:59.999999999  2020-12-31 23:59:59.999999999  2021-03-31 23:59:59.999999999
 		half year       2020-06-30 23:59:59.999999999  2020-12-31 23:59:59.999999999  2021-06-30 23:59:59.999999999  2021-12-31 23:59:59.999999999
 		year            2020-12-31 23:59:59.999999999  2021-12-31 23:59:59.999999999  2022-12-31 23:59:59.999999999  2023-12-31 23:59:59.999999999`
-	if d := ztest.Diff(have, want, ztest.DiffNormalizeWhitespace); d != "" {
-		t.Error(d)
+		if d := ztest.Diff(have, want, ztest.DiffNormalizeWhitespace); d != "" {
+			t.Error(d)
+		}
+	})
+
+	tests := []struct {
+		in   string
+		p    Period
+		want string
+	}{
+		// Next week is in the next year
+		{"2022-12-26 00:00:00 CET", WeekMonday, "2023-01-01 23:59:59.999999999 CET"},
+	}
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("%s %s", tt.p, tt.in), func(t *testing.T) {
+			have := EndOf(FromString(tt.in), tt.p)
+			if h := have.Format("2006-01-02 15:04:05.999999999 MST"); h != tt.want {
+				t.Errorf("\nhave: %s\nwant: %s", h, tt.want)
+			}
+		})
 	}
 }
 
