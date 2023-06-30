@@ -119,6 +119,19 @@ func Remove[T comparable](l *[]T, name T) bool {
 	return found
 }
 
+// RemoveIndexes removes all the given indexes.
+//
+// The indexes is expected to be sorted from lowest to highest.
+//
+// Will panic on out of bounds.
+func RemoveIndexes[T any](l *[]T, indexes ...int) {
+	ll := *l
+	for i := len(indexes) - 1; i >= 0; i-- {
+		ll = append(ll[:indexes[i]], ll[indexes[i]+1:]...)
+	}
+	*l = ll
+}
+
 // Max gets the highest value from a list.
 func Max[T constraints.Ordered](list []T) T {
 	var max T

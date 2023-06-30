@@ -374,3 +374,25 @@ func TestSameElements(t *testing.T) {
 		})
 	}
 }
+
+func TestRemoveIndexes(t *testing.T) {
+	tests := []struct {
+		in   []string
+		rm   []int
+		want []string
+	}{
+		{[]string{}, []int{}, []string{}},
+		{[]string{"a"}, []int{0}, []string{}},
+		{[]string{"a", "b", "c"}, []int{1}, []string{"a", "c"}},
+		{[]string{"a", "b", "c"}, []int{1, 2}, []string{"a"}},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			RemoveIndexes(&tt.in, tt.rm...)
+			if !reflect.DeepEqual(tt.in, tt.want) {
+				t.Errorf("\nhave: %#v\nwant: %#v", tt.in, tt.want)
+			}
+		})
+	}
+}
