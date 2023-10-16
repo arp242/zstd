@@ -3,9 +3,8 @@ package zreflect
 
 import (
 	"reflect"
+	"slices"
 	"strings"
-
-	"zgo.at/zstd/internal/exp/slices"
 )
 
 // Tag splits the tag in to the tag name and options.

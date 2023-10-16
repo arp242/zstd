@@ -25,7 +25,7 @@ func Uniq(list []string) []string {
 
 // Contains reports whether str is within the list.
 //
-// Deprecated: use golang.org/x/exp/slices.Contains
+// Deprecated: use slices.Contains
 func Contains(list []string, str string) bool {
 	for _, item := range list {
 		if item == str {

@@ -6,9 +6,12 @@ import (
 	"math"
 	"strconv"
 	"strings"
-
-	"zgo.at/zstd/internal/exp/constraints"
 )
+
+type integer interface {
+	~int | ~int8 | ~int16 | ~int32 | ~int64 |
+		~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64 | ~uintptr
+}
 
 // Int with various methods to make conversions easier; useful especially in
 // templates etc.
@@ -21,7 +24,7 @@ func (s Int) Float32() float32 { return float32(s) }
 func (s Int) Float64() float64 { return float64(s) }
 
 // Join a slice of ints to a comma separated string with the given separator.
-func Join[T constraints.Integer](ints []T, sep string) string {
+func Join[T integer](ints []T, sep string) string {
 	s := make([]string, len(ints))
 	for i := range ints {
 		s[i] = strconv.FormatInt(int64(ints[i]), 10)
@@ -59,7 +62,7 @@ func Range(start, end int) []int {
 }
 
 // Min gets the lowest of two numbers.
-func Min[T constraints.Integer](a, b T) T {
+func Min[T integer](a, b T) T {
 	if a > b {
 		return b
 	}
@@ -67,7 +70,7 @@ func Min[T constraints.Integer](a, b T) T {
 }
 
 // Max gets the highest of two numbers.
-func Max[T constraints.Integer](a, b T) T {
+func Max[T integer](a, b T) T {
 	if a < b {
 		return b
 	}

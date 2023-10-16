@@ -33,7 +33,7 @@ func Uniq(list []int64) []int64 {
 
 // Contains reports whether i is within the list.
 //
-// Deprecated: use golang.org/x/exp/slices.Contains
+// Deprecated: use slices.Contains
 func Contains(list []int, i int) bool {
 	for _, item := range list {
 		if item == i {
@@ -45,7 +45,7 @@ func Contains(list []int, i int) bool {
 
 // Contains64 reports whether i is within the list.
 //
-// Deprecated: use golang.org/x/exp/slices.Contains
+// Deprecated: use slices.Contains
 func Contains64(list []int64, i int64) bool {
 	for _, item := range list {
 		if item == i {

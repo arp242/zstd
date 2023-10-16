@@ -2,16 +2,14 @@
 package zslice
 
 import (
+	"cmp"
 	"crypto/rand"
 	"fmt"
 	"math/big"
 	mrand "math/rand"
+	"slices"
 	"sync"
 	"time"
-
-	// Exception to the "stdlib-only" rule, since this should be in stdlib soon.
-	"zgo.at/zstd/internal/exp/constraints"
-	"zgo.at/zstd/internal/exp/slices"
 )
 
 // Choose a random item from the list.
@@ -60,7 +58,7 @@ func ContainsAny[T comparable](list []T, find ...T) bool {
 }
 
 // UniqSort removes duplicate entries from list; the list will be sorted.
-func UniqSort[T constraints.Ordered](list []T) []T {
+func UniqSort[T cmp.Ordered](list []T) []T {
 	slices.Sort(list)
 	var last T
 	l := list[:0]
@@ -90,7 +88,7 @@ func Uniq[T comparable](list []T) []T {
 }
 
 // IsUniq reports if the list contains unique values.
-func IsUniq[T constraints.Ordered](list []T) bool {
+func IsUniq[T cmp.Ordered](list []T) bool {
 	return len(list) == len(UniqSort(list))
 }
 
@@ -133,7 +131,7 @@ func RemoveIndexes[T any](l *[]T, indexes ...int) {
 }
 
 // Max gets the highest value from a list.
-func Max[T constraints.Ordered](list []T) T {
+func Max[T cmp.Ordered](list []T) T {
 	var max T
 	for _, n := range list {
 		if n > max {
@@ -144,7 +142,7 @@ func Max[T constraints.Ordered](list []T) T {
 }
 
 // Min gets the lowest value from a list.
-func Min[T constraints.Ordered](list []T) T {
+func Min[T cmp.Ordered](list []T) T {
 	var min T
 	for _, n := range list {
 		if n < min {
@@ -187,13 +185,13 @@ func Intersect[T comparable](a, b []T) []T {
 // SameElements reports if the two slices have the same elements.
 //
 // This is similar to slices.Equal, but don't take order in to account.
-func SameElements[T constraints.Ordered](a, b []T) bool {
+func SameElements[T cmp.Ordered](a, b []T) bool {
 	if len(a) != len(b) {
 		return false
 	}
 
 	// TODO: there is probably a better way of doing this; dropping the sort
-	//       would also allow constraints.Ordered to be comparable.
+	//       would also allow cmp.Ordered to be comparable.
 	aCp := slices.Clone(a)
 	bCp := slices.Clone(b)
 	slices.Sort(aCp)
