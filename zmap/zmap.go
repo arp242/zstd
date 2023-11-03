@@ -15,3 +15,14 @@ func KeysOrdered[M ~map[K]V, K cmp.Ordered, V any](m M) []K {
 	slices.Sort(r)
 	return r
 }
+
+// LongestKey returns the longest key in this map.
+func LongestKey[M ~map[string]V, V any](m M) int {
+	l := 0
+	for k := range m {
+		if ll := len(k); ll > l {
+			l = ll
+		}
+	}
+	return l
+}
