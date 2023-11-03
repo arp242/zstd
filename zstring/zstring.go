@@ -7,6 +7,7 @@
 package zstring
 
 import (
+	"bytes"
 	"strings"
 	"unicode"
 	"unicode/utf8"
@@ -426,4 +427,34 @@ func HasUpper(s string) bool {
 		}
 	}
 	return false
+}
+
+// Unwrap a string: single newlines become a space, whereas two or more are
+// preserved.
+//
+// Removes newlines at the start and end of the string, but leaves all other
+// spacing intact (including before and after newlines).
+func Unwrap(s string) string {
+	var (
+		b bytes.Buffer
+		n = 0
+	)
+	b.Grow(len(s))
+	for _, c := range s {
+		if c == '\n' {
+			n++
+			continue
+		}
+		if b.Len() > 0 {
+			if n == 1 {
+				b.WriteByte(' ')
+			} else if n >= 2 {
+				b.WriteByte('\n')
+				b.WriteByte('\n')
+			}
+		}
+		n = 0
+		b.WriteRune(c)
+	}
+	return b.String()
 }

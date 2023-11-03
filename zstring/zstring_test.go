@@ -714,3 +714,51 @@ func TestRemove(t *testing.T) {
 		})
 	}
 }
+
+func TestUnwrap(t *testing.T) {
+	tests := []struct {
+		in, want string
+	}{
+		{"", ""},
+		{"Hello", "Hello"},
+		{"Hello\nworld", "Hello world"},
+		{"Hello\nworld\n!", "Hello world !"},
+
+		{"Hello\nworld!\n\nXXX", "Hello world!\n\nXXX"},
+
+		{"\nHello\nworld!\n\nXXX\n", "Hello world!\n\nXXX"},
+		{"\n\n\nHello\nworld!\n\nXXX\n", "Hello world!\n\nXXX"},
+		{"\n\n\nHello\n\n\n\n\n\nworld!\n\n\n\n\n\n\nXXX\n\n\n", "Hello\n\nworld!\n\nXXX"},
+
+		{"\tHello\n\n\tworld!", "\tHello\n\n\tworld!"},
+
+		{" Hello\n world!", " Hello  world!"},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			have := Unwrap(tt.in)
+			if have != tt.want {
+				t.Errorf("\nhave: %q\nwant: %q", have, tt.want)
+			}
+		})
+	}
+}
+
+func BenchmarkUnwrap(b *testing.B) {
+	var (
+		l = strings.Repeat("Hello, world, test. ", 4) + "\n"
+		s string
+	)
+	for i := 0; i < 10; i++ {
+		if i > 0 {
+			s += "\n"
+		}
+		s += strings.Repeat(l, 3)
+	}
+
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		Unwrap(s)
+	}
+}
