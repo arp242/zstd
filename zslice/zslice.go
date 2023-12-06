@@ -198,3 +198,17 @@ func SameElements[T cmp.Ordered](a, b []T) bool {
 	slices.Sort(bCp)
 	return slices.Equal(aCp, bCp)
 }
+
+// Copy a slice.
+//
+// This is like slices.Clone, but you can set a len and cap for the new slice;
+// this can be larger than the src slice to prevent copying the array if you're
+// appending more items later, or lower if you want to copy and truncate the
+// array.
+//
+// Like make(), this will panic if len > cap.
+func Copy[T any](src []T, len, cap int) []T {
+	dst := make([]T, len, cap)
+	copy(dst, src)
+	return dst
+}

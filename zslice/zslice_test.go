@@ -396,3 +396,31 @@ func TestRemoveIndexes(t *testing.T) {
 		})
 	}
 }
+
+func TestCopy(t *testing.T) {
+	tests := []struct {
+		in           []string
+		inLen, inCap int
+		want         string
+	}{
+		{[]string{}, 0, 0, `0 0 []`},
+		{[]string{}, 0, 1, `0 1 []`},
+		{[]string{}, 1, 1, `1 1 []`},
+		{[]string{"x"}, 1, 1, `1 1 [x]`},
+
+		{[]string{"x"}, 2, 2, `2 2 [x ]`},
+		{[]string{"x"}, 2, 8, `2 8 [x ]`},
+
+		{[]string{"a", "b", "c"}, 1, 1, `1 1 [a]`},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			h := Copy(tt.in, tt.inLen, tt.inCap)
+			have := fmt.Sprintf("%d %d %s", len(h), cap(h), h)
+			if have != tt.want {
+				t.Errorf("\nhave: %s\nwant: %s", have, tt.want)
+			}
+		})
+	}
+}
