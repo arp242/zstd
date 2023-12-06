@@ -212,3 +212,12 @@ func Copy[T any](src []T, len, cap int) []T {
 	copy(dst, src)
 	return dst
 }
+
+// AppendCopy is like append(), but ensures the new value is always a copy.
+//
+// The len and cap will always be set to exactly the len and cap of the new
+// array.
+func AppendCopy[T any](s []T, app T, more ...T) []T {
+	n := Copy(s, len(s), len(s)+len(more)+1)
+	return append(append(n, app), more...)
+}

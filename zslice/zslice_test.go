@@ -424,3 +424,37 @@ func TestCopy(t *testing.T) {
 		})
 	}
 }
+
+func TestAppendCopy(t *testing.T) {
+	tests := []struct {
+		in   []string
+		app  string
+		more []string
+		want []string
+	}{
+		{nil, "X", nil, []string{"X"}},
+		{[]string{}, "X", nil, []string{"X"}},
+		{[]string{}, "X", []string{"Y"}, []string{"X", "Y"}},
+		{[]string{}, "X", []string{"Y", "Z"}, []string{"X", "Y", "Z"}},
+		{[]string{"a", "b"}, "X", nil, []string{"a", "b", "X"}},
+		{[]string{"a", "b"}, "X", []string{"Y"}, []string{"a", "b", "X", "Y"}},
+		{[]string{"a", "b"}, "X", []string{"Y", "Z"}, []string{"a", "b", "X", "Y", "Z"}},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			before := fmt.Sprintf("%v", tt.in)
+			have := AppendCopy(tt.in, tt.app, tt.more...)
+			if !reflect.DeepEqual(have, tt.want) {
+				t.Errorf("\nhave: %s\nwant: %s", have, tt.want)
+			}
+			pin, phave := fmt.Sprintf("%p", tt.in), fmt.Sprintf("%p", have)
+			if pin == phave {
+				t.Errorf("same array; wasn't copied\nhave: %s\nwant: %s", pin, phave)
+			}
+			if a := fmt.Sprintf("%v", tt.in); a != before {
+				t.Errorf("tt.in changed\nbefore: %s\nafter:  %s", before, a)
+			}
+		})
+	}
+}
