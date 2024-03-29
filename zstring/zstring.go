@@ -360,8 +360,7 @@ func Indent(s string, n int) string {
 //	strings.HasSuffix(s, "one") || strings.HasSuffix(s, "two")
 func HasSuffixes(s string, suffixes ...string) bool {
 	for _, suf := range suffixes {
-		h := strings.HasSuffix(s, suf)
-		if h {
+		if strings.HasSuffix(s, suf) {
 			return true
 		}
 	}
@@ -375,8 +374,7 @@ func HasSuffixes(s string, suffixes ...string) bool {
 //	strings.HasPrefix(s, "one") || strings.HasPrefix(s, "two")
 func HasPrefixes(s string, prefixes ...string) bool {
 	for _, pre := range prefixes {
-		h := strings.HasPrefix(s, pre)
-		if h {
+		if strings.HasPrefix(s, pre) {
 			return true
 		}
 	}

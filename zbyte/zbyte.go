@@ -1,6 +1,8 @@
 // Package zbyte implements functions for byte slices.
 package zbyte
 
+import "bytes"
+
 // Binary reports if this looks like binary data.
 //
 // Something is considered binary if it contains a NULL byte in the first 8000
@@ -30,4 +32,32 @@ func ElideRight(b []byte, n int) []byte {
 		b = b[len(b)-n:]
 	}
 	return b
+}
+
+// HasSuffixes tests whether the byte slice b ends with any of the suffixes.
+//
+// Identical to:
+//
+//	bytes.HasSuffix(s, "one") || bytes.HasSuffix(s, "two")
+func HasSuffixes(b []byte, suffixes ...[]byte) bool {
+	for _, suf := range suffixes {
+		if bytes.HasSuffix(b, suf) {
+			return true
+		}
+	}
+	return false
+}
+
+// HasPrefixes tests whether the byte slice b starts with any of the prefixes.
+//
+// Identical to:
+//
+//	bytes.HasPrefix(s, "one") || bytes.HasPrefix(s, "two")
+func HasPrefixes(b []byte, prefixes ...[]byte) bool {
+	for _, pre := range prefixes {
+		if bytes.HasPrefix(b, pre) {
+			return true
+		}
+	}
+	return false
 }
