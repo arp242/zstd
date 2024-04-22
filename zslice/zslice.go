@@ -221,3 +221,29 @@ func AppendCopy[T any](s []T, app T, more ...T) []T {
 	n := Copy(s, len(s), len(s)+len(more)+1)
 	return append(append(n, app), more...)
 }
+
+// Longest gets the longest string value in this list.
+func Longest(list []string) int {
+	l := 0
+	for _, s := range list {
+		if ll := len(s); ll > l {
+			l = ll
+		}
+	}
+	return l
+}
+
+// LongestFunc gets the longest string value in this list.
+//
+// for example to get the longest email address from a []mail.Address:
+//
+//	zslice.LongestFunc(addrs, func(s mail.Address) string { return s.Address })
+func LongestFunc[T any](list []T, f func(T) string) int {
+	l := 0
+	for _, s := range list {
+		if ll := len(f(s)); ll > l {
+			l = ll
+		}
+	}
+	return l
+}

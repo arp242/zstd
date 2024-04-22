@@ -2,6 +2,7 @@ package zslice
 
 import (
 	"fmt"
+	"net/mail"
 	"reflect"
 	"testing"
 )
@@ -454,6 +455,53 @@ func TestAppendCopy(t *testing.T) {
 			}
 			if a := fmt.Sprintf("%v", tt.in); a != before {
 				t.Errorf("tt.in changed\nbefore: %s\nafter:  %s", before, a)
+			}
+		})
+	}
+}
+
+func TestLongest(t *testing.T) {
+	tests := []struct {
+		in   []string
+		want int
+	}{
+		{nil, 0},
+		{[]string{}, 0},
+		{[]string{""}, 0},
+		{[]string{"a"}, 1},
+		{[]string{"a", "ab"}, 2},
+		{[]string{"ab", "a"}, 2},
+		{[]string{"a", "ab", "a"}, 2},
+		{[]string{"a", "ab", "ab "}, 3},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			have := Longest(tt.in)
+			if have != tt.want {
+				t.Errorf("\nhave: %d\nwant: %d", have, tt.want)
+			}
+		})
+	}
+}
+
+func TestLongestFunc(t *testing.T) {
+	tests := []struct {
+		in   []mail.Address
+		want int
+	}{
+		{nil, 0},
+		{[]mail.Address{}, 0},
+		{[]mail.Address{{}}, 0},
+		{[]mail.Address{{Address: "a"}}, 1},
+		{[]mail.Address{{Address: "a"}, {Address: "ab"}}, 2},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			have := LongestFunc(tt.in, func(m mail.Address) string { return m.Address })
+			if have != tt.want {
+				t.Errorf("\nhave: %d\nwant: %d", have, tt.want)
 			}
 		})
 	}
