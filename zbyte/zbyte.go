@@ -61,3 +61,23 @@ func HasPrefixes(b []byte, prefixes ...[]byte) bool {
 	}
 	return false
 }
+
+// IndexAll finds all occurrences of "find".
+func IndexAll(s, find []byte) []int {
+	if len(s) == 0 || len(find) == 0 {
+		return nil
+	}
+	var (
+		found = make([]int, 0, 2)
+		pos   int
+	)
+	for {
+		p := bytes.Index(s[pos:], find)
+		if p == -1 {
+			break
+		}
+		found = append(found, pos+p)
+		pos += p + 1
+	}
+	return found
+}
