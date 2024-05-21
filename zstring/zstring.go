@@ -153,26 +153,6 @@ func GetLine(in string, n int) string {
 	return arr[n-1]
 }
 
-// Filter a list.
-//
-// The function will be called for every item and those that return false will
-// not be included in the return value.
-func Filter(list []string, fun func(string) bool) []string {
-	var ret []string
-	for _, e := range list {
-		if fun(e) {
-			ret = append(ret, e)
-		}
-	}
-
-	return ret
-}
-
-// FilterEmpty is a filter for Filter() to remove empty entries.
-//
-// An entry is considered "empty" if it's "" or contains only whitespace.
-func FilterEmpty(e string) bool { return strings.TrimSpace(e) != "" }
-
 // AlignLeft left-aligns a string, filling up any remaining width with spaces.
 func AlignLeft(s string, n int) string {
 	l := utf8.RuneCountInString(s)

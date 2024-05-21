@@ -246,49 +246,6 @@ func BenchmarkRemoveUnprintable(b *testing.B) {
 	}
 }
 
-func TestFilter(t *testing.T) {
-	cases := []struct {
-		fun  func(string) bool
-		in   []string
-		want []string
-	}{
-		{
-			FilterEmpty,
-			[]string(nil),
-			[]string(nil),
-		},
-		{
-			FilterEmpty,
-			[]string{},
-			[]string(nil),
-		},
-		{
-			FilterEmpty,
-			[]string{"1"},
-			[]string{"1"},
-		},
-		{
-			FilterEmpty,
-			[]string{"", "1", ""},
-			[]string{"1"},
-		},
-		{
-			FilterEmpty,
-			[]string{"", "1", "", "2", "asd", "", "", "", "zx", "", "a"},
-			[]string{"1", "2", "asd", "zx", "a"},
-		},
-	}
-
-	for i, tt := range cases {
-		t.Run(fmt.Sprintf("%v", i), func(t *testing.T) {
-			out := Filter(tt.in, tt.fun)
-			if !reflect.DeepEqual(tt.want, out) {
-				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tt.want)
-			}
-		})
-	}
-}
-
 func TestAlign(t *testing.T) {
 	tests := []struct {
 		in                  string

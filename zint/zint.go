@@ -61,39 +61,6 @@ func Range(start, end int) []int {
 	return rng
 }
 
-// Min gets the lowest of two numbers.
-func Min[T integer](a, b T) T {
-	if a > b {
-		return b
-	}
-	return a
-}
-
-// Max gets the highest of two numbers.
-func Max[T integer](a, b T) T {
-	if a < b {
-		return b
-	}
-	return a
-}
-
-// NonZero returns the first argument that is not 0. It will return 0 if all
-// arguments are 0.
-func NonZero(a, b int64, c ...int64) int64 {
-	if a != 0 {
-		return a
-	}
-	if b != 0 {
-		return b
-	}
-	for i := range c {
-		if c[i] != 0 {
-			return c[i]
-		}
-	}
-	return 0
-}
-
 // DivideCeil divides two integers and rounds up, rather than down (which is
 // what happens when you do int64/int64).
 func DivideCeil(count int64, pageSize int64) int64 {
@@ -262,21 +229,3 @@ func Fields(s string) ([]int64, error) {
 
 	return nf, nil
 }
-
-// Fiter a list.
-//
-// The function will be called for every item and those that return false will
-// not be included in the return value.
-func Filter(list []int64, fun func(int64) bool) []int64 {
-	var ret []int64
-	for _, e := range list {
-		if fun(e) {
-			ret = append(ret, e)
-		}
-	}
-
-	return ret
-}
-
-// FilterEmpty is a filter for Filter() to remove empty entries.
-func FilterEmpty(e int64) bool { return e != 0 }
