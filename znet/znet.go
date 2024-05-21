@@ -4,13 +4,12 @@ package znet
 import (
 	"fmt"
 	"net"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
 	"syscall"
 	"time"
-
-	"zgo.at/zstd/zstring"
 )
 
 var (
@@ -129,7 +128,7 @@ func socketControl(allowedNets []string, allowedPorts []int) func(string, string
 	}
 
 	return func(network, address string, _ syscall.RawConn) error {
-		if !zstring.Contains(allowedNets, network) {
+		if !slices.Contains(allowedNets, network) {
 			return fmt.Errorf("znet.SafeDialer: network not in allowed list %v: %q", allowedNets, network)
 		}
 
@@ -137,7 +136,7 @@ func socketControl(allowedNets []string, allowedPorts []int) func(string, string
 		if err != nil {
 			return fmt.Errorf("znet.SafeDialer: invalid host/port pair: %q: %w", address, err)
 		}
-		if !zstring.Contains(ports, port) {
+		if !slices.Contains(ports, port) {
 			return fmt.Errorf("znet.SafeDialer: port not in allowed list %v: %q", ports, port)
 		}
 

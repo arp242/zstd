@@ -8,7 +8,7 @@ import "bytes"
 // Something is considered binary if it contains a NULL byte in the first 8000
 // bytes.
 //
-// This is the same check as git uses; see buffer_is_binary.
+// This is the same check as git uses; see buffer_is_binary().
 func Binary(b []byte) bool {
 	for i := range ElideLeft(b, 8000) {
 		if b[i] == 0 {

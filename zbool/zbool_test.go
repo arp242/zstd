@@ -125,7 +125,7 @@ func TestBool(t *testing.T) {
 		}
 
 		for _, tc := range cases {
-			t.Run(fmt.Sprintf("%s", tc.in), func(t *testing.T) {
+			t.Run(string(tc.in), func(t *testing.T) {
 				var out Bool
 				err := out.UnmarshalText(tc.in)
 				if !ztest.ErrorContains(err, tc.wantErr) {

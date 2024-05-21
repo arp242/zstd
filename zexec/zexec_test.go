@@ -26,7 +26,6 @@ func TestCommand(t *testing.T) {
 			fmt.Fprintln(os.Stderr, "error reading:", line.Error)
 			break
 		}
-
 		have = append(have, line.String())
 	}
 

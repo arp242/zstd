@@ -7,16 +7,21 @@ import (
 )
 
 func TestNoCancel(t *testing.T) {
-	ctx := context.WithValue(context.Background(), "a", "value a")
+	type (
+		a struct{}
+		b struct{}
+	)
+
+	ctx := context.WithValue(context.Background(), a{}, "value a")
 	ctx, c := context.WithTimeout(ctx, 50*time.Millisecond)
 	defer c()
-	ctx = context.WithValue(ctx, "b", "value b")
+	ctx = context.WithValue(ctx, b{}, "value b")
 
 	ctx2 := WithoutTimeout(ctx)
-	if ctx2.Value("a").(string) != "value a" {
+	if ctx2.Value(a{}).(string) != "value a" {
 		t.Fatal()
 	}
-	if ctx2.Value("b").(string) != "value b" {
+	if ctx2.Value(b{}).(string) != "value b" {
 		t.Fatal()
 	}
 

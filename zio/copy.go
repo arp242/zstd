@@ -11,9 +11,8 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"slices"
 	"time"
-
-	"zgo.at/zstd/zstring"
 )
 
 // ErrSameFile is used when the source and destination file are the same file.
@@ -340,7 +339,7 @@ func CopyTree(src, dst string, options *CopyTreeOptions) error {
 	}
 
 	for _, entry := range entries {
-		if zstring.Contains(ignoredNames, entry.Name()) {
+		if slices.Contains(ignoredNames, entry.Name()) {
 			continue
 		}
 
