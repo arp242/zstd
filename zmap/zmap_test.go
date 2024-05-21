@@ -2,6 +2,7 @@ package zmap
 
 import (
 	"reflect"
+	"slices"
 	"testing"
 )
 
@@ -27,22 +28,27 @@ func TestKeysOrdered(t *testing.T) {
 
 func TestLongestKey(t *testing.T) {
 	tests := []struct {
-		in   map[string]int
-		want int
+		in      map[string]int
+		wantK   []string
+		wantLen int
 	}{
-		{nil, 0},
-		{map[string]int{"": 0}, 0},
-		{map[string]int{"a": 0}, 1},
-		{map[string]int{"aa": 0}, 2},
-		{map[string]int{"a": 5, "aa": 3}, 2},
-		{map[string]int{"aa": 0}, 2},
+		{nil, []string{}, 0},
+		{map[string]int{"": 0}, []string{""}, 0},
+		{map[string]int{"a": 0}, []string{"a"}, 1},
+		{map[string]int{"aa": 0}, []string{"aa"}, 2},
+		{map[string]int{"a": 5, "aa": 3}, []string{"a", "aa"}, 2},
+		{map[string]int{"aa": 0}, []string{"aa"}, 2},
 	}
 
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
-			have := LongestKey(tt.in)
-			if have != tt.want {
-				t.Errorf("\nhave: %v\nwant: %v", have, tt.want)
+			haveK, haveLen := LongestKey(tt.in)
+			if haveLen != tt.wantLen {
+				t.Errorf("\nhave: %v\nwant: %v", haveLen, tt.wantLen)
+			}
+			slices.Sort(haveK)
+			if !reflect.DeepEqual(haveK, tt.wantK) {
+				t.Errorf("\nhave: %#v\nwant: %#v", haveK, tt.wantK)
 			}
 		})
 	}
