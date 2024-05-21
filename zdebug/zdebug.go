@@ -54,10 +54,8 @@ func PrintStack(filterFun ...string) {
 func Loc(n int) string {
 	_, file, line, ok := runtime.Caller(n + 1)
 	if !ok {
-		file = "???"
-		line = 0
+		file, line = "???", 0
 	}
-
 	short := file
 	for i := len(file) - 1; i > 0; i-- {
 		if file[i] == '/' {
@@ -65,7 +63,5 @@ func Loc(n int) string {
 			break
 		}
 	}
-	file = short
-
-	return fmt.Sprintf("%v:%v", file, line)
+	return fmt.Sprintf("%v:%v", short, line)
 }
