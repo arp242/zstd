@@ -3,7 +3,6 @@ package zreflect
 
 import (
 	"reflect"
-	"slices"
 	"strings"
 )
 
@@ -84,7 +83,7 @@ func Fields(t any, tagname, skip string) (names []string, vals []any, opts [][]s
 		var opt []string
 		if tagname != "" {
 			tname, o := Tag(t, tagname)
-			if tname == "-" || slices.Contains(o, skip) {
+			if tname == "-" || contains(o, skip) {
 				continue
 			}
 			if tname != "" {
@@ -119,4 +118,13 @@ func Names(t any, tagname, skip string) []string {
 func Values(t any, tagname, skip string) []any {
 	_, vals, _ := Fields(t, tagname, skip)
 	return vals
+}
+
+func contains[S ~[]E, E comparable](s S, v E) bool {
+	for i := range s {
+		if v == s[i] {
+			return true
+		}
+	}
+	return false
 }

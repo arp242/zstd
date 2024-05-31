@@ -1,18 +1,23 @@
 // Package zmap implements generic functions for maps.
 package zmap
 
-import (
-	"cmp"
-	"slices"
-)
+import "sort"
+
+// cmp.Ordered, added in Go 1.21.
+type ordered interface {
+	~int | ~int8 | ~int16 | ~int32 | ~int64 |
+		~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64 | ~uintptr |
+		~float32 | ~float64 |
+		~string
+}
 
 // KeysOrdered returns the sorted keys of the map.
-func KeysOrdered[M ~map[K]V, K cmp.Ordered, V any](m M) []K {
+func KeysOrdered[M ~map[K]V, K ordered, V any](m M) []K {
 	r := make([]K, 0, len(m))
 	for k := range m {
 		r = append(r, k)
 	}
-	slices.Sort(r)
+	sort.Slice(r, func(i, j int) bool { return r[i] < r[j] })
 	return r
 }
 

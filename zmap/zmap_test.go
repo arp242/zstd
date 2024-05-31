@@ -2,7 +2,7 @@ package zmap
 
 import (
 	"reflect"
-	"slices"
+	"sort"
 	"testing"
 )
 
@@ -46,7 +46,7 @@ func TestLongestKey(t *testing.T) {
 			if haveLen != tt.wantLen {
 				t.Errorf("\nhave: %v\nwant: %v", haveLen, tt.wantLen)
 			}
-			slices.Sort(haveK)
+			sort.Slice(haveK, func(i, j int) bool { return haveK[i] < haveK[j] })
 			if !reflect.DeepEqual(haveK, tt.wantK) {
 				t.Errorf("\nhave: %#v\nwant: %#v", haveK, tt.wantK)
 			}
