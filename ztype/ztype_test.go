@@ -15,3 +15,12 @@ func TestPtr(t *testing.T) {
 		t.Error(have)
 	}
 }
+
+func TestPtrOrNil(t *testing.T) {
+	if have := Deref(PtrOrNil("hello"), "<NIL>"); have != "hello" {
+		t.Error(have)
+	}
+	if have := Deref(PtrOrNil(""), "<NIL>"); have != "<NIL>" {
+		t.Error(have)
+	}
+}
