@@ -2,6 +2,7 @@
 package zbool
 
 import (
+	"bytes"
 	"database/sql/driver"
 	"fmt"
 	"strings"
@@ -99,7 +100,7 @@ func (b Bool) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON converts the data from JSON.
 func (b *Bool) UnmarshalJSON(text []byte) error {
-	switch string(text) {
+	switch string(bytes.Trim(text, `"`)) {
 	case "true", "1", "on":
 		*b = true
 		return nil
