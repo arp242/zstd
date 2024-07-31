@@ -70,6 +70,11 @@ func Diff(have, want string, opt ...DiffOpt) string {
 	return "\n" + d
 }
 
+var (
+	reUnquoteMeta     *regexp.Regexp
+	reUnquoteMetaOnce sync.Once
+)
+
 // DiffMatch formats a unified diff, but accepts various patterns in the want
 // string:
 //
@@ -93,33 +98,31 @@ func DiffMatch(have, want string, opt ...DiffOpt) string {
 	have, want = applyOpt(have, want, opt...)
 
 	now := time.Now().UTC()
-	r := strings.NewReplacer(
+	want = regexp.QuoteMeta(strings.NewReplacer(
 		`%(YEAR)`, fmt.Sprintf("%d", now.Year()),
 		`%(MONTH)`, fmt.Sprintf("%02d", now.Month()),
 		`%(DAY)`, fmt.Sprintf("%02d", now.Day()),
-	)
+	).Replace(want))
 
-	wantRe := regexp.MustCompile(`%\\\(.+?\\\)`).ReplaceAllStringFunc(
-		regexp.QuoteMeta(r.Replace(want)),
-		func(m string) string {
-			switch {
-			case m == `%\(UUID\)`:
-				return `[[:xdigit:]]{8}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{12}`
-			case m == `%\(ANY\)`:
-				return `.+?`
-			case m == `%\(NUMBER\)`:
-				return `\d+?`
-			case strings.HasPrefix(m, `%\(ANY `):
-				return fmt.Sprintf(`.{%s}?`, m[7:len(m)-2])
-			case strings.HasPrefix(m, `%\(NUMBER `):
-				return fmt.Sprintf(`\d{%s}?`, m[10:len(m)-2])
-			default:
-				// TODO: we need to undo the \ from QuoteMeta() here, but this
-				// means we won't be allowed to use \. Be a bit smarter about
-				// this. TODO: doesn't quite seem to work?
-				return strings.ReplaceAll(m[3:len(m)-2], `\`, ``)
-			}
-		})
+	wantRe := regexp.MustCompile(`%\\\(.+?\\\)`).ReplaceAllStringFunc(want, func(m string) string {
+		switch {
+		case m == `%\(UUID\)`:
+			return `[[:xdigit:]]{8}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{12}`
+		case m == `%\(ANY\)`:
+			return `.+?`
+		case m == `%\(NUMBER\)`:
+			return `\d+?`
+		case strings.HasPrefix(m, `%\(ANY `):
+			return fmt.Sprintf(`.{%s}?`, m[7:len(m)-2])
+		case strings.HasPrefix(m, `%\(NUMBER `):
+			return fmt.Sprintf(`\d{%s}?`, m[10:len(m)-2])
+		default:
+			// TODO: we need to undo the \ from QuoteMeta() here, but this
+			// means we won't be allowed to use \. Be a bit smarter about
+			// this. TODO: doesn't quite seem to work?
+			return strings.ReplaceAll(m[3:len(m)-2], `\`, ``)
+		}
+	})
 
 	// Quick check for exact match.
 	if m := regexp.MustCompile(`^` + wantRe + `$`).MatchString(have); m {
@@ -139,7 +142,11 @@ func DiffMatch(have, want string, opt ...DiffOpt) string {
 	if len(d) == 0 {
 		return "ztest.DiffMatch: strings didn't match but no diff?" // Should never happen.
 	}
-	return "\n" + d
+
+	reUnquoteMetaOnce.Do(func() {
+		reUnquoteMeta = regexp.MustCompile(`([^\\])\\([\\.+*?()|\[\]{}^$])`)
+	})
+	return "\n" + reUnquoteMeta.ReplaceAllString(d, `$1$2`)
 }
 
 var (
