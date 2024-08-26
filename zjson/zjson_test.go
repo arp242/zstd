@@ -219,3 +219,22 @@ func ErrorContains(have error, want string) bool {
 	}
 	return strings.Contains(have.Error(), want)
 }
+
+func TestGet(t *testing.T) {
+	if h, err := Get[float64]([]byte(`{"a":1}`), "a"); h != 1 {
+		t.Fatalf("wrong: %v; err: %s", h, err)
+	}
+	if h, err := Get[string]([]byte(`{"a":"b"}`), "a"); h != "b" {
+		t.Fatalf("wrong: %v; err: %s", h, err)
+	}
+	if h, err := Get[[]any]([]byte(`{"a":["b", "c"]}`), "a"); !reflect.DeepEqual(h, []any{"b", "c"}) {
+		t.Fatalf("wrong: %v; err: %s", h, err)
+	}
+	if h, err := Get[map[string]any]([]byte(`{"a":{"b":"c"}}`), "a"); !reflect.DeepEqual(h, map[string]any{"b": "c"}) {
+		t.Fatalf("wrong: %v; err: %s", h, err)
+	}
+
+	if h, err := Get[string]([]byte(`{"a":{"b":"c"}}`), "a.b"); h != "c" {
+		t.Fatalf("wrong: %v; err: %s", h, err)
+	}
+}

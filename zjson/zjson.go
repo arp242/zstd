@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -146,4 +147,56 @@ func IndentString(data []byte, v any, prefix, indent string) (string, error) {
 // MustIndentString is like MustIndent, but returns a string.
 func MustIndentString(data []byte, v any, prefix, indent string) string {
 	return string(MustIndent(data, v, prefix, indent))
+}
+
+// Types that can occur in JSON documents.
+type Types interface {
+	~float64 | ~string | ~[]any | ~map[string]any
+}
+
+// Get a value from JSON bytes.
+//
+// Format of path:
+//
+//	foo
+//	foo.nested
+func Get[T Types](j []byte, path string) (T, error) {
+	var (
+		zero  T
+		m     map[string]any
+		paths = strings.Split(path, ".")
+	)
+
+	err := json.Unmarshal(j, &m)
+	if err != nil {
+		return zero, fmt.Errorf("zjson.Get: %w", err)
+	}
+
+	for i, p := range paths {
+		v, ok := m[p]
+		if !ok {
+			return zero, fmt.Errorf("zjson.Get: field %q not found", path)
+		}
+
+		if i == len(paths)-1 {
+			vv, ok := v.(T)
+			if !ok {
+				return zero, fmt.Errorf("zjson.Get: field %q is wrong type (have: %T, want: %T)", p, v, zero)
+			}
+			return vv, nil
+		}
+
+		// TODO: also support arrays as "path.[0]", "path.[0].nest".
+		m = v.(map[string]any)
+	}
+	panic("unreachable")
+}
+
+// MustGet is like [Get], but will panic on errors.
+func MustGet[T Types](j []byte, path string) T {
+	v, err := Get[T](j, path)
+	if err != nil {
+		panic(err)
+	}
+	return v
 }
