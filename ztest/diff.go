@@ -159,7 +159,7 @@ func applyOpt(have, want string, opt ...DiffOpt) (string, string) {
 		switch o {
 		case DiffNormalizeWhitespace:
 			reNormalizeWhitespaceOnce.Do(func() {
-				reNormalizeWhitespace = regexp.MustCompile(`(?m)(^\s+|\s+$)`)
+				reNormalizeWhitespace = regexp.MustCompile(`(?m)(^[\t ]+|[\t ]+$)`)
 			})
 			have = reNormalizeWhitespace.ReplaceAllString(have, "")
 			want = reNormalizeWhitespace.ReplaceAllString(want, "")

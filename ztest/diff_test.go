@@ -300,3 +300,85 @@ func TestDiffXML(t *testing.T) {
 		})
 	}
 }
+
+func TestDiffNormalizeWhitespace(t *testing.T) {
+	a := `
+one
+two
+three
+	`
+
+	b := `
+		one
+		two
+		three`
+	if d := Diff(a, b, DiffNormalizeWhitespace); d != "" {
+		t.Fatal(d)
+	}
+
+	a = `
+one
+two
+
+three
+	`
+
+	b = `
+		one
+		two
+
+		three`
+	if d := Diff(a, b, DiffNormalizeWhitespace); d != "" {
+		t.Fatal(d)
+	}
+
+	a = `
+one
+two
+three
+	`
+
+	b = `
+		one
+		two
+
+		three`
+
+	want := `
+--- have
++++ want
+@@ -1,3 +1,4 @@
+      one
+      two
++want 
+      three
+`
+	if d := Diff(a, b, DiffNormalizeWhitespace); d != want {
+		t.Fatalf("\nhave: %q\nwant: %q", d, want)
+	}
+
+	a = `
+one
+two
+
+three
+	`
+
+	b = `
+		one
+		two
+		three`
+
+	want = `
+--- have
++++ want
+@@ -1,4 +1,3 @@
+      one
+      two
+-have 
+      three
+`
+	if d := Diff(a, b, DiffNormalizeWhitespace); d != want {
+		t.Fatalf("\nhave: %q\nwant: %q", d, want)
+	}
+}
