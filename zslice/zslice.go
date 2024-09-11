@@ -247,6 +247,17 @@ func LongestFunc[T any](list []T, f func(T) string) int {
 	return l
 }
 
+// LastIndex returns the index of the last occurrence of v in s, or -1 if not
+// present.
+func LastIndex[S ~[]E, E comparable](s S, v E) int {
+	for i := len(s) - 1; i >= 0; i-- {
+		if s[i] == v {
+			return i
+		}
+	}
+	return -1
+}
+
 // Go 1.19 compat stuff.
 
 type ordered interface {

@@ -506,3 +506,25 @@ func TestLongestFunc(t *testing.T) {
 		})
 	}
 }
+
+func TestLastIndex(t *testing.T) {
+	tests := []struct {
+		in   []string
+		s    string
+		want int
+	}{
+		{[]string{}, "x", -1},
+		{[]string{"x"}, "x", 0},
+		{[]string{"x", "x"}, "x", 1},
+		{[]string{"x", "x", "y", "x"}, "x", 3},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			have := LastIndex(tt.in, tt.s)
+			if have != tt.want {
+				t.Errorf("\nhave: %d\nwant: %d", have, tt.want)
+			}
+		})
+	}
+}
