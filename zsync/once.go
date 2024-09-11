@@ -7,8 +7,8 @@ import (
 // Once is an object that will perform exactly one action per key.
 //
 // This is mix between sync.Once and x/sync/singleflight; like Once, a function
-// is only run once, and like singleflight it allows grouping per-key and
-// returns if the function is already run.
+// is only run once, and like singleflight it allows grouping per-key and has a
+// return value informing whether the function is already run.
 //
 // This implementation is a bit slower than the stdlib one; the benchmark
 // regresses from ~1.6ns/op to ~52ns/op on my system.
@@ -55,6 +55,14 @@ func (o *Once) Do(key string, f func()) bool {
 	defer func() { o.done[key] = struct{}{} }()
 	f()
 	return true
+}
+
+// Did reports if something has been run for the given key.
+func (o *Once) Did(key string) bool {
+	o.m.Lock()
+	_, ok := o.done[key]
+	o.m.Unlock()
+	return ok
 }
 
 // Forget about a key, causing the next invocation to Do() to run again.

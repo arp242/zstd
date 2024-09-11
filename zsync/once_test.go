@@ -46,6 +46,14 @@ func TestOnce(t *testing.T) {
 	if *o != 1 {
 		t.Errorf("once failed outside run: %d is not 1", *o)
 	}
+
+	if once.Did("xxx") {
+		t.Fatal("reporting xxx was run")
+	}
+	once.Do("xxx", func() {})
+	if !once.Did("xxx") {
+		t.Fatal("not reporting xxx was run")
+	}
 }
 
 func TestOncePanic(t *testing.T) {
