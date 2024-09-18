@@ -514,3 +514,27 @@ func BenchmarkUnwrap(b *testing.B) {
 		Unwrap(s)
 	}
 }
+
+func TestSafe(t *testing.T) {
+	tests := []struct {
+		in, want string
+	}{
+		// {"", ""},
+		// {"€", ""},
+		{"abc", "abc"},
+		{"abc/def", "abc-def"},
+		{"abc1///def2", "abc1-def2"},
+		{"abc1'\n-def2-", "abc1-def2"},
+		{"abc1--def2-", "abc1-def2"},
+		{"a🤷b é", "a-b-é"},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			have := Safe(tt.in)
+			if have != tt.want {
+				t.Errorf("\nhave: %q\nwant: %q", have, tt.want)
+			}
+		})
+	}
+}

@@ -11,6 +11,8 @@ import (
 	"strings"
 	"unicode"
 	"unicode/utf8"
+
+	"zgo.at/zstd/zcrypto"
 )
 
 // Reverse a string.
@@ -435,4 +437,33 @@ func Unwrap(s string) string {
 		b.WriteRune(c)
 	}
 	return b.String()
+}
+
+// Safe converts a string to a "safe" value by replacing every non-letter and
+// non-digit by a '-', squeezing consecutive dashes and trimming dashes at the
+// start and end. Capitalisation is left intact.
+//
+// If the result is an empty string, it will return a small random string
+// instead of an empty string.
+//
+// This makes the string suitable for pathnames, URLs, etc. This is more
+// conservative than is strictly needed, but usually that's fine.
+func Safe(s string) string {
+	var (
+		ss   = []rune(s)
+		n    = make([]rune, 0, len(ss))
+		dash bool
+	)
+	for _, c := range ss {
+		if unicode.In(c, unicode.Letter, unicode.Digit) {
+			n, dash = append(n, c), false
+		} else if !dash {
+			n, dash = append(n, '-'), true
+		}
+	}
+	s = strings.Trim(string(n), "-")
+	if s == "" {
+		return zcrypto.SecretString(20, "")
+	}
+	return s
 }
