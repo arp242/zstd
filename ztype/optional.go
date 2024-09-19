@@ -19,17 +19,17 @@ import (
 //	}
 //	if v, ok := s.Value.Get(); ok {
 //	}
-type Optional[Value any] struct {
-	v  Value
+type Optional[V any] struct {
+	v  V
 	ok bool
 }
 
 // NewOptional creates a new Optional for the given value.
-func NewOptional[Value any](v Value) Optional[Value] {
-	return Optional[Value]{v, true}
+func NewOptional[V any](v V) Optional[V] {
+	return Optional[V]{v, true}
 }
 
-func (o Optional[Value]) String() string {
+func (o Optional[V]) String() string {
 	if o.ok {
 		return fmt.Sprintf("%v", o.v)
 	}
@@ -40,30 +40,28 @@ func (o Optional[Value]) String() string {
 //
 // The returned value is undefined if it's not set; it can be the type zero
 // value, nil, or anything else.
-func (o Optional[Value]) Get() (Value, bool) {
+func (o Optional[V]) Get() (V, bool) {
 	return o.v, o.ok
 }
 
 // Set a value.
-func (o *Optional[Value]) Set(v Value) {
-	o.v = v
-	o.ok = true
+func (o *Optional[V]) Set(v V) {
+	o.v, o.ok = v, true
 }
 
 // Unset this optional.
-func (o *Optional[Value]) Unset() {
-	var v Value
-	o.v = v
-	o.ok = false
+func (o *Optional[V]) Unset() {
+	var v V
+	o.v, o.ok = v, false
 }
 
-func (o *Optional[Value]) Scan(v any) error {
+func (o *Optional[V]) Scan(v any) error {
 	if v == nil {
 		o.ok = false
 		return nil
 	}
 
-	o.v, o.ok = v.(Value)
+	o.v, o.ok = v.(V)
 	if !o.ok {
 		return fmt.Errorf("Optional.Scan: unable to scan %#v", v)
 	}
@@ -71,22 +69,26 @@ func (o *Optional[Value]) Scan(v any) error {
 	return nil
 }
 
-func (o Optional[Value]) Value() (driver.Value, error) {
+func (o Optional[V]) Value() (driver.Value, error) {
 	if !o.ok {
 		return nil, nil
 	}
 	return o.v, nil
 }
 
-func (o Optional[Value]) MarshalJSON() ([]byte, error) {
+func (o Optional[V]) MarshalJSON() ([]byte, error) {
 	if !o.ok {
+		// TODO: we want to be able to also marshal this to the zero type.
+		//
+		// https://github.com/guregu/null has a separate "zero" package for it. Meh; not
+		// a brilliant solution.
 		return []byte("null"), nil
 	}
 
 	return json.Marshal(o.v)
 }
 
-func (o *Optional[Value]) UnmarshalJSON(data []byte) error {
+func (o *Optional[V]) UnmarshalJSON(data []byte) error {
 	switch string(data) {
 	case "null", "undefined":
 		return nil

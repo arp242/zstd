@@ -1,6 +1,7 @@
 package zio
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"net/http"
@@ -77,5 +78,21 @@ func TestExists(t *testing.T) {
 				t.Errorf("\nout:  %#v\nwant: %#v\n", out, tt.want)
 			}
 		})
+	}
+}
+
+func TestTeeReader(t *testing.T) {
+	w1, w2 := new(bytes.Buffer), new(bytes.Buffer)
+	tee := TeeReader(strings.NewReader("hello"), w1, w2)
+
+	h, _ := io.ReadAll(tee)
+	if string(h) != "hello" {
+		t.Errorf("read from TeeWriter: %q", string(h))
+	}
+	if w1.String() != "hello" {
+		t.Errorf("read from w1: %q", w1.String())
+	}
+	if w2.String() != "hello" {
+		t.Errorf("read from w2: %q", w2.String())
 	}
 }

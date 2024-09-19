@@ -82,3 +82,32 @@ type NopWriter struct{}
 
 // Write is a stub.
 func (w *NopWriter) Write(b []byte) (int, error) { return len(b), nil }
+
+// TeeReader returns a [Reader] that writes to w what it reads from r.
+//
+// All reads from r performed through it are matched with corresponding writes
+// to w. There is no internal buffering - the write must complete before the
+// read completes. Any error encountered while writing is reported as a read
+// error.
+//
+// This is simular to [io.TeeReader], except that it supports multiple writers.
+func TeeReader(r io.Reader, w ...io.Writer) io.Reader {
+	return &teeReader{r, w}
+}
+
+type teeReader struct {
+	r io.Reader
+	w []io.Writer
+}
+
+func (t *teeReader) Read(p []byte) (n int, err error) {
+	n, err = t.r.Read(p)
+	if n > 0 {
+		for _, ww := range t.w {
+			if n, err := ww.Write(p[:n]); err != nil {
+				return n, err
+			}
+		}
+	}
+	return
+}
