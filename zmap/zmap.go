@@ -45,3 +45,21 @@ func Values[M ~map[K]V, K comparable, V any](m M) []V {
 	}
 	return r
 }
+
+// KeyValue returns a struct slice with the keys and values.
+func KeyValue[M ~map[K]V, K comparable, V any](m M) []struct {
+	K K
+	V V
+} {
+	r := make([]struct {
+		K K
+		V V
+	}, 0, len(m))
+	for k, v := range m {
+		r = append(r, struct {
+			K K
+			V V
+		}{k, v})
+	}
+	return r
+}

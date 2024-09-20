@@ -1,6 +1,7 @@
 package zmap
 
 import (
+	"fmt"
 	"reflect"
 	"sort"
 	"testing"
@@ -52,4 +53,18 @@ func TestLongestKey(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestKeyValue(t *testing.T) {
+	kv := KeyValue(map[string]int{
+		"a": 1,
+		"b": 42,
+		"c": 666,
+	})
+	have := fmt.Sprintf("%v", kv)
+	want := `[{a 1} {b 42} {c 666}]`
+	if have != want {
+		t.Errorf("\nhave: %q\nwant: %q", have, want)
+	}
+
 }
