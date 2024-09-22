@@ -1,7 +1,11 @@
 // Package zos implements functions for interfacing with the operating system.
 package zos
 
-import "os"
+import (
+	"errors"
+	"io/fs"
+	"os"
+)
 
 const (
 	Setuid uint32 = 1 << (12 - 1 - iota)
@@ -59,4 +63,19 @@ func Arg(n int) string {
 		return ""
 	}
 	return os.Args[n]
+}
+
+// CreateNew creates a new file.
+//
+// An error is returned if the file already exists, unless zeroByte is set it's
+// a zero-byte file. Note that this is subject to race conditions, and not
+// suitable if multiple processes may create the same file.
+func CreateNew(path string, zeroByte bool) (*os.File, error) {
+	out, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_EXCL, 0o666)
+	if zeroByte && errors.Is(err, fs.ErrExist) {
+		if st, stErr := os.Stat(path); stErr == nil && st.Size() == 0 {
+			out, err = os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0o666)
+		}
+	}
+	return out, err
 }
