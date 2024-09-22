@@ -2,6 +2,7 @@ package zio
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -95,4 +96,109 @@ func TestTeeReader(t *testing.T) {
 	if w2.String() != "hello" {
 		t.Errorf("read from w2: %q", w2.String())
 	}
+}
+
+var (
+	_ io.Reader = &peekReader{}
+	_ io.Closer = &peekReader{}
+	_ io.Closer = &testClose{}
+)
+
+type testClose struct {
+	io.Reader
+	didClose bool
+}
+
+func (tc *testClose) Close() error { tc.didClose = true; return nil }
+
+func TestPeekReader(t *testing.T) {
+	t.Run("read from both", func(t *testing.T) {
+		r := PeekReader(strings.NewReader("hello"), []byte("abc"))
+		buf := make([]byte, 10)
+		n, err := r.Read(buf)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if n != 8 {
+			t.Error(n)
+		}
+		if h := fmt.Sprintf("%s", string(buf)); h != "abchello\x00\x00" {
+			t.Errorf("%q", h)
+		}
+
+		buf = make([]byte, 10)
+		n, err = r.Read(buf)
+		if n != 0 {
+			t.Error(n, string(buf))
+		}
+		if !errors.Is(err, io.EOF) {
+			t.Fatal(err)
+		}
+	})
+
+	t.Run("multiple reads from peeked", func(t *testing.T) {
+		r := PeekReader(strings.NewReader("de"), []byte("abc"))
+		for i := 0; i < 5; i++ {
+			buf := make([]byte, 1)
+			n, err := r.Read(buf)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if n != 1 {
+				t.Error(n)
+			}
+			want := ""
+			switch i {
+			case 0:
+				want = "a"
+			case 1:
+				want = "b"
+			case 2:
+				want = "c"
+			case 3:
+				want = "d"
+			case 4:
+				want = "e"
+			}
+			if h := string(buf); h != want {
+				t.Error(h)
+			}
+		}
+
+		buf := make([]byte, 10)
+		n, err := r.Read(buf)
+		if n != 0 {
+			t.Error(n, string(buf))
+		}
+		if !errors.Is(err, io.EOF) {
+			t.Fatal(err)
+		}
+	})
+
+	t.Run("empty peeked", func(t *testing.T) {
+		r := PeekReader(strings.NewReader("hello"), nil)
+		buf := make([]byte, 10)
+		n, err := r.Read(buf)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if n != 5 {
+			t.Error(n)
+		}
+		if h := string(buf[:n]); h != "hello" {
+			t.Error(h)
+		}
+	})
+
+	t.Run("close", func(t *testing.T) {
+		tc := &testClose{Reader: strings.NewReader("hello")}
+		r := PeekReader(tc, nil)
+		err := r.Close()
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !tc.didClose {
+			t.Error("!tc.didClose")
+		}
+	})
 }

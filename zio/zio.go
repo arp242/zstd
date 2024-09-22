@@ -152,3 +152,41 @@ func Count(fp io.ReadSeeker, find []byte) (int, error) {
 		}
 	}
 }
+
+// PeekReader returns a reader that first returns data from peeked, before
+// reading from the reader r.
+//
+// This is useful in cases where you want to "peek" a bit data from a reader
+// that doesn't support seeking to determine if the compression or file format.
+func PeekReader(r io.Reader, peeked []byte) io.ReadCloser {
+	return &peekReader{r, peeked}
+}
+
+type peekReader struct {
+	r      io.Reader
+	peeked []byte
+}
+
+func (r *peekReader) Read(d []byte) (int, error) {
+	if len(r.peeked) == 0 {
+		return r.r.Read(d)
+	}
+
+	n := copy(d, r.peeked)
+	r.peeked = r.peeked[n:]
+	if len(r.peeked) > 0 {
+		return n, nil
+	}
+	r.peeked = nil
+
+	n2, err := r.r.Read(d[n:])
+	return n + n2, err
+}
+
+// Close the underlying reader if it implements a Close method.
+func (r *peekReader) Close() error {
+	if rc, ok := r.r.(io.ReadCloser); ok {
+		return rc.Close()
+	}
+	return nil
+}
