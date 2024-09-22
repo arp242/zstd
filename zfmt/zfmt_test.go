@@ -28,10 +28,36 @@ func TestBinary(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
-			got := Binary(tt.in)
-			if got != tt.want {
-				t.Errorf("\ngot:  %q\nwant: %q", got, tt.want)
+			have := Binary(tt.in)
+			if have != tt.want {
+				t.Errorf("\nhave: %q\nwant: %q", have, tt.want)
 			}
 		})
 	}
+}
+
+func TestNumber(t *testing.T) {
+	tt := func(t *testing.T, have, want string) {
+		t.Run("", func(t *testing.T) {
+			if have != want {
+				t.Errorf("\nhave: %q\nwant: %q", have, want)
+			}
+		})
+	}
+
+	tt(t, Number(32, ','), "32")
+	tt(t, Number(3200, ','), "3,200")
+	tt(t, Number(233200, ','), "233,200")
+	tt(t, Number(1233200, ','), "1,233,200")
+
+	tt(t, Number(123.0, ','), "123")
+	tt(t, Number(123.1, ','), "123.1")
+	tt(t, Number(123456.994, ','), "123,456.994")
+	tt(t, Number(9123456.994, ','), "9,123,456.994")
+
+	tt(t, Number(1233200, '.'), "1.233.200")
+	tt(t, Number(9123456.994, '.'), "9.123.456,994")
+	tt(t, Number(9123456.994, '_'), "9_123_456.994")
+	tt(t, Number(9123456.994, '\''), "9'123'456.994")
+	tt(t, Number(9123456.994, ' '), "9 123 456.994")
 }

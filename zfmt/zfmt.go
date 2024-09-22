@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
 // Binary returns a nicely formatted binary representation of a number.
@@ -47,4 +48,55 @@ func Binary(c any) string {
 	}
 	reBin := regexp.MustCompile(`([01])([01])([01])([01])([01])([01])([01])([01])`)
 	return reverse(reBin.ReplaceAllString(reverse(b), `$1$2$3${4}_$5$6$7$8 `))[1:]
+}
+
+type number interface {
+	~int | ~int8 | ~int16 | ~int32 | ~int64 |
+		~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64 | ~uintptr |
+		~float32 | ~float64
+}
+
+// Number returns a formatted representation of n, using thousandsSep to
+// separate thousands.
+//
+// If thousandsSep is '.' it will use ',' as the fraction separator, otherwise
+// it will default to '.'.
+func Number[T number](n T, thousandsSep rune) string {
+	var s string
+	switch any(n).(type) {
+	case int, int8, int16, int32, int64:
+		s = strconv.FormatInt(int64(n), 10)
+	case uint, uint8, uint16, uint32, uint64:
+		s = strconv.FormatUint(uint64(n), 10)
+	case float32, float64:
+		s = strconv.FormatFloat(float64(n), 'f', -1, 64)
+	}
+
+	s, d, _ := strings.Cut(s, ".")
+	b := []byte(s)
+	for i, j := 0, len(b)-1; i < j; i, j = i+1, j-1 {
+		b[i], b[j] = b[j], b[i]
+	}
+
+	var out []rune
+	for i := range b {
+		if i > 0 && i%3 == 0 && thousandsSep > 1 {
+			out = append(out, thousandsSep)
+		}
+		out = append(out, rune(b[i]))
+	}
+
+	for i, j := 0, len(out)-1; i < j; i, j = i+1, j-1 {
+		out[i], out[j] = out[j], out[i]
+	}
+
+	s = string(out)
+	if d != "" {
+		if thousandsSep == '.' {
+			s += "," + d
+		} else {
+			s += "." + d
+		}
+	}
+	return s
 }
