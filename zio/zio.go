@@ -3,6 +3,7 @@ package zio
 
 import (
 	"bytes"
+	"errors"
 	"io"
 	"net/http"
 	"os"
@@ -110,4 +111,44 @@ func (t *teeReader) Read(p []byte) (n int, err error) {
 		}
 	}
 	return
+}
+
+// Count the number of occurrences of find in the stream.
+//
+// It will try to seek back to the original position after counting, so that
+// something like this will just work:
+//
+//	fp, _ := os.Open("..")
+//	lines, _ := zio.Count(fp, []byte{'\n'})
+//
+//	scan := bufio.NewScanner(fp)
+//	var i int
+//	for scan.Scan() {
+//	  fmt.Printf("line %d/%d\n", i+1, lines)
+//	  i++
+//	}
+func Count(fp io.ReadSeeker, find []byte) (int, error) {
+	pos, err := fp.Seek(0, io.SeekCurrent)
+	if err != nil {
+		return 0, err
+	}
+
+	var (
+		buf = make([]byte, 1024*128)
+		cnt int
+	)
+	for {
+		n, err := fp.Read(buf)
+		cnt += bytes.Count(buf[:n], find)
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				err = nil
+			}
+			_, seekErr := fp.Seek(pos, io.SeekStart)
+			if err == nil {
+				err = seekErr
+			}
+			return cnt, err
+		}
+	}
 }
