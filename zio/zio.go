@@ -3,6 +3,7 @@ package zio
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"io"
 	"net/http"
@@ -119,37 +120,57 @@ func (t *teeReader) Read(p []byte) (n int, err error) {
 // something like this will just work:
 //
 //	fp, _ := os.Open("..")
-//	lines, _ := zio.Count(fp, []byte{'\n'})
+//	lines, _ := zio.Count(context.Background(), fp, []byte{'\n'})
 //
 //	scan := bufio.NewScanner(fp)
 //	var i int
 //	for scan.Scan() {
-//	  fmt.Printf("line %d/%d\n", i+1, lines)
+//	  fmt.Printf("line %d / %d\n", i+1, lines)
 //	  i++
 //	}
-func Count(fp io.ReadSeeker, find []byte) (int, error) {
+func Count(ctx context.Context, fp io.ReadSeeker, find []byte) (int, error) {
 	pos, err := fp.Seek(0, io.SeekCurrent)
 	if err != nil {
 		return 0, err
 	}
 
 	var (
-		buf = make([]byte, 1024*128)
-		cnt int
+		result = make(chan struct {
+			cnt int
+			err error
+		})
 	)
-	for {
-		n, err := fp.Read(buf)
-		cnt += bytes.Count(buf[:n], find)
-		if err != nil {
-			if errors.Is(err, io.EOF) {
-				err = nil
+	go func() {
+		var (
+			buf = make([]byte, 1024*128)
+			cnt int
+		)
+		for {
+			n, err := fp.Read(buf)
+			cnt += bytes.Count(buf[:n], find)
+			if err != nil {
+				if errors.Is(err, io.EOF) {
+					err = nil
+				}
+				_, seekErr := fp.Seek(pos, io.SeekStart)
+				if err == nil {
+					err = seekErr
+				}
+				result <- struct {
+					cnt int
+					err error
+				}{cnt, err}
+				break
 			}
-			_, seekErr := fp.Seek(pos, io.SeekStart)
-			if err == nil {
-				err = seekErr
-			}
-			return cnt, err
 		}
+	}()
+
+	select {
+	case r := <-result:
+		return r.cnt, r.err
+	case <-ctx.Done():
+		fp.Seek(pos, io.SeekStart)
+		return 0, ctx.Err()
 	}
 }
 

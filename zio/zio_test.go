@@ -2,12 +2,15 @@ package zio
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestDumpReader(t *testing.T) {
@@ -122,7 +125,7 @@ func TestPeekReader(t *testing.T) {
 		if n != 8 {
 			t.Error(n)
 		}
-		if h := fmt.Sprintf("%s", string(buf)); h != "abchello\x00\x00" {
+		if h := string(buf); h != "abchello\x00\x00" {
 			t.Errorf("%q", h)
 		}
 
@@ -201,4 +204,64 @@ func TestPeekReader(t *testing.T) {
 			t.Error("!tc.didClose")
 		}
 	})
+}
+
+func TestCount(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 50*time.Millisecond)
+	defer cancel()
+
+	want := "hello\nworld\nxxx\n"
+	tmp := t.TempDir() + "/tmp"
+	err := os.WriteFile(tmp, []byte(want), 0o644)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	{
+		fp, err := os.Open(tmp)
+		if err != nil {
+			t.Fatal(err)
+		}
+		cnt, err := Count(ctx, fp, []byte{'\n'})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if cnt != 3 {
+			t.Fatal(cnt)
+		}
+		have, err := io.ReadAll(fp)
+		if err != nil {
+			t.Fatal(err)
+		}
+		fp.Close()
+		if string(have) != want {
+			t.Fatal(string(have))
+		}
+	}
+
+	{
+		time.Sleep(60 * time.Millisecond)
+		fp, err := os.Open(tmp)
+		if err != nil {
+			t.Fatal(err)
+		}
+		cnt, err := Count(ctx, fp, []byte{'\n'})
+		if err == nil {
+			t.Fatal("error is nil")
+		}
+		if !errors.Is(err, context.DeadlineExceeded) {
+			t.Fatal(err)
+		}
+		if cnt != 0 {
+			t.Fatal(cnt)
+		}
+		have, err := io.ReadAll(fp)
+		if err != nil {
+			t.Fatal(err)
+		}
+		fp.Close()
+		if string(have) != want {
+			t.Fatal(string(have))
+		}
+	}
 }
