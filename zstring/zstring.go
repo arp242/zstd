@@ -467,3 +467,17 @@ func Safe(s string) string {
 	}
 	return s
 }
+
+// ShellQuote quotes a string for Bourne shell quoting.
+func ShellQuote(s string) string {
+	if len(s) == 0 {
+		return "''"
+	}
+	if !strings.ContainsAny(s, "\\'\"`${[|&;<>()*?! \t\n") && s[0] != '~' {
+		return s
+	}
+	if strings.Contains(s, "'") && !strings.ContainsAny("\\\"$`", s) {
+		return `"` + s + `"`
+	}
+	return "'" + strings.ReplaceAll(s, "'", `'\''`) + "'"
+}
