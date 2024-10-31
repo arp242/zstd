@@ -527,6 +527,10 @@ func TestSafe(t *testing.T) {
 		{"abc1'\n-def2-", "abc1-def2"},
 		{"abc1--def2-", "abc1-def2"},
 		{"a🤷b é", "a-b-é"},
+		{"ab_c.txt", "ab_c.txt"},
+		{"ab_c.txt.foo", "ab_c.txt.foo"},
+		{"a__b_c.txt.foo", "a__b_c.txt.foo"},
+		{"a__b_€c.txt.foo", "a__b_-c.txt.foo"},
 	}
 
 	for _, tt := range tests {

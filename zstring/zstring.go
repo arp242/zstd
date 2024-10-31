@@ -439,9 +439,9 @@ func Unwrap(s string) string {
 	return b.String()
 }
 
-// Safe converts a string to a "safe" value by replacing every non-letter and
-// non-digit by a '-', squeezing consecutive dashes and trimming dashes at the
-// start and end. Capitalisation is left intact.
+// Safe converts a string to a "safe" value by replacing every non-letter,
+// non-digit, or non-._ by a '-', squeezing consecutive dashes and trimming
+// dashes at the start and end. Capitalisation is left intact.
 //
 // If the result is an empty string, it will return a small random string
 // instead of an empty string.
@@ -455,7 +455,7 @@ func Safe(s string) string {
 		dash bool
 	)
 	for _, c := range ss {
-		if unicode.In(c, unicode.Letter, unicode.Digit) {
+		if unicode.In(c, unicode.Letter, unicode.Digit) || c == '.' || c == '_' {
 			n, dash = append(n, c), false
 		} else if !dash {
 			n, dash = append(n, '-'), true
