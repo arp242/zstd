@@ -6,12 +6,11 @@ import (
 
 // Once is an object that will perform exactly one action per key.
 //
-// This is mix between sync.Once and x/sync/singleflight; like Once, a function
-// is only run once, and like singleflight it allows grouping per-key and has a
-// return value informing whether the function is already run.
+// This is similar to sync.Once, but allows grouping per-key and has a return
+// value informing whether the function was already run.
 //
-// This implementation is a bit slower than the stdlib one; the benchmark
-// regresses from ~1.6ns/op to ~52ns/op on my system.
+// This implementation is a bit slower than sync.Once; the benchmark regresses
+// from ~1.6ns/op to ~52ns/op on my system.
 type Once struct {
 	m    sync.Mutex
 	done map[string]struct{}
@@ -33,7 +32,7 @@ type Once struct {
 // It may be necessary to use a function literal to capture the arguments to a
 // function to be invoked by Do:
 //
-//	config.once.Do(func() { config.init(filename) })
+//	once.Do("x", func() { config.init(filename) })
 //
 // Because no call to Do returns until the one call to f returns, if f causes Do
 // to be called, it will deadlock.
