@@ -3,11 +3,14 @@ package zio
 import (
 	"bytes"
 	"context"
+	"crypto/sha1"
+	"crypto/sha256"
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -263,5 +266,66 @@ func TestCount(t *testing.T) {
 		if string(have) != want {
 			t.Fatal(string(have))
 		}
+	}
+}
+
+func TestHashWriter(t *testing.T) {
+	buf := new(bytes.Buffer)
+	w := HashWriter(NopCloser(buf), sha1.New())
+
+	var have []string
+	have = append(have, fmt.Sprintf("%x %d", w.Hash(), w.Len()))
+	w.Write([]byte("a"))
+	have = append(have, fmt.Sprintf("%x %d", w.Hash(), w.Len()))
+	w.Write([]byte("b"))
+	have = append(have, fmt.Sprintf("%x %d", w.Hash(), w.Len()))
+
+	w = HashWriter(NopCloser(buf), sha256.New())
+	have = append(have, fmt.Sprintf("%x %d", w.Hash(), w.Len()))
+	w.Write([]byte("a"))
+	have = append(have, fmt.Sprintf("%x %d", w.Hash(), w.Len()))
+	w.Write([]byte("b"))
+	have = append(have, fmt.Sprintf("%x %d", w.Hash(), w.Len()))
+
+	want := []string{
+		"da39a3ee5e6b4b0d3255bfef95601890afd80709 0",
+		"86f7e437faa5a7fce15d1ddcb9eaeaea377667b8 1",
+		"da23614e02469a0d7c7bd1bdab5c9c474b1904dc 2",
+		"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 0",
+		"ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb 1",
+		"fb8e20fc2e4c3f248c60c39bd652f3c1347298bb977b8b4d5903b85055620603 2",
+	}
+	if !reflect.DeepEqual(have, want) {
+		t.Errorf("\nhave: %#v\nwant: %#v", have, want)
+	}
+}
+
+func TestHashReader(t *testing.T) {
+	r := HashReader(io.NopCloser(strings.NewReader("abab")), sha1.New())
+
+	var have []string
+	have = append(have, fmt.Sprintf("%x %d", r.Hash(), r.Len()))
+	r.Read(make([]byte, 1))
+	have = append(have, fmt.Sprintf("%x %d", r.Hash(), r.Len()))
+	r.Read(make([]byte, 1))
+	have = append(have, fmt.Sprintf("%x %d", r.Hash(), r.Len()))
+
+	r = HashReader(io.NopCloser(strings.NewReader("abab")), sha256.New())
+	have = append(have, fmt.Sprintf("%x %d", r.Hash(), r.Len()))
+	r.Read(make([]byte, 1))
+	have = append(have, fmt.Sprintf("%x %d", r.Hash(), r.Len()))
+	r.Read(make([]byte, 1))
+	have = append(have, fmt.Sprintf("%x %d", r.Hash(), r.Len()))
+
+	want := []string{
+		"da39a3ee5e6b4b0d3255bfef95601890afd80709 0",
+		"86f7e437faa5a7fce15d1ddcb9eaeaea377667b8 1",
+		"da23614e02469a0d7c7bd1bdab5c9c474b1904dc 2",
+		"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 0",
+		"ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb 1",
+		"fb8e20fc2e4c3f248c60c39bd652f3c1347298bb977b8b4d5903b85055620603 2",
+	}
+	if !reflect.DeepEqual(have, want) {
+		t.Errorf("\nhave: %#v\nwant: %#v", have, want)
 	}
 }

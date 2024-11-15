@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"hash"
 	"io"
 	"net/http"
 	"os"
@@ -246,3 +247,58 @@ func (l *LimitedReader) Read(p []byte) (n int, err error) {
 func (l *LimitedReader) Close() error {
 	return l.R.Close()
 }
+
+type hashWriter struct {
+	w io.WriteCloser
+	h hash.Hash
+	l int
+}
+
+// HashWriter writes to both the writer and hash.
+func HashWriter(w io.WriteCloser, h hash.Hash) *hashWriter {
+	return &hashWriter{w, h, 0}
+}
+
+// Write to the underlying writer and hash.
+func (w *hashWriter) Write(b []byte) (int, error) {
+	w.h.Write(b)
+	w.l += len(b)
+	return w.w.Write(b)
+}
+
+// Close the underlying writer.
+func (w *hashWriter) Close() error { return w.w.Close() }
+
+// Hash sums the hash.
+func (w *hashWriter) Hash() []byte { return w.h.Sum(nil) }
+
+// Len gets the total number of bytes written thus far.
+func (w *hashWriter) Len() int { return w.l }
+
+type hashReader struct {
+	r io.ReadCloser
+	h hash.Hash
+	l int
+}
+
+// HashReader writes to the hash for all data it reads.
+func HashReader(r io.ReadCloser, h hash.Hash) *hashReader {
+	return &hashReader{r, h, 0}
+}
+
+// Read the underlying reader and write to the hash.
+func (r *hashReader) Read(b []byte) (int, error) {
+	n, err := r.r.Read(b)
+	r.h.Write(b[:n])
+	r.l += n
+	return n, err
+}
+
+// Close the underlying reader.
+func (r *hashReader) Close() error { return r.r.Close() }
+
+// Hash sums the hash.
+func (r *hashReader) Hash() []byte { return r.h.Sum(nil) }
+
+// Len gets the total number of bytes read thus far.
+func (r *hashReader) Len() int { return r.l }
