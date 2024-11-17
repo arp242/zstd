@@ -207,8 +207,8 @@ func (r *peekReader) Read(d []byte) (int, error) {
 
 // Close the underlying reader if it implements a Close method.
 func (r *peekReader) Close() error {
-	if rc, ok := r.r.(io.ReadCloser); ok {
-		return rc.Close()
+	if c, ok := r.r.(io.Closer); ok {
+		return c.Close()
 	}
 	return nil
 }
@@ -216,20 +216,20 @@ func (r *peekReader) Close() error {
 // LimitReader returns a Reader that reads from r but stops with EOF after n
 // bytes. The underlying implementation is a *LimitedReader.
 //
-// This is identical to [io.LimitReader], except that it accepts a ReadCloser
-// (and supports Close).
-func LimitReader(r io.ReadCloser, n int64) io.ReadCloser { return &LimitedReader{r, n} }
+// This is identical to [io.LimitReader], except that it calls Close on the
+// reader if it has a Close method.
+func LimitReader(r io.Reader, n int64) io.ReadCloser { return &LimitedReader{r, n} }
 
 // A LimitedReader reads from R but limits the amount of data returned to just N
 // bytes. Each call to Read updates N to reflect the new amount remaining.
 //
 // Read returns EOF when N <= 0 or when the underlying R returns EOF.
 //
-// This is identical to [io.LimitedReader], except that it accepts a ReadCloser
-// (and supports Close).
+// This is identical to [io.LimiterReader], except that it calls Close on the
+// reader if it has a Close method.
 type LimitedReader struct {
-	R io.ReadCloser // underlying reader
-	N int64         // max bytes remaining
+	R io.Reader // underlying reader
+	N int64     // max bytes remaining
 }
 
 func (l *LimitedReader) Read(p []byte) (n int, err error) {
@@ -244,18 +244,22 @@ func (l *LimitedReader) Read(p []byte) (n int, err error) {
 	return
 }
 
+// Close the underlying reader if it implements a Close method.
 func (l *LimitedReader) Close() error {
-	return l.R.Close()
+	if c, ok := l.R.(io.Closer); ok {
+		return c.Close()
+	}
+	return nil
 }
 
 type hashWriter struct {
-	w io.WriteCloser
+	w io.Writer
 	h hash.Hash
 	l int
 }
 
 // HashWriter writes to both the writer and hash.
-func HashWriter(w io.WriteCloser, h hash.Hash) *hashWriter {
+func HashWriter(w io.Writer, h hash.Hash) *hashWriter {
 	return &hashWriter{w, h, 0}
 }
 
@@ -266,8 +270,13 @@ func (w *hashWriter) Write(b []byte) (int, error) {
 	return w.w.Write(b)
 }
 
-// Close the underlying writer.
-func (w *hashWriter) Close() error { return w.w.Close() }
+// Close the underlying writer if it implements a Close method.
+func (w *hashWriter) Close() error {
+	if c, ok := w.w.(io.Closer); ok {
+		return c.Close()
+	}
+	return nil
+}
 
 // Hash sums the hash.
 func (w *hashWriter) Hash() []byte { return w.h.Sum(nil) }
@@ -276,13 +285,13 @@ func (w *hashWriter) Hash() []byte { return w.h.Sum(nil) }
 func (w *hashWriter) Len() int { return w.l }
 
 type hashReader struct {
-	r io.ReadCloser
+	r io.Reader
 	h hash.Hash
 	l int
 }
 
 // HashReader writes to the hash for all data it reads.
-func HashReader(r io.ReadCloser, h hash.Hash) *hashReader {
+func HashReader(r io.Reader, h hash.Hash) *hashReader {
 	return &hashReader{r, h, 0}
 }
 
@@ -294,8 +303,13 @@ func (r *hashReader) Read(b []byte) (int, error) {
 	return n, err
 }
 
-// Close the underlying reader.
-func (r *hashReader) Close() error { return r.r.Close() }
+// Close the underlying reader if it implements a Close method.
+func (r *hashReader) Close() error {
+	if c, ok := r.r.(io.Closer); ok {
+		return c.Close()
+	}
+	return nil
+}
 
 // Hash sums the hash.
 func (r *hashReader) Hash() []byte { return r.h.Sum(nil) }

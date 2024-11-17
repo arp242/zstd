@@ -16,6 +16,17 @@ import (
 	"time"
 )
 
+type (
+	testWriteCloser struct {
+		io.Writer
+		closed bool
+	}
+	testReadCloser struct {
+		io.Reader
+		closed bool
+	}
+)
+
 func TestDumpReader(t *testing.T) {
 	cases := []struct {
 		in   io.ReadCloser
@@ -269,9 +280,13 @@ func TestCount(t *testing.T) {
 	}
 }
 
+func (t *testWriteCloser) Close() error { t.closed = true; return nil }
+func (t *testReadCloser) Close() error  { t.closed = true; return nil }
+
 func TestHashWriter(t *testing.T) {
 	buf := new(bytes.Buffer)
-	w := HashWriter(NopCloser(buf), sha1.New())
+	closer := &testWriteCloser{buf, false}
+	w := HashWriter(closer, sha1.New())
 
 	var have []string
 	have = append(have, fmt.Sprintf("%x %d", w.Hash(), w.Len()))
@@ -279,13 +294,20 @@ func TestHashWriter(t *testing.T) {
 	have = append(have, fmt.Sprintf("%x %d", w.Hash(), w.Len()))
 	w.Write([]byte("b"))
 	have = append(have, fmt.Sprintf("%x %d", w.Hash(), w.Len()))
+	if w.Close(); !closer.closed {
+		t.Fatal("not closed")
+	}
 
-	w = HashWriter(NopCloser(buf), sha256.New())
+	closer = &testWriteCloser{buf, false}
+	w = HashWriter(closer, sha256.New())
 	have = append(have, fmt.Sprintf("%x %d", w.Hash(), w.Len()))
 	w.Write([]byte("a"))
 	have = append(have, fmt.Sprintf("%x %d", w.Hash(), w.Len()))
 	w.Write([]byte("b"))
 	have = append(have, fmt.Sprintf("%x %d", w.Hash(), w.Len()))
+	if w.Close(); !closer.closed {
+		t.Fatal("not closed")
+	}
 
 	want := []string{
 		"da39a3ee5e6b4b0d3255bfef95601890afd80709 0",
@@ -301,7 +323,8 @@ func TestHashWriter(t *testing.T) {
 }
 
 func TestHashReader(t *testing.T) {
-	r := HashReader(io.NopCloser(strings.NewReader("abab")), sha1.New())
+	closer := &testReadCloser{strings.NewReader("abab"), false}
+	r := HashReader(closer, sha1.New())
 
 	var have []string
 	have = append(have, fmt.Sprintf("%x %d", r.Hash(), r.Len()))
@@ -309,13 +332,20 @@ func TestHashReader(t *testing.T) {
 	have = append(have, fmt.Sprintf("%x %d", r.Hash(), r.Len()))
 	r.Read(make([]byte, 1))
 	have = append(have, fmt.Sprintf("%x %d", r.Hash(), r.Len()))
+	if r.Close(); !closer.closed {
+		t.Fatal("not closed")
+	}
 
-	r = HashReader(io.NopCloser(strings.NewReader("abab")), sha256.New())
+	closer = &testReadCloser{strings.NewReader("abab"), false}
+	r = HashReader(closer, sha256.New())
 	have = append(have, fmt.Sprintf("%x %d", r.Hash(), r.Len()))
 	r.Read(make([]byte, 1))
 	have = append(have, fmt.Sprintf("%x %d", r.Hash(), r.Len()))
 	r.Read(make([]byte, 1))
 	have = append(have, fmt.Sprintf("%x %d", r.Hash(), r.Len()))
+	if r.Close(); !closer.closed {
+		t.Fatal("not closed")
+	}
 
 	want := []string{
 		"da39a3ee5e6b4b0d3255bfef95601890afd80709 0",
