@@ -11,12 +11,18 @@ type ordered interface {
 		~string
 }
 
-// KeysOrdered returns the sorted keys of the map.
-func KeysOrdered[M ~map[K]V, K ordered, V any](m M) []K {
+// Keys returns an unsorted list of keys of the map.
+func Keys[M ~map[K]V, K ordered, V any](m M) []K {
 	r := make([]K, 0, len(m))
 	for k := range m {
 		r = append(r, k)
 	}
+	return r
+}
+
+// KeysOrdered returns the sorted keys of the map.
+func KeysOrdered[M ~map[K]V, K ordered, V any](m M) []K {
+	r := Keys(m)
 	sort.Slice(r, func(i, j int) bool { return r[i] < r[j] })
 	return r
 }
