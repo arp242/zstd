@@ -7,8 +7,10 @@ import (
 	"errors"
 	"hash"
 	"io"
+	"io/fs"
 	"net/http"
 	"os"
+	"time"
 )
 
 // DumpReader reads all of b to memory and then returns two equivalent
@@ -73,12 +75,60 @@ func ChangedFrom(file, base string) bool {
 	return filest.ModTime().After(basest.ModTime())
 }
 
-type nopCloser struct{ io.Writer }
+// ReadNopCloser is like [io.NopCloser], but reads return [fs.ErrClosed] after
+// the first close.
+//
+// This is especially useful for tests, as readers may be closed which has no
+// effect with io.NopCloser(), and may behave different from production code in
+// some error cases.
+func ReadNopCloser(r io.Reader) io.ReadCloser {
+	return &readNopCloser{r: r}
+}
 
-func (nopCloser) Close() error { return nil }
+type readNopCloser struct {
+	r      io.Reader
+	closed bool
+}
 
-// NopCloser returns a WriteCloser with a no-op Close method.
-func NopCloser(r io.Writer) io.WriteCloser { return nopCloser{r} }
+func (n *readNopCloser) Read(p []byte) (int, error) {
+	if n.closed {
+		return 0, fs.ErrClosed
+	}
+	return n.r.Read(p)
+}
+
+func (n *readNopCloser) Close() error {
+	if n.closed {
+		return fs.ErrClosed
+	}
+	n.closed = true
+	return nil
+}
+
+// WriteNopCloser is the io.Writer variant of [ReadNopCloser].
+func WriteNopCloser(w io.Writer) io.WriteCloser {
+	return &writeNopCloser{w: w}
+}
+
+type writeNopCloser struct {
+	w      io.Writer
+	closed bool
+}
+
+func (n *writeNopCloser) Write(p []byte) (int, error) {
+	if n.closed {
+		return 0, fs.ErrClosed
+	}
+	return n.w.Write(p)
+}
+
+func (n *writeNopCloser) Close() error {
+	if n.closed {
+		return fs.ErrClosed
+	}
+	n.closed = true
+	return nil
+}
 
 // NopWriter is an io.Writer that does nothing.
 type NopWriter struct{}
@@ -316,3 +366,36 @@ func (r *hashReader) Hash() []byte { return r.h.Sum(nil) }
 
 // Len gets the total number of bytes read thus far.
 func (r *hashReader) Len() int { return r.l }
+
+// SlowReader returns a reader that waits after reading chunkSize bytes.
+//
+// This is mainly intended for testing timeouts and such, where you want an
+// intentionally slow reader.
+func SlowReader(r io.Reader, chunkSize int, wait time.Duration) io.Reader {
+	return &slowReader{r: r, c: chunkSize, d: wait}
+}
+
+type slowReader struct {
+	r io.Reader
+	c int
+	d time.Duration
+}
+
+func (r *slowReader) Read(p []byte) (int, error) {
+	time.Sleep(r.d)
+	buf := make([]byte, r.c)
+	n, err := r.r.Read(buf)
+	p = p[:n] // TODO: panics if c > cap(p); for now, that's okay.
+	for i := 0; i < n; i++ {
+		p[i] = buf[i]
+	}
+	return n, err
+}
+
+// Close the underlying reader if it implements a Close method.
+func (r *slowReader) Close() error {
+	if c, ok := r.r.(io.Closer); ok {
+		return c.Close()
+	}
+	return nil
+}

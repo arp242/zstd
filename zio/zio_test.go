@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"net/http"
 	"os"
 	"reflect"
@@ -358,4 +359,102 @@ func TestHashReader(t *testing.T) {
 	if !reflect.DeepEqual(have, want) {
 		t.Errorf("\nhave: %#v\nwant: %#v", have, want)
 	}
+}
+
+func TestReadNopCloser(t *testing.T) {
+	r := ReadNopCloser(strings.NewReader("abcd"))
+	buf := make([]byte, 2)
+	n, err := r.Read(buf)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if n != 2 {
+		t.Fatal(n)
+	}
+	err = r.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	n, err = r.Read(buf)
+	if !errors.Is(err, fs.ErrClosed) {
+		t.Fatal(err)
+	}
+	if n != 0 {
+		t.Fatal(n)
+	}
+}
+
+func TestWriteNopCloser(t *testing.T) {
+	buf := new(bytes.Buffer)
+	r := WriteNopCloser(buf)
+
+	n, err := r.Write([]byte("ab"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if n != 2 {
+		t.Fatal(n)
+	}
+	err = r.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	n, err = r.Write([]byte("cd"))
+	if !errors.Is(err, fs.ErrClosed) {
+		t.Fatal(err)
+	}
+	if n != 0 {
+		t.Fatal(n)
+	}
+}
+
+func TestSlowReader(t *testing.T) {
+	t.Run("", func(t *testing.T) {
+		start := time.Now()
+		r := SlowReader(strings.NewReader("abcd"), 1, 10*time.Millisecond)
+		all, err := io.ReadAll(r)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if h := string(all); h != "abcd" {
+			t.Error(h)
+		}
+		if took := time.Since(start); took < time.Millisecond*40 {
+			t.Errorf("too fast: %s", took)
+		}
+	})
+
+	t.Run("", func(t *testing.T) {
+		start := time.Now()
+		r := SlowReader(strings.NewReader("abcd"), 1, 10*time.Millisecond)
+
+		var all []byte
+		for {
+			buf := make([]byte, 4)
+			n, err := r.Read(buf)
+			if err != nil {
+				if err == io.EOF {
+					break
+				}
+				t.Fatal(err)
+			}
+			all = append(all, buf[:n]...)
+		}
+		if h := string(all); h != "abcd" {
+			t.Error(h)
+		}
+		if took := time.Since(start); took < time.Millisecond*40 {
+			t.Errorf("too fast: %s", took)
+		}
+	})
+
+	// t.Run("", func(t *testing.T) {
+	// 	r := SlowReader(strings.NewReader("abcd"), 2, 10*time.Millisecond)
+
+	// 	buf := make([]byte, 1)
+	// 	n, err := r.Read(buf)
+	// 	fmt.Println(n, err, string(buf))
+	// })
 }
