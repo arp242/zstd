@@ -191,6 +191,11 @@ func (r Range) String() string {
 		return s
 	}
 
+	// Entire year
+	if r.Start.Year() == r.End.Year() && r.Start.Month() == 1 && r.Start.Day() == 1 && r.End.Month() == 12 && r.End.Day() == 31 {
+		return strconv.Itoa(r.Start.Year())
+	}
+
 	// Selected one full month, display as month name.
 	if d.Months == 0 && r.Start.Day() == 1 && LastInMonth(r.End) {
 		return r.Start.Format(addYear(r.Start, "January"))
