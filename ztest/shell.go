@@ -4,7 +4,6 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
-	"syscall"
 	"testing"
 )
 
@@ -55,30 +54,6 @@ func Symlink(t *testing.T, target string, link ...string) {
 	err := os.Symlink(target, join(link...))
 	if err != nil {
 		t.Fatalf("ztest.Symlink(%q, %q): %s", target, join(link...), err)
-	}
-}
-
-// mkfifo
-func Mkfifo(t *testing.T, path ...string) {
-	t.Helper()
-	if len(path) < 1 {
-		t.Fatalf("ztest.Mkfifo: path must have at least one element: %s", path)
-	}
-	err := syscall.Mkfifo(join(path...), 0o644)
-	if err != nil {
-		t.Fatalf("ztest.Mkfifo(%q): %s", join(path...), err)
-	}
-}
-
-// mknod
-func Mknod(t *testing.T, dev int, path ...string) {
-	t.Helper()
-	if len(path) < 1 {
-		t.Fatalf("ztest.Mknod: path must have at least one element: %s", path)
-	}
-	err := syscall.Mknod(join(path...), 0o644, dev)
-	if err != nil {
-		t.Fatalf("ztest.Mknod(%d, %q): %s", dev, join(path...), err)
 	}
 }
 
