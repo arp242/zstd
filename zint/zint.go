@@ -6,6 +6,8 @@ import (
 	"math"
 	"strconv"
 	"strings"
+
+	"zgo.at/zstd/zstrconv"
 )
 
 type integer interface {
@@ -32,17 +34,17 @@ func Join[T integer](ints []T, sep string) string {
 	return strings.Join(s, sep)
 }
 
-// Split a string to a slice of []int64.
-func Split(s string, sep string) ([]int64, error) {
+// Split a string to a slice of integers.
+func Split[T integer](s string, sep string) ([]T, error) {
 	s = strings.Trim(s, " \t\n"+sep)
 	if len(s) == 0 {
 		return nil, nil
 	}
 
 	items := strings.Split(s, sep)
-	ret := make([]int64, len(items))
+	ret := make([]T, len(items))
 	for i := range items {
-		val, err := strconv.ParseInt(strings.TrimSpace(items[i]), 10, 64)
+		val, err := zstrconv.ParseInt[T](strings.TrimSpace(items[i]), 10)
 		if err != nil {
 			return nil, err
 		}
@@ -216,11 +218,11 @@ func RoundToPowerOf2(n uint64) uint64 {
 
 // Fields splits a strings with strings.Fields() and parses each entry as an
 // integer.
-func Fields(s string) ([]int64, error) {
+func Fields[T integer](s string) ([]T, error) {
 	sf := strings.Fields(s)
-	nf := make([]int64, len(sf))
+	nf := make([]T, len(sf))
 	for i, f := range sf {
-		n, err := strconv.ParseInt(f, 0, 64)
+		n, err := zstrconv.ParseInt[T](f, 0)
 		if err != nil {
 			return nil, fmt.Errorf("zint.Fields: parsing entry %d in %q: %w", i, s, err)
 		}
