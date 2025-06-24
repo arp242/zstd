@@ -120,6 +120,30 @@ func Values(t any, tagname, skip string) []any {
 	return vals
 }
 
+// DerefValue calls Elem() until the value is no longer a pointer.
+//
+// This is safe to call on non-pointers, the bool return indicates if it was a
+// pointer.
+func DerefValue(v reflect.Value) (reflect.Value, bool) {
+	var ptr bool
+	for v.Kind() == reflect.Ptr {
+		v, ptr = v.Elem(), true
+	}
+	return v, ptr
+}
+
+// DerefType calls Elem() until the value is no longer a pointer.
+//
+// This is safe to call on non-pointers, the bool return indicates if it was a
+// pointer.
+func DerefType(t reflect.Type) (reflect.Type, bool) {
+	var ptr bool
+	for t.Kind() == reflect.Ptr {
+		t, ptr = t.Elem(), true
+	}
+	return t, ptr
+}
+
 func contains[S ~[]E, E comparable](s S, v E) bool {
 	for i := range s {
 		if v == s[i] {

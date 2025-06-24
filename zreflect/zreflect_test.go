@@ -281,3 +281,51 @@ func BenchmarkValues(b *testing.B) {
 	}
 	g1 = v1
 }
+
+func TestDerefValue(t *testing.T) {
+	tests := []struct {
+		in      any
+		want    string
+		wantPtr bool
+	}{
+		{"x", "x", false},
+		{ztype.Ptr("x"), "x", true},
+		{ztype.Ptr(ztype.Ptr("x")), "x", true},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			have, havePtr := DerefValue(reflect.ValueOf(tt.in))
+			if have.Interface() != tt.want {
+				t.Errorf("\nhave: %q\nwant: %q", have, tt.want)
+			}
+			if havePtr != tt.wantPtr {
+				t.Errorf("\nhave: %v\nwant: %v", havePtr, tt.wantPtr)
+			}
+		})
+	}
+}
+
+func TestDerefType(t *testing.T) {
+	tests := []struct {
+		in      any
+		want    string
+		wantPtr bool
+	}{
+		{"x", "x", false},
+		{ztype.Ptr("x"), "x", true},
+		{ztype.Ptr(ztype.Ptr("x")), "x", true},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			have, havePtr := DerefType(reflect.TypeOf(tt.in))
+			if have != reflect.TypeOf(tt.want) {
+				t.Errorf("\nhave: %q\nwant: %q", have, tt.want)
+			}
+			if havePtr != tt.wantPtr {
+				t.Errorf("\nhave: %v\nwant: %v", havePtr, tt.wantPtr)
+			}
+		})
+	}
+}
