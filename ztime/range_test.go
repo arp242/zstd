@@ -297,8 +297,7 @@ func TestRangeString(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
-			SetNow(t, tt.now)
-
+			rangeNow = func() time.Time { return FromString(tt.now) }
 			have := NewRange(FromString(tt.start)).To(FromString(tt.end)).String()
 			if have != tt.want {
 				t.Errorf("\nhave: %q\nwant: %q", have, tt.want)

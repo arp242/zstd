@@ -169,6 +169,8 @@ func (r Range) Last(p Period) Range {
 	return r
 }
 
+var rangeNow = func() time.Time { return time.Now() }
+
 // String shows the range from start to end as a human-readable representation;
 // e.g. "current week", "last week", "previous month", etc.
 //
@@ -180,7 +182,7 @@ func (r Range) String() string {
 	if r.locale.Today == nil {
 		r.locale = DefaultRangeLocale
 	}
-	today := StartOf(Now().In(r.Start.Location()), Day)
+	today := StartOf(rangeNow().In(r.Start.Location()), Day)
 	r.Start, r.End = StartOf(r.Start, Day), StartOf(r.End, Day)
 
 	d := r.Diff(Day, Month)

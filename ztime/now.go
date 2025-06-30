@@ -1,26 +1,24 @@
 package ztime
 
 import (
-	"testing"
+	"context"
 	"time"
 )
 
-// Now returns the current time as UTC.
-//
-// This can be swapped out in tests with SetNow()
-//
-// TODO: this shouldn't use .UTC(), at least not by default.
-var Now = func() time.Time { return time.Now().UTC() }
+var ctxkey = &struct{ n string }{"now"}
 
-// SetNow sets Now() and restores it when the test finishes.
+// Now returns the time on the context, if any.
 //
-// The date is parsed with FromString().
-func SetNow(t *testing.T, s string) {
-	t.Helper()
+// Returns just time.Now().UTC() if there is no time on the context.
+func Now(ctx context.Context) time.Time {
+	t, ok := ctx.Value(ctxkey).(time.Time)
+	if ok {
+		return t.UTC()
+	}
+	return time.Now().UTC()
+}
 
-	d := FromString(s)
-	Now = func() time.Time { return d }
-	t.Cleanup(func() {
-		Now = func() time.Time { return time.Now().UTC() }
-	})
+// WithNow returns a context with the time set.
+func WithNow(ctx context.Context, t time.Time) context.Context {
+	return context.WithValue(ctx, ctxkey, t)
 }
