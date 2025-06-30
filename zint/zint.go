@@ -15,16 +15,6 @@ type integer interface {
 		~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64 | ~uintptr
 }
 
-// Int with various methods to make conversions easier; useful especially in
-// templates etc.
-type Int int
-
-func (s Int) String() string   { return strconv.FormatInt(int64(s), 10) }
-func (s Int) Int() int         { return int(s) }
-func (s Int) Int64() int64     { return int64(s) }
-func (s Int) Float32() float32 { return float32(s) }
-func (s Int) Float64() float64 { return float64(s) }
-
 // Join a slice of ints to a comma separated string with the given separator.
 func Join[T integer](ints []T, sep string) string {
 	s := make([]string, len(ints))
