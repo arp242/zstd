@@ -107,7 +107,7 @@ func (d Durations) Len() int {
 }
 
 // Sum returns the sum of all durations in this list.
-func (d Durations) Sum() time.Duration {
+func (d *Durations) Sum() time.Duration {
 	if d.modified {
 		d.mu.Lock()
 		defer d.mu.Unlock()
@@ -144,7 +144,7 @@ func (d Durations) Min() time.Duration {
 }
 
 // Max returns the maximum value in this list.
-func (d Durations) Max() time.Duration {
+func (d *Durations) Max() time.Duration {
 	if d.modified {
 		d.mu.Lock()
 		defer d.mu.Unlock()

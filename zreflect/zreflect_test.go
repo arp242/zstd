@@ -29,10 +29,10 @@ func TestTag(t *testing.T) {
 		{
 			func() reflect.StructField {
 				return reflect.TypeOf(struct {
-					XXX string `json:"xxx,opt1,opt2" db:"yyy"`
+					XXX string `tagname:"xxx,opt1,opt2" db:"yyy"`
 				}{}).Field(0)
 			}(),
-			"json",
+			"tagname",
 			"xxx", []string{"opt1", "opt2"},
 		},
 

@@ -20,6 +20,7 @@ func TestCreateNew(t *testing.T) {
 	if err == nil {
 		t.Fatal("error is nil")
 	}
+	fp.Close()
 
 	// 0 byte, re-open
 	fp, err = CreateNew(tmp, true)
@@ -36,6 +37,7 @@ func TestCreateNew(t *testing.T) {
 	if err == nil {
 		t.Fatal("error is nil")
 	}
+	fp.Close()
 
 	have, err := os.ReadFile(tmp)
 	if err != nil {

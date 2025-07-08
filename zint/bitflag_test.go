@@ -43,7 +43,7 @@ func TestBitflag(t *testing.T) {
 			t.Fatal(err)
 		}
 		if string(j) != "3" {
-			t.Errorf(string(j))
+			t.Error(string(j))
 		}
 
 		var nf Bitflag8

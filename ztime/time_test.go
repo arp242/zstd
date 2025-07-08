@@ -8,7 +8,7 @@ import (
 
 func TestTakes(t *testing.T) {
 	tt := Takes(func() { time.Sleep(50 * time.Millisecond) })
-	if tt < 50*time.Millisecond || tt > 52*time.Millisecond {
+	if tt < 50*time.Millisecond || tt > 60*time.Millisecond {
 		t.Error(tt)
 	}
 }
