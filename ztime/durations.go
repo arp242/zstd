@@ -99,68 +99,36 @@ func (d *Durations) appendWithData(add time.Duration, data any) {
 	d.data[d.off+len(d.list)-1] = data
 }
 
-// Len returns the number of durations in this list.
-func (d Durations) Len() int {
-	d.mu.Lock()
-	defer d.mu.Unlock()
-	return len(d.list)
+func (d *Durations) calc() {
+	if d.modified {
+		d.mu.Lock()
+		defer d.mu.Unlock()
+
+		d.min, d.max, d.sum = math.MaxInt64, 0, 0
+		for _, l := range d.list {
+			d.sum += l
+			if l > d.max {
+				d.max = l
+			}
+			if l < d.min {
+				d.min = l
+			}
+		}
+		d.modified = false
+	}
 }
+
+// Len returns the number of durations in this list.
+func (d Durations) Len() int { d.mu.Lock(); defer d.mu.Unlock(); return len(d.list) }
 
 // Sum returns the sum of all durations in this list.
-func (d *Durations) Sum() time.Duration {
-	if d.modified {
-		d.mu.Lock()
-		defer d.mu.Unlock()
-
-		var sum time.Duration
-		for _, l := range d.list {
-			sum += l
-		}
-		d.sum = sum
-		d.modified = false
-	}
-	return d.sum
-}
+func (d *Durations) Sum() time.Duration { d.calc(); return d.sum }
 
 // Min returns the minimum value in this list.
-func (d Durations) Min() time.Duration {
-	if d.Len() == 0 {
-		return 0
-	}
-	if d.modified {
-		d.mu.Lock()
-		defer d.mu.Unlock()
-
-		m := time.Duration(math.MaxInt64)
-		for _, l := range d.list {
-			if l < m {
-				m = l
-			}
-		}
-		d.min = m
-		d.modified = false
-	}
-	return d.min
-}
+func (d *Durations) Min() time.Duration { d.calc(); return d.min }
 
 // Max returns the maximum value in this list.
-func (d *Durations) Max() time.Duration {
-	if d.modified {
-		d.mu.Lock()
-		defer d.mu.Unlock()
-
-		var m time.Duration
-		for _, l := range d.list {
-			if l > m {
-				m = l
-			}
-		}
-
-		d.max = m
-		d.modified = false
-	}
-	return d.max
-}
+func (d *Durations) Max() time.Duration { d.calc(); return d.max }
 
 // Mean returns the mean average of the durations in this list.
 func (d Durations) Mean() time.Duration {
@@ -175,7 +143,6 @@ func (d Durations) Median() time.Duration {
 	if d.Len() == 0 {
 		return 0
 	}
-
 	cpy := d.copyAndSort()
 	return cpy[len(cpy)/2]
 }
