@@ -1,4 +1,4 @@
-//go:build unix && !freebsd
+//go:build freebsd
 
 package ztest
 
@@ -25,7 +25,7 @@ func Mknod(t *testing.T, dev int, path ...string) {
 	if len(path) < 1 {
 		t.Fatalf("ztest.Mknod: path must have at least one element: %s", path)
 	}
-	err := syscall.Mknod(join(path...), 0o644, dev)
+	err := syscall.Mknod(join(path...), 0o644, uint64(dev))
 	if err != nil {
 		t.Fatalf("ztest.Mknod(%d, %q): %s", dev, join(path...), err)
 	}
