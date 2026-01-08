@@ -3,6 +3,7 @@ package zreflect
 
 import (
 	"reflect"
+	"slices"
 	"strings"
 )
 
@@ -24,12 +25,12 @@ func Tag(field reflect.StructField, tag string) (string, []string) {
 // Fields gets all exported fields for the struct t, as a slice of names,
 // values, and tag options, in the order they are in the struct.
 //
-// If tag is not an "" it will use the tag name as the field name, falling back
-// to the field name if it's not set. Tags with a value of "-" will be skipped.
+// If tag is not "" it will use the tag name as the field name, falling back to
+// the field name if it's not set. Tags with a value of "-" will be skipped.
 //
-// Fields will be skipped if the option given in skip is set in the tag.
+// Fields are skipped if the option given in skip is set in the tag.
 //
-// It will panic if t is not a struct.
+// It panics if t is not a struct.
 //
 // For example:
 //
@@ -41,19 +42,15 @@ func Tag(field reflect.StructField, tag string) (string, []string) {
 //
 //	Fields(t, "db", "noinsert")
 //
-// Will return:
+// Returns:
 //
 //	[]string{"one", "Three"}
 //	[]any{"xxx", 42}
 //	[][]string{nil, []string{"noinsert"}}
 func Fields(t any, tagname, skip string) (names []string, vals []any, opts [][]string) {
-	var (
-		values = reflect.ValueOf(t)
-		types  = reflect.TypeOf(t)
-	)
+	values, types := reflect.ValueOf(t), reflect.TypeOf(t)
 	for values.Kind() == reflect.Ptr {
-		values = values.Elem()
-		types = types.Elem()
+		values, types = values.Elem(), types.Elem()
 	}
 
 	if tagname == "" && skip != "" {
@@ -64,9 +61,7 @@ func Fields(t any, tagname, skip string) (names []string, vals []any, opts [][]s
 	}
 
 	n := values.NumField()
-	names = make([]string, 0, n)
-	vals = make([]any, 0, n)
-	opts = make([][]string, 0, n)
+	names, vals, opts = make([]string, 0, n), make([]any, 0, n), make([][]string, 0, n)
 	for i := 0; n > i; i++ {
 		t := types.Field(i)
 		if !t.IsExported() {
@@ -83,7 +78,7 @@ func Fields(t any, tagname, skip string) (names []string, vals []any, opts [][]s
 		var opt []string
 		if tagname != "" {
 			tname, o := Tag(t, tagname)
-			if tname == "-" || contains(o, skip) {
+			if tname == "-" || slices.Contains(o, skip) {
 				continue
 			}
 			if tname != "" {
@@ -92,9 +87,9 @@ func Fields(t any, tagname, skip string) (names []string, vals []any, opts [][]s
 			opt = o
 		}
 
-		names = append(names, name)
-		vals = append(vals, values.Field(i).Interface())
-		opts = append(opts, opt)
+		names, vals, opts = append(names, name),
+			append(vals, values.Field(i).Interface()),
+			append(opts, opt)
 	}
 	return names, vals, opts
 }
@@ -142,13 +137,4 @@ func DerefType(t reflect.Type) (reflect.Type, bool) {
 		t, ptr = t.Elem(), true
 	}
 	return t, ptr
-}
-
-func contains[S ~[]E, E comparable](s S, v E) bool {
-	for i := range s {
-		if v == s[i] {
-			return true
-		}
-	}
-	return false
 }

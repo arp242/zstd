@@ -2,10 +2,12 @@
 package zslice
 
 import (
+	"cmp"
 	"crypto/rand"
 	"fmt"
 	"math/big"
 	mrand "math/rand"
+	"slices"
 	"sort"
 	"sync"
 	"time"
@@ -49,7 +51,7 @@ func Shuffle[T any](list []T) {
 // ContainsAny reports whether any of the strings are in the list
 func ContainsAny[T comparable](list []T, find ...T) bool {
 	for _, s := range find {
-		if contains(list, s) {
+		if slices.Contains(list, s) {
 			return true
 		}
 	}
@@ -57,7 +59,7 @@ func ContainsAny[T comparable](list []T, find ...T) bool {
 }
 
 // UniqSort removes duplicate entries from list; the list will be sorted.
-func UniqSort[T ordered](list []T) []T {
+func UniqSort[T cmp.Ordered](list []T) []T {
 	sort.Slice(list, func(i, j int) bool { return list[i] < list[j] })
 	var last T
 	l := list[:0]
@@ -87,7 +89,7 @@ func Uniq[T comparable](list []T) []T {
 }
 
 // IsUniq reports if the list contains unique values.
-func IsUniq[T ordered](list []T) bool {
+func IsUniq[T cmp.Ordered](list []T) bool {
 	return len(list) == len(UniqSort(list))
 }
 
@@ -130,7 +132,7 @@ func RemoveIndexes[T any](l *[]T, indexes ...int) {
 }
 
 // Max gets the highest value from a list.
-func Max[T ordered](list []T) T {
+func Max[T cmp.Ordered](list []T) T {
 	var max T
 	for _, n := range list {
 		if n > max {
@@ -141,7 +143,7 @@ func Max[T ordered](list []T) T {
 }
 
 // Min gets the lowest value from a list.
-func Min[T ordered](list []T) T {
+func Min[T cmp.Ordered](list []T) T {
 	var min T
 	for _, n := range list {
 		if n < min {
@@ -158,7 +160,7 @@ func Difference[T comparable](set []T, others ...[]T) []T {
 	for _, setItem := range set {
 		found := false
 		for _, o := range others {
-			if contains(o, setItem) {
+			if slices.Contains(o, setItem) {
 				found = true
 				break
 			}
@@ -174,7 +176,7 @@ func Difference[T comparable](set []T, others ...[]T) []T {
 func Intersect[T comparable](a, b []T) []T {
 	c := make([]T, 0, len(a))
 	for _, v := range a {
-		if contains(b, v) {
+		if slices.Contains(b, v) {
 			c = append(c, v)
 		}
 	}
@@ -184,18 +186,18 @@ func Intersect[T comparable](a, b []T) []T {
 // SameElements reports if the two slices have the same elements.
 //
 // This is similar to [slices.Equal], but doesn't take order in to account.
-func SameElements[T ordered](a, b []T) bool {
+func SameElements[T cmp.Ordered](a, b []T) bool {
 	if len(a) != len(b) {
 		return false
 	}
 
 	// TODO: there is probably a better way of doing this; dropping the sort
 	//       would also allow cmp.Ordered to be comparable.
-	aCp := clone(a)
-	bCp := clone(b)
+	aCp := slices.Clone(a)
+	bCp := slices.Clone(b)
 	sort.Slice(aCp, func(i, j int) bool { return aCp[i] < aCp[j] })
 	sort.Slice(bCp, func(i, j int) bool { return bCp[i] < bCp[j] })
-	return equal(aCp, bCp)
+	return slices.Equal(aCp, bCp)
 }
 
 // Copy a slice.
@@ -256,39 +258,4 @@ func LastIndex[S ~[]E, E comparable](s S, v E) int {
 		}
 	}
 	return -1
-}
-
-// Go 1.19 compat stuff.
-
-type ordered interface {
-	~int | ~int8 | ~int16 | ~int32 | ~int64 |
-		~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64 | ~uintptr |
-		~float32 | ~float64 |
-		~string
-}
-
-func contains[S ~[]E, E comparable](s S, v E) bool {
-	for i := range s {
-		if v == s[i] {
-			return true
-		}
-	}
-	return false
-}
-
-func equal[S ~[]E, E comparable](s1, s2 S) bool {
-	if len(s1) != len(s2) {
-		return false
-	}
-	for i := range s1 {
-		if s1[i] != s2[i] {
-			return false
-		}
-	}
-	return true
-}
-
-func clone[S ~[]E, E any](s S) S {
-	// The s[:0:0] preserves nil in case it matters.
-	return append(s[:0:0], s...)
 }
