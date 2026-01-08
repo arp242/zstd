@@ -135,63 +135,28 @@ func TempFiles(t *testing.T, nameData ...string) string {
 
 	dir := t.TempDir()
 	for i := 0; i < len(nameData); i += 2 {
-		tempFile(t, dir, nameData[i], nameData[i+1])
+		tempFile(t, filepath.Join(dir, nameData[i]), nameData[i+1])
 	}
 	return dir
 }
 
 // TempFile creates a new temporary file and returns the path.
-//
-// The name is the filename to use; a "*" will be replaced with a random string,
-// if it doesn't then it will create a file with exactly that name. If name is
-// empty then it will use "ztest.*".
-//
-// The file will be removed when the test ends.
 func TempFile(t *testing.T, name, data string) string {
 	t.Helper()
-	return tempFile(t, t.TempDir(), name, data)
+	if name == "" {
+		name = "ztest"
+	}
+	name = filepath.Join(t.TempDir(), name)
+	tempFile(t, name, data)
+	return name
 }
 
-func tempFile(t *testing.T, dir, name, data string) string {
+func tempFile(t *testing.T, path, data string) {
 	t.Helper()
-
-	if name == "" {
-		name = "ztest.*"
-	}
-
-	var (
-		fp  *os.File
-		err error
-	)
-	if strings.Contains(name, "*") {
-		fp, err = os.CreateTemp(dir, name)
-	} else {
-		fp, err = os.Create(filepath.Join(dir, name))
-	}
+	err := os.WriteFile(path, []byte(data), 0o666)
 	if err != nil {
-		t.Fatalf("ztest.TempFile: could not create file in %v: %v", dir, err)
+		t.Fatalf("ztest.TempFile: %s", err)
 	}
-
-	defer func() {
-		err := fp.Close()
-		if err != nil {
-			t.Fatalf("ztest.TempFile: close: %v", err)
-		}
-	}()
-
-	_, err = fp.WriteString(data)
-	if err != nil {
-		t.Fatalf("ztest.TempFile: write: %v", err)
-	}
-
-	t.Cleanup(func() {
-		err := os.Remove(fp.Name())
-		if err != nil {
-			t.Errorf("ztest.TempFile: cannot remove %#v: %v", fp.Name(), err)
-		}
-	})
-
-	return fp.Name()
 }
 
 // NormalizeIndent removes tab indentation from every line.
