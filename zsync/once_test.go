@@ -36,11 +36,11 @@ func TestOnce(t *testing.T) {
 	go run(t, once, "x", o, true, c)
 	time.Sleep(25 * time.Millisecond)
 
-	for i := 0; i < N; i++ {
+	for range N {
 		go run(t, once, "x", o, false, c)
 	}
 	go run(t, once, "y", o2, true, c)
-	for i := 0; i < N+2; i++ {
+	for range N + 2 {
 		<-c
 	}
 	if *o != 1 {

@@ -5,6 +5,7 @@ package zos
 import (
 	"fmt"
 	"os"
+	"slices"
 	"syscall"
 )
 
@@ -25,10 +26,8 @@ func Readable(s os.FileInfo) (bool, error) {
 	if err != nil {
 		return false, fmt.Errorf("zos.Readable: %w", err)
 	}
-	for _, gid := range gids {
-		if int(stat.Gid) == gid {
-			return perm.Group.Read, nil
-		}
+	if slices.Contains(gids, int(stat.Gid)) {
+		return perm.Group.Read, nil
 	}
 
 	return perm.Other.Read, nil
@@ -51,10 +50,8 @@ func Writable(s os.FileInfo) (bool, error) {
 	if err != nil {
 		return false, fmt.Errorf("zos.Writable: %w", err)
 	}
-	for _, gid := range gids {
-		if int(stat.Gid) == gid {
-			return perm.Group.Read, nil
-		}
+	if slices.Contains(gids, int(stat.Gid)) {
+		return perm.Group.Read, nil
 	}
 
 	return perm.Other.Write, nil

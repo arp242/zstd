@@ -3,7 +3,7 @@ package ztime
 import (
 	"fmt"
 	"math"
-	"sort"
+	"slices"
 	"sync"
 	"time"
 )
@@ -267,6 +267,6 @@ func (d Durations) copyAndSort() []time.Duration {
 	copy(cpy, d.list)
 	d.mu.Unlock()
 
-	sort.Slice(cpy, func(i, j int) bool { return cpy[i] < cpy[j] })
+	slices.Sort(cpy)
 	return cpy
 }

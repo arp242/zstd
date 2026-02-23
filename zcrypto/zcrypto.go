@@ -100,7 +100,7 @@ var max = big.NewInt(0).SetUint64(1e19)
 
 func secret(n int) string {
 	var key strings.Builder
-	for i := 0; i < n; i++ {
+	for range n {
 		n, err := rand.Int(rand.Reader, max)
 		if err != nil {
 			panic(fmt.Errorf("zcrypto.Secret: %w", err))

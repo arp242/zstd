@@ -62,16 +62,16 @@ func (i *Uint128) New(b []byte) error {
 }
 
 func (i *Uint128) Parse(str string, base int) error {
-	d := strings.Index(str, "-")
-	if d == -1 {
+	before, after, ok := strings.Cut(str, "-")
+	if !ok {
 		return fmt.Errorf("*Uint128.Parse: invalid format")
 	}
 
-	l, err := strconv.ParseUint(str[d+1:], base, 64)
+	l, err := strconv.ParseUint(after, base, 64)
 	if err != nil {
 		return fmt.Errorf("Uint128.Parse: L: %w", err)
 	}
-	h, err := strconv.ParseUint(str[:d], base, 64)
+	h, err := strconv.ParseUint(before, base, 64)
 	if err != nil {
 		return fmt.Errorf("Uint128.Parse: H: %w", err)
 	}

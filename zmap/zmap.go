@@ -3,7 +3,7 @@ package zmap
 
 import (
 	"cmp"
-	"sort"
+	"slices"
 )
 
 // Keys returns an unsorted list of keys of the map.
@@ -18,7 +18,7 @@ func Keys[M ~map[K]V, K cmp.Ordered, V any](m M) []K {
 // KeysOrdered returns the sorted keys of the map.
 func KeysOrdered[M ~map[K]V, K cmp.Ordered, V any](m M) []K {
 	r := Keys(m)
-	sort.Slice(r, func(i, j int) bool { return r[i] < r[j] })
+	slices.Sort(r)
 	return r
 }
 

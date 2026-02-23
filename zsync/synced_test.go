@@ -37,7 +37,7 @@ func TestSynced(t *testing.T) {
 		s := zsync.NewSynced[int](0)
 
 		var wg sync.WaitGroup
-		for i := 0; i < 100; i++ {
+		for i := range 100 {
 			func(i int) {
 				wg.Add(1)
 				go func() {

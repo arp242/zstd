@@ -47,7 +47,7 @@ func Split[T integer](s string, sep string) ([]T, error) {
 // Range creates an []int counting at "start" up to (and including) "end".
 func Range(start, end int) []int {
 	rng := make([]int, end-start+1)
-	for i := 0; i < len(rng); i++ {
+	for i := range rng {
 		rng[i] = start + i
 	}
 	return rng

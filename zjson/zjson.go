@@ -62,7 +62,7 @@ func UnmarshalTo(data []byte, target reflect.Type) (any, error) {
 	if target == nil {
 		return nil, errors.New("zjson.UnmarshalTo: target is nil")
 	}
-	for target.Kind() == reflect.Ptr {
+	for target.Kind() == reflect.Pointer {
 		target = target.Elem()
 	}
 

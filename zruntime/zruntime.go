@@ -8,6 +8,7 @@ import (
 	"os"
 	"reflect"
 	"runtime"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -26,12 +27,7 @@ func Test() bool {
 
 // TestVerbose reports if the test was started with the -v flag.
 func TestVerbose() bool {
-	for _, a := range os.Args[1:] {
-		if a == "-test.v=true" {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(os.Args[1:], "-test.v=true")
 }
 
 // FuncName gets the name of a function.
@@ -150,7 +146,7 @@ func sizeOf(v reflect.Value, seen map[uintptr]bool) uintptr {
 	size := v.Type().Size()
 
 	switch v.Kind() {
-	case reflect.Ptr:
+	case reflect.Pointer:
 		p := v.Pointer()
 		if !seen[p] && !v.IsNil() {
 			seen[p] = true
@@ -162,7 +158,7 @@ func sizeOf(v reflect.Value, seen map[uintptr]bool) uintptr {
 
 	case reflect.Slice:
 		n := v.Len()
-		for i := 0; i < n; i++ {
+		for i := range n {
 			size += sizeOf(v.Index(i), seen)
 		}
 
@@ -201,7 +197,7 @@ func sizeOf(v reflect.Value, seen map[uintptr]bool) uintptr {
 		for i := 0; i < v.NumField(); i++ {
 			f := v.Field(i)
 			switch f.Kind() {
-			case reflect.Ptr:
+			case reflect.Pointer:
 				p := f.Pointer()
 				if !seen[p] && !f.IsNil() {
 					seen[p] = true

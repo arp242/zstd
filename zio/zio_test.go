@@ -156,7 +156,7 @@ func TestPeekReader(t *testing.T) {
 
 	t.Run("multiple reads from peeked", func(t *testing.T) {
 		r := PeekReader(strings.NewReader("de"), []byte("abc"))
-		for i := 0; i < 5; i++ {
+		for i := range 5 {
 			buf := make([]byte, 1)
 			n, err := r.Read(buf)
 			if err != nil {

@@ -49,7 +49,7 @@ func Tag(field reflect.StructField, tag string) (string, []string) {
 //	[][]string{nil, []string{"noinsert"}}
 func Fields(t any, tagname, skip string) (names []string, vals []any, opts [][]string) {
 	values, types := reflect.ValueOf(t), reflect.TypeOf(t)
-	for values.Kind() == reflect.Ptr {
+	for values.Kind() == reflect.Pointer {
 		values, types = values.Elem(), types.Elem()
 	}
 
@@ -121,7 +121,7 @@ func Values(t any, tagname, skip string) []any {
 // pointer.
 func DerefValue(v reflect.Value) (reflect.Value, bool) {
 	var ptr bool
-	for v.Kind() == reflect.Ptr {
+	for v.Kind() == reflect.Pointer {
 		v, ptr = v.Elem(), true
 	}
 	return v, ptr
@@ -133,7 +133,7 @@ func DerefValue(v reflect.Value) (reflect.Value, bool) {
 // pointer.
 func DerefType(t reflect.Type) (reflect.Type, bool) {
 	var ptr bool
-	for t.Kind() == reflect.Ptr {
+	for t.Kind() == reflect.Pointer {
 		t, ptr = t.Elem(), true
 	}
 	return t, ptr

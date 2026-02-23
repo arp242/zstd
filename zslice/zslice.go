@@ -8,7 +8,6 @@ import (
 	"math/big"
 	mrand "math/rand"
 	"slices"
-	"sort"
 	"sync"
 	"time"
 )
@@ -60,7 +59,7 @@ func ContainsAny[T comparable](list []T, find ...T) bool {
 
 // UniqSort removes duplicate entries from list; the list will be sorted.
 func UniqSort[T cmp.Ordered](list []T) []T {
-	sort.Slice(list, func(i, j int) bool { return list[i] < list[j] })
+	slices.Sort(list)
 	var last T
 	l := list[:0]
 	for _, str := range list {
@@ -96,7 +95,7 @@ func IsUniq[T cmp.Ordered](list []T) bool {
 // Repeat returns a slice with the value v repeated n times.
 func Repeat[T any](s T, n int) []T {
 	r := make([]T, 0, n)
-	for i := 0; i < n; i++ {
+	for range n {
 		r = append(r, s)
 	}
 	return r
@@ -195,8 +194,8 @@ func SameElements[T cmp.Ordered](a, b []T) bool {
 	//       would also allow cmp.Ordered to be comparable.
 	aCp := slices.Clone(a)
 	bCp := slices.Clone(b)
-	sort.Slice(aCp, func(i, j int) bool { return aCp[i] < aCp[j] })
-	sort.Slice(bCp, func(i, j int) bool { return bCp[i] < bCp[j] })
+	slices.Sort(aCp)
+	slices.Sort(bCp)
 	return slices.Equal(aCp, bCp)
 }
 

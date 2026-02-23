@@ -95,7 +95,7 @@ func (b Bool) Value() (driver.Value, error) {
 
 // MarshalJSON converts the data to JSON.
 func (b Bool) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%t", b)), nil
+	return fmt.Appendf(nil, "%t", b), nil
 }
 
 // UnmarshalJSON converts the data from JSON.
@@ -114,7 +114,7 @@ func (b *Bool) UnmarshalJSON(text []byte) error {
 
 // MarshalText converts the data to a human readable representation.
 func (b Bool) MarshalText() ([]byte, error) {
-	return []byte(fmt.Sprintf("%t", b)), nil
+	return fmt.Appendf(nil, "%t", b), nil
 }
 
 // UnmarshalText parses text in to the Go data structure.

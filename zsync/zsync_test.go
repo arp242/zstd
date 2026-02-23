@@ -65,7 +65,7 @@ func TestAtomicInt(t *testing.T) {
 	}
 
 	// For go test -race to ensure there are no data races.
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		go func(ii int) { atom.Set(int32(ii)) }(i)
 		go func(ii int) { atom.Value() }(i)
 	}
@@ -91,7 +91,7 @@ func TestAtomicInt64(t *testing.T) {
 	}
 
 	// For go test -race to ensure there are no data races.
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		go func(ii int) { atom.Set(int64(ii)) }(i)
 		go func(ii int) { atom.Value() }(i)
 	}

@@ -186,12 +186,12 @@ func NormalizeIndent(in string) string {
 		indent++
 	}
 
-	r := ""
+	var r strings.Builder
 	for _, line := range strings.Split(in, "\n") {
-		r += strings.Replace(line, "\t", "", indent) + "\n"
+		r.WriteString(strings.Replace(line, "\t", "", indent) + "\n")
 	}
 
-	return strings.TrimSpace(r)
+	return strings.TrimSpace(r.String())
 }
 
 // R recovers a panic and cals t.Fatal().

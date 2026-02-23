@@ -500,18 +500,18 @@ func TestUnwrap(t *testing.T) {
 func BenchmarkUnwrap(b *testing.B) {
 	var (
 		l = strings.Repeat("Hello, world, test. ", 4) + "\n"
-		s string
+		s strings.Builder
 	)
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		if i > 0 {
-			s += "\n"
+			s.WriteString("\n")
 		}
-		s += strings.Repeat(l, 3)
+		s.WriteString(strings.Repeat(l, 3))
 	}
 
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
-		Unwrap(s)
+		Unwrap(s.String())
 	}
 }
 

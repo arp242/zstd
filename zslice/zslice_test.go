@@ -22,7 +22,7 @@ func TestChoose(t *testing.T) {
 		l   = []int{1, 2, 3}
 		rnd = make([]int, 0, 100)
 	)
-	for i := 0; i < 100; i++ {
+	for range 100 {
 		rnd = append(rnd, Choose(l))
 	}
 
@@ -70,7 +70,7 @@ func TestShuffle(t *testing.T) {
 		var (
 			rnd = make([]int, 0, 100)
 		)
-		for i := 0; i < 100; i++ {
+		for range 100 {
 			l := []int{1, 2, 3}
 			Shuffle(l)
 			rnd = append(rnd, l[0])

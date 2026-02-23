@@ -18,9 +18,9 @@ func TestTag(t *testing.T) {
 	}{
 		{
 			func() reflect.StructField {
-				return reflect.TypeOf(struct {
-					XXX string `json:"xxx" db:"yyy"`
-				}{}).Field(0)
+				return reflect.TypeFor[struct {
+					XXX string "json:\"xxx\" db:\"yyy\""
+				}]().Field(0)
 			}(),
 			"json",
 			"xxx", nil,
@@ -28,9 +28,9 @@ func TestTag(t *testing.T) {
 
 		{
 			func() reflect.StructField {
-				return reflect.TypeOf(struct {
-					XXX string `tagname:"xxx,opt1,opt2" db:"yyy"`
-				}{}).Field(0)
+				return reflect.TypeFor[struct {
+					XXX string "tagname:\"xxx,opt1,opt2\" db:\"yyy\""
+				}]().Field(0)
 			}(),
 			"tagname",
 			"xxx", []string{"opt1", "opt2"},
@@ -38,9 +38,9 @@ func TestTag(t *testing.T) {
 
 		{
 			func() reflect.StructField {
-				return reflect.TypeOf(struct {
-					XXX string `db:"yyy"`
-				}{}).Field(0)
+				return reflect.TypeFor[struct {
+					XXX string "db:\"yyy\""
+				}]().Field(0)
 			}(),
 			"json",
 			"", nil,
@@ -247,7 +247,7 @@ type Strukt struct {
 }
 
 func BenchmarkTag(b *testing.B) {
-	f := reflect.TypeOf(Strukt{}).Field(0)
+	f := reflect.TypeFor[Strukt]().Field(0)
 	var v1, v2 any
 	for n := 0; n < b.N; n++ {
 		v1, v2 = Tag(f, "db")
@@ -320,7 +320,7 @@ func TestDerefType(t *testing.T) {
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
 			have, havePtr := DerefType(reflect.TypeOf(tt.in))
-			if have != reflect.TypeOf(tt.want) {
+			if have != reflect.TypeFor[string]() {
 				t.Errorf("\nhave: %q\nwant: %q", have, tt.want)
 			}
 			if havePtr != tt.wantPtr {

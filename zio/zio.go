@@ -386,7 +386,7 @@ func (r *slowReader) Read(p []byte) (int, error) {
 	buf := make([]byte, r.c)
 	n, err := r.r.Read(buf)
 	p = p[:n] // TODO: panics if c > cap(p); for now, that's okay.
-	for i := 0; i < n; i++ {
+	for i := range n {
 		p[i] = buf[i]
 	}
 	return n, err

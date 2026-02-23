@@ -188,11 +188,11 @@ func TestUnmarshalto(t *testing.T) {
 	}{
 		{"", nil, nil, "target is nil"},
 
-		{`{}`, reflect.TypeOf(&mail.Address{}), &mail.Address{}, ""},
-		{`{"Name": "Martin"}`, reflect.TypeOf(&mail.Address{}), &mail.Address{Name: "Martin"}, ""},
+		{`{}`, reflect.TypeFor[*mail.Address](), &mail.Address{}, ""},
+		{`{"Name": "Martin"}`, reflect.TypeFor[*mail.Address](), &mail.Address{Name: "Martin"}, ""},
 
-		{`{}`, reflect.TypeOf(mail.Address{}), &mail.Address{}, ""},
-		{`{"Name": "Martin"}`, reflect.TypeOf(mail.Address{}), &mail.Address{Name: "Martin"}, ""},
+		{`{}`, reflect.TypeFor[mail.Address](), &mail.Address{}, ""},
+		{`{"Name": "Martin"}`, reflect.TypeFor[mail.Address](), &mail.Address{Name: "Martin"}, ""},
 	}
 
 	for _, tt := range tests {

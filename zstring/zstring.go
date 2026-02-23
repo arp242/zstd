@@ -198,11 +198,11 @@ func AlignCenter(s string, n int) string {
 //	  s = s[:i]
 //	}
 func Upto(s string, sep string) string {
-	i := strings.Index(s, sep)
-	if i == -1 {
+	before, _, ok := strings.Cut(s, sep)
+	if !ok {
 		return s
 	}
-	return s[:i]
+	return before
 }
 
 // From slices the string from first occurrence of sep. This is a shortcut for:
@@ -211,11 +211,11 @@ func Upto(s string, sep string) string {
 //	  s = s[i+len(sep):]
 //	}
 func From(s string, sep string) string {
-	i := strings.Index(s, sep)
-	if i == -1 {
+	_, after, ok := strings.Cut(s, sep)
+	if !ok {
 		return s
 	}
-	return s[i+len(sep):]
+	return after
 }
 
 // IndexN finds the nth occurrence of a string.

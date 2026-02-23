@@ -69,8 +69,8 @@ func Tag(f *ast.Field, n string) (string, []string) {
 		return f.Names[0].Name, nil
 	}
 
-	if p := strings.Index(tag, ","); p != -1 {
-		return tag[:p], strings.Split(tag[p+1:], ",")
+	if name, opt, ok := strings.Cut(tag, ","); ok {
+		return name, strings.Split(opt, ",")
 	}
 	return tag, nil
 }

@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"slices"
 	"strings"
 )
 
@@ -62,10 +63,8 @@ func Format(xmlDoc []byte, prefix, indent string) ([]byte, error) {
 			if ns == "" {
 				return
 			}
-			for _, n := range namespaces {
-				if ns == n {
-					return
-				}
+			if slices.Contains(namespaces, ns) {
+				return
 			}
 			if i := strings.LastIndex(ns, "/"); i > -1 {
 				ns = ns[i+1:]

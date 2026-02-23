@@ -169,13 +169,13 @@ func TestWeek(t *testing.T) {
 	)
 
 	h.WriteString("Monday:\n")
-	for i := 0; i < 7; i++ {
+	for i := range 7 {
 		fmt.Fprintf(h, "%d  %s → %s %s\n", i, mon.AddPeriod(i, Day).Format(f),
 			mon.AddPeriod(i, Day).StartOf(Week(false)).Format(f),
 			mon.AddPeriod(i, Day).EndOf(Week(false)).Format(f))
 	}
 	h.WriteString("\nSunday:\n")
-	for i := 0; i < 7; i++ {
+	for i := range 7 {
 		fmt.Fprintf(h, "%d  %s → %s %s\n", i, sun.AddPeriod(i, Day).Format(f),
 			sun.AddPeriod(i, Day).StartOf(Week(true)).Format(f),
 			sun.AddPeriod(i, Day).EndOf(Week(true)).Format(f))

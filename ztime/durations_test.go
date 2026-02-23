@@ -165,7 +165,7 @@ func TestDurationsStats(t *testing.T) {
 func BenchmarkTop(b *testing.B) {
 	d := NewDurations(0)
 	d.Grow(1_000_000)
-	for i := 0; i < 1_000_000; i++ {
+	for range 1_000_000 {
 		d.Append(time.Duration(rand.Intn(200)))
 	}
 
