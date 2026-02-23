@@ -1,6 +1,8 @@
 package ztime
 
 import (
+	"reflect"
+	"slices"
 	"testing"
 	"time"
 )
@@ -347,4 +349,72 @@ func TestDiff(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestRangeAdd(t *testing.T) {
+	tests := []struct {
+		a, b time.Time
+		add  time.Duration
+		want Range
+	}{
+		{time.Time{}, time.Time{}, 0, Range{}},
+		{time.Time{}, time.Time{}, time.Hour, NewRange(time.Time{}.Add(time.Hour)).To(time.Time{}.Add(time.Hour))},
+		{time.Time{}, time.Time{}, -time.Hour, NewRange(time.Time{}.Add(-time.Hour)).To(time.Time{}.Add(-time.Hour))},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			have := NewRange(tt.a).To(tt.b).Add(tt.add)
+			if !have.Equal(tt.want) {
+				t.Fatalf("\nhave: start=%s; end=%s\nwant: start=%s; end=%s", have.Start, have.End, tt.want.Start, tt.want.End)
+			}
+		})
+	}
+}
+
+func TestRangeIter(t *testing.T) {
+	tests := []struct {
+		in   Range
+		p    Period
+		want []time.Time
+	}{
+		{NewRange(FromString("2020-06-21 14:15:16")).To(FromString("2020-06-18 14:15:16")), Day, nil},
+
+		// Day
+		{NewRange(FromString("2020-06-18 14:15:16")).To(FromString("2020-06-18 14:15:16")), Day,
+			[]time.Time{FromString("2020-06-18 00:00:00")},
+		},
+		{NewRange(FromString("2020-06-18 14:15:16")).To(FromString("2020-06-20 14:15:16")), Day,
+			[]time.Time{FromString("2020-06-18 00:00:00"), FromString("2020-06-19 00:00:00"), FromString("2020-06-20 00:00:00")},
+		},
+
+		// Second
+		{NewRange(FromString("2020-06-18 14:15:16")).To(FromString("2020-06-18 14:15:16")), Second,
+			[]time.Time{FromString("2020-06-18 14:15:16")},
+		},
+		{NewRange(FromString("2020-06-18 14:15:16")).To(FromString("2020-06-18 14:15:20")), Second,
+			[]time.Time{
+				FromString("2020-06-18 14:15:16"), FromString("2020-06-18 14:15:17"),
+				FromString("2020-06-18 14:15:18"), FromString("2020-06-18 14:15:19"),
+				FromString("2020-06-18 14:15:20")},
+		},
+
+		// Month
+		{NewRange(FromString("2020-06-18 14:15:16")).To(FromString("2020-06-18 14:15:16")), Month,
+			[]time.Time{FromString("2020-06-01 00:00:00")},
+		},
+		{NewRange(FromString("2020-06-18 14:15:16")).To(FromString("2020-07-01 00:00:00")), Month,
+			[]time.Time{FromString("2020-06-01 00:00:00"), FromString("2020-07-01 00:00:00")},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			have := slices.Collect(tt.in.Iter(tt.p))
+			if !reflect.DeepEqual(have, tt.want) {
+				t.Errorf("\nhave: %v\nwant: %v", have, tt.want)
+			}
+		})
+	}
+
 }

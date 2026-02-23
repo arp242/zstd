@@ -1,6 +1,7 @@
 package ztime
 
 import (
+	"iter"
 	"strconv"
 	"time"
 )
@@ -101,6 +102,11 @@ func (r Range) Equal(cmp Range) bool {
 // instant with time.Time.Equal().
 func (r Range) IsZero() bool {
 	return r.Start.IsZero() && r.End.IsZero()
+}
+
+// Add returns the start and end time + d.
+func (r Range) Add(d time.Duration) Range {
+	return NewRange(r.Start.Add(d)).To(r.End.Add(d))
 }
 
 // Round returns the result of rounding the start and end dates to the nearest
@@ -377,4 +383,28 @@ func (d Diff) String() string {
 		s += ", " + n(d.Days) + " days"
 	}
 	return s
+}
+
+// Iter iterates over every instance of the given period, including the start
+// and end times themselves.
+func (r Range) Iter(p Period) iter.Seq[time.Time] {
+	if r.Start.After(r.End) {
+		return func(func(time.Time) bool) {}
+	}
+
+	return func(yield func(time.Time) bool) {
+		var (
+			cur = StartOf(r.Start, p)
+			end = EndOf(r.End, p)
+		)
+		for {
+			if !yield(cur) {
+				return
+			}
+			cur = AddPeriod(cur, 1, p)
+			if cur.After(end) {
+				break
+			}
+		}
+	}
 }
