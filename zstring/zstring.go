@@ -481,3 +481,22 @@ func ShellQuote(s string) string {
 	}
 	return "'" + strings.ReplaceAll(s, "'", `'\''`) + "'"
 }
+
+// Squeeze removes repeated sequences of b, replacing them with a single
+// instance of b.
+//
+// For example "a--b----c-d" becomes "a-b-c-d".
+func Squeeze(s string, b rune) string {
+	var (
+		runes    = []rune(s)
+		squeezed = make([]rune, 0, len(runes))
+		wasb     bool
+	)
+	for _, c := range runes {
+		if c == b && wasb {
+			continue
+		}
+		squeezed, wasb = append(squeezed, c), c == b
+	}
+	return string(squeezed)
+}

@@ -542,3 +542,32 @@ func TestSafe(t *testing.T) {
 		})
 	}
 }
+
+func TestSqueeze(t *testing.T) {
+	tests := []struct {
+		in   string
+		b    rune
+		want string
+	}{
+		{"", 0, ""},
+
+		{"a-b--c-----d", '-', "a-b-c-d"},
+		{"-a-", '-', "-a-"},
+		{"---a---", '-', "-a-"},
+		{"------", '-', "-"},
+
+		{"a€b€€c€€€€€d", '€', "a€b€c€d"},
+		{"€a€", '€', "€a€"},
+		{"€€€a€€€", '€', "€a€"},
+		{"€€€€€€", '€', "€"},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			have := Squeeze(tt.in, tt.b)
+			if have != tt.want {
+				t.Errorf("\nhave: %q\nwant: %q", have, tt.want)
+			}
+		})
+	}
+}
