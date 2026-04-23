@@ -81,16 +81,12 @@ func SecretString(size int, sel string) string {
 	if sel == "" {
 		sel = alphabet
 	}
-
 	var (
 		b = make([]byte, size)
 		m = big.NewInt(int64(len(sel)))
 	)
 	for i := range b {
-		n, err := rand.Int(rand.Reader, m)
-		if err != nil {
-			panic(fmt.Errorf("zcrypto.Secret: %w", err))
-		}
+		n, _ := rand.Int(rand.Reader, m) // rand.Read() never errors.
 		b[i] = sel[n.Int64()]
 	}
 	return string(b)
@@ -101,10 +97,7 @@ var max = big.NewInt(0).SetUint64(1e19)
 func secret(n int) string {
 	var key strings.Builder
 	for range n {
-		n, err := rand.Int(rand.Reader, max)
-		if err != nil {
-			panic(fmt.Errorf("zcrypto.Secret: %w", err))
-		}
+		n, _ := rand.Int(rand.Reader, max) // rand.Read never errors.
 		_, _ = key.WriteString(strconv.FormatUint(n.Uint64(), 36))
 	}
 	return key.String()
