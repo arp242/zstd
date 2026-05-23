@@ -111,7 +111,6 @@ func SafeDialer(allowedNets []string, allowedPorts []int) *net.Dialer {
 		// Same defaults as net/http.DefaultTransport
 		Timeout:   30 * time.Second,
 		KeepAlive: 30 * time.Second,
-		DualStack: true,
 	}
 }
 
