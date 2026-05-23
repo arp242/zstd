@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io/fs"
 	"os"
+	"strings"
 )
 
 const (
@@ -78,4 +79,46 @@ func CreateNew(path string, zeroByte bool) (*os.File, error) {
 		}
 	}
 	return out, err
+}
+
+type createAtomic struct{ *os.File }
+
+// Close the [os.File], rendering it unusable for I/O. On files that support
+// [File.SetDeadline], any pending I/O operations will be cancelled and return
+// immediately with an [os.ErrClosed] error.
+//
+// The temporary file will be renamed to the destination.
+//
+// Close will return an error if it has already been called.
+func (c createAtomic) Close() error {
+	err := c.File.Close()
+	if err != nil {
+		return err
+	}
+	return os.Rename(c.File.Name(), c.Name())
+}
+
+// Name returns the name of the file as presented to Open.
+//
+// It is safe to call Name after [Close].
+func (c createAtomic) Name() string {
+	return strings.TrimSuffix(c.File.Name(), "-tmp")
+}
+
+// RemoveTmp removes the temporary file, if any.
+func (c createAtomic) RemoveTemp() error {
+	return os.Remove(c.File.Name())
+}
+
+// CreateAtomic is like [os.Create], but creates a temporary file (name +
+// "-tmp"), which is moved to name on Close().
+//
+// The tmp file is not removed on errors, but the RemoveTemp() method can be
+// used to clean up the -tmp file.
+func CreateAtomic(name string) (createAtomic, error) {
+	fp, err := os.Create(name + "-tmp")
+	if err != nil {
+		return createAtomic{}, err
+	}
+	return createAtomic{fp}, err
 }
