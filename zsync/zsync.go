@@ -85,6 +85,9 @@ func (a *AtMost) Wait() {
 
 // Run a function. Blocks if the job queue is full.
 func (a *AtMost) Run(f func()) {
+	// TODO: should probably rename to Go(f func()), as that's the same as
+	// sync.WaitGroup.
+
 	a.ch <- struct{}{}
 	a.wg.Add(1)
 	go func() {

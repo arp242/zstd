@@ -64,3 +64,12 @@ func KeyValue[M ~map[K]V, K comparable, V any](m M) []struct {
 	}
 	return r
 }
+
+// Reverse the key and values in a map.
+func Reverse[K, V comparable](m map[K]V) map[V]K {
+	n := make(map[V]K, len(m))
+	for k, v := range m {
+		n[v] = k
+	}
+	return n
+}
