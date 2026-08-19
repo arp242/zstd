@@ -107,8 +107,8 @@ func Repeat[T any](s T, n int) []T {
 func Remove[T comparable](l *[]T, name T) bool {
 	found := false
 	ll := *l
-	for i := len(ll) - 1; i >= 0; i-- {
-		if ll[i] == name {
+	for i, l := range slices.Backward(ll) {
+		if l == name {
 			ll = append(ll[:i], ll[i+1:]...)
 			found = true
 		}
@@ -124,8 +124,8 @@ func Remove[T comparable](l *[]T, name T) bool {
 // Will panic on out of bounds.
 func RemoveIndexes[T any](l *[]T, indexes ...int) {
 	ll := *l
-	for i := len(indexes) - 1; i >= 0; i-- {
-		ll = append(ll[:indexes[i]], ll[indexes[i]+1:]...)
+	for _, indexe := range slices.Backward(indexes) {
+		ll = append(ll[:indexe], ll[indexe+1:]...)
 	}
 	*l = ll
 }
