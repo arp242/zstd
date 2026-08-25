@@ -194,8 +194,7 @@ func sizeOf(v reflect.Value, seen map[uintptr]bool) uintptr {
 
 	case reflect.Struct:
 		// Chase pointer and slice fields and add the size of their members.
-		for i := 0; i < v.NumField(); i++ {
-			f := v.Field(i)
+		for _, f := range v.Fields() {
 			switch f.Kind() {
 			case reflect.Pointer:
 				p := f.Pointer()

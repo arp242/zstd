@@ -4,6 +4,7 @@ import (
 	"errors"
 	"io/fs"
 	"os"
+	"runtime"
 	"slices"
 	"testing"
 )
@@ -92,6 +93,12 @@ func TestCreateAtomic(t *testing.T) {
 	})
 
 	t.Run("removetemp", func(t *testing.T) {
+		if runtime.GOOS == "windows" {
+			// remove C:\Users\RUNNER~1\AppData\Local\Temp\TestCreateAtomicremovetemp501911070\001/file-tmp:
+			// The process cannot access the file because it is being used by another process.
+			t.Skip()
+		}
+
 		tmp := t.TempDir()
 		fp, err := CreateAtomic(tmp + "/file")
 		if err != nil {

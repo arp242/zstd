@@ -4,7 +4,7 @@ import "testing"
 
 func TestPtr(t *testing.T) {
 	s := "hello"
-	sp := Ptr(s)
+	sp := new(s)
 
 	if have := Deref(sp, "NIL"); have != "hello" {
 		t.Error(have)

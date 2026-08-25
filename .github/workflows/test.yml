@@ -16,7 +16,7 @@ jobs:
   test:
     strategy:
       matrix:
-        go: ['1.23.x', '1.27.x']
+        go: ['1.27.x']
         os: ['ubuntu-latest', 'ubuntu-24.04-arm', 'macos-latest', 'windows-latest', 'windows-11-arm']
     runs-on: ${{ matrix.os }}
     steps:
@@ -57,7 +57,7 @@ jobs:
         with:
           prepare: 'pkg_add go'
           # "-race is not supported on openbsd/amd64"
-          run:     'go test ./...'
+          run:     'GOTOOLCHAIN=auto go test ./...'
 
   netbsd:
     runs-on: 'ubuntu-latest'
@@ -82,6 +82,6 @@ jobs:
       id:   'illumos'
       uses: 'vmactions/omnios-vm@v1'
       with:
-        prepare: 'pkg install go-123'
+        prepare: 'pkg install go-126'
         # "-race is not supported on illumos/amd64"
-        run:     'go test ./...'
+        run:     'GOTOOLCHAIN=auto go test ./...'

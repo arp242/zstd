@@ -5,8 +5,6 @@ import (
 	"strings"
 	"testing"
 	"time"
-
-	"zgo.at/zstd/ztype"
 )
 
 func TestTag(t *testing.T) {
@@ -84,7 +82,7 @@ func TestFields(t *testing.T) {
 	}{
 		{struct{}{}, []string{}, []any{}, [][]string{}},
 
-		{ztype.Ptr(struct {
+		{new(struct {
 			F1 int `db:"f1,opt"`
 		}{42}),
 			[]string{"f1"},
@@ -111,9 +109,9 @@ func TestFields(t *testing.T) {
 			F4 int `db:",skip"`
 			F5 int `db:"-"`
 			F6 *int
-		}{1, 2, 3, 4, 5, ztype.Ptr(6)},
+		}{1, 2, 3, 4, 5, new(6)},
 			[]string{"f1", "F3", "F6"},
-			[]any{1, 3, ztype.Ptr(6)},
+			[]any{1, 3, new(6)},
 			[][]string{nil, nil, nil}},
 
 		{struct {
@@ -144,7 +142,7 @@ func TestFields(t *testing.T) {
 			unexport2 int `db:"asd"`
 		}{1, 2}, []string{}, []any{}, [][]string{}},
 
-		{ztype.Ptr(struct {
+		{new(struct {
 			embedUnexport
 			F1 int `db:"f1,opt"`
 		}{embedUnexport{"X", 1}, 42}),
@@ -152,7 +150,7 @@ func TestFields(t *testing.T) {
 			[]any{42},
 			[][]string{{"opt"}}},
 
-		{ztype.Ptr(struct {
+		{new(struct {
 			EmbedUnexport
 			F1 int `db:"f1,opt"`
 		}{EmbedUnexport{"X", 1}, 42}),
@@ -289,8 +287,8 @@ func TestDerefValue(t *testing.T) {
 		wantPtr bool
 	}{
 		{"x", "x", false},
-		{ztype.Ptr("x"), "x", true},
-		{ztype.Ptr(ztype.Ptr("x")), "x", true},
+		{new("x"), "x", true},
+		{new(new("x")), "x", true},
 	}
 
 	for _, tt := range tests {
@@ -313,8 +311,8 @@ func TestDerefType(t *testing.T) {
 		wantPtr bool
 	}{
 		{"x", "x", false},
-		{ztype.Ptr("x"), "x", true},
-		{ztype.Ptr(ztype.Ptr("x")), "x", true},
+		{new("x"), "x", true},
+		{new(new("x")), "x", true},
 	}
 
 	for _, tt := range tests {

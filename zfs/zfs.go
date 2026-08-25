@@ -66,7 +66,7 @@ func Exists(fsys fs.FS, name string) bool {
 // to "query" regardless of whether the Sub to "db" succeeded or not, so
 // "db/query" and "query" will end up beiing Sub()'d.
 func SubIfExists(fsys fs.FS, dir string) (fs.FS, error) {
-	for _, p := range strings.Split(dir, "/") {
+	for p := range strings.SplitSeq(dir, "/") {
 		ls, err := fs.ReadDir(fsys, ".")
 		if err != nil {
 			return nil, err

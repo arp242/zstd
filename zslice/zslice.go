@@ -92,15 +92,6 @@ func IsUniq[T cmp.Ordered](list []T) bool {
 	return len(list) == len(UniqSort(list))
 }
 
-// Repeat returns a slice with the value v repeated n times.
-func Repeat[T any](s T, n int) []T {
-	r := make([]T, 0, n)
-	for range n {
-		r = append(r, s)
-	}
-	return r
-}
-
 // Remove all values from a list.
 //
 // The return value indicates if this value was found at all.
@@ -128,28 +119,6 @@ func RemoveIndexes[T any](l *[]T, indexes ...int) {
 		ll = append(ll[:indexe], ll[indexe+1:]...)
 	}
 	*l = ll
-}
-
-// Max gets the highest value from a list.
-func Max[T cmp.Ordered](list []T) T {
-	var max T
-	for _, n := range list {
-		if n > max {
-			max = n
-		}
-	}
-	return max
-}
-
-// Min gets the lowest value from a list.
-func Min[T cmp.Ordered](list []T) T {
-	var min T
-	for _, n := range list {
-		if n < min {
-			min = n
-		}
-	}
-	return min
 }
 
 // Difference returns a new slice with elements that are in "set" but not in
