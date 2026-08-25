@@ -39,12 +39,10 @@ func TestSynced(t *testing.T) {
 		var wg sync.WaitGroup
 		for i := range 100 {
 			func(i int) {
-				wg.Add(1)
-				go func() {
-					defer wg.Done()
+				wg.Go(func() {
 					_ = s.Get()
 					s.Set(i)
-				}()
+				})
 			}(i)
 		}
 		wg.Wait()

@@ -187,7 +187,7 @@ func NormalizeIndent(in string) string {
 	}
 
 	var r strings.Builder
-	for _, line := range strings.Split(in, "\n") {
+	for line := range strings.SplitSeq(in, "\n") {
 		r.WriteString(strings.Replace(line, "\t", "", indent) + "\n")
 	}
 
@@ -258,7 +258,7 @@ func MustInline(t *testing.T, pkg string, funs ...string) {
 			t.Errorf("unknown function: %q", f)
 		}
 		if !l.inlined {
-			t.Errorf(l.line)
+			t.Error(l.line)
 		}
 	}
 }
@@ -296,7 +296,7 @@ func getInlines(t *testing.T) {
 		}{in, mod + line}
 	}
 
-	for _, line := range strings.Split(string(out), "\n") {
+	for line := range strings.SplitSeq(string(out), "\n") {
 		if strings.HasPrefix(line, "# ") {
 			pkg = line[2:]
 		}

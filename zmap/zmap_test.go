@@ -13,7 +13,7 @@ func TestKeysOrdered(t *testing.T) {
 		in   map[int]int
 		want []int
 	}{
-		{nm, []int{}},
+		{nm, []int(nil)},
 		{map[int]int{1: 0, 2: 0, 3: 0}, []int{1, 2, 3}},
 	}
 

@@ -279,7 +279,7 @@ func TestMax(t *testing.T) {
 		t.Run("", func(t *testing.T) {
 			have := Max(tt.in)
 			if have != tt.want {
-				t.Errorf("\nhave: %q\nwant: %q", have, tt.want)
+				t.Errorf("\nhave: %v\nwant: %v", have, tt.want)
 			}
 		})
 	}
@@ -300,7 +300,7 @@ func TestMin(t *testing.T) {
 		t.Run("", func(t *testing.T) {
 			have := Min(tt.in)
 			if have != tt.want {
-				t.Errorf("\nhave: %q\nwant: %q", have, tt.want)
+				t.Errorf("\nhave: %v\nwant: %v", have, tt.want)
 			}
 		})
 	}

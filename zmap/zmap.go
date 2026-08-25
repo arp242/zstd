@@ -3,21 +3,13 @@ package zmap
 
 import (
 	"cmp"
+	"maps"
 	"slices"
 )
 
-// Keys returns an unsorted list of keys of the map.
-func Keys[M ~map[K]V, K cmp.Ordered, V any](m M) []K {
-	r := make([]K, 0, len(m))
-	for k := range m {
-		r = append(r, k)
-	}
-	return r
-}
-
 // KeysOrdered returns the sorted keys of the map.
 func KeysOrdered[M ~map[K]V, K cmp.Ordered, V any](m M) []K {
-	r := Keys(m)
+	r := slices.Collect(maps.Keys(m))
 	slices.Sort(r)
 	return r
 }
@@ -36,15 +28,6 @@ func LongestKey[M ~map[string]V, V any](m M) ([]string, int) {
 		}
 	}
 	return r, l
-}
-
-// Values returns the values of the map.
-func Values[M ~map[K]V, K comparable, V any](m M) []V {
-	r := make([]V, 0, len(m))
-	for _, v := range m {
-		r = append(r, v)
-	}
-	return r
 }
 
 // KeyValue returns a struct slice with the keys and values.

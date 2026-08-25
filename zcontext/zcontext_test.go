@@ -17,7 +17,7 @@ func TestNoCancel(t *testing.T) {
 	defer c()
 	ctx = context.WithValue(ctx, b{}, "value b")
 
-	ctx2 := WithoutTimeout(ctx)
+	ctx2 := context.WithoutCancel(ctx)
 	if ctx2.Value(a{}).(string) != "value a" {
 		t.Fatal()
 	}
