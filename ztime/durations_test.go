@@ -108,7 +108,7 @@ func TestDurationsTop(t *testing.T) {
 	cmpDurations(t, d.Top(-20), Durations{list: []time.Duration{1}})
 }
 
-func TestDurationsDistrubute(t *testing.T) {
+func TestDurationsDistribute(t *testing.T) {
 	d := NewDurations(0)
 	d.Append(20)
 	d.Append(20)
