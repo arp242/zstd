@@ -15,7 +15,7 @@ func TestInt(t *testing.T) {
 		Int Int `json:"int"`
 	}
 
-	{ // Parse stings.
+	{ // Parse strings.
 		MustUnmarshal([]byte(`{"int":"1234567890"}`), &x)
 		have := fmt.Sprintf("%v", x)
 		want := "{1234567890}"

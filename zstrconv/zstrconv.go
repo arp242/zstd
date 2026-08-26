@@ -10,7 +10,7 @@ type integer interface {
 		~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64 | ~uintptr
 }
 
-// ParseInt parses an integer. The bitSize is infered from the type parameter.
+// ParseInt parses an integer. The bitSize is inferred from the type parameter.
 //
 // Other than that, works like [strconv.ParseInt] or [strconv.ParseUint].
 func ParseInt[T integer](s string, base int) (T, error) {

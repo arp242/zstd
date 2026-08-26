@@ -70,7 +70,7 @@ func (r Range) To(end time.Time) Range {
 	return r
 }
 
-// Period returns a copy withh the end time set to n Period from the start time.
+// Period returns a copy with the end time set to n Period from the start time.
 //
 // This uses ztime.AddPeriod() and its "common sense" understanding of months.
 func (r Range) Period(n int, p Period) Range {

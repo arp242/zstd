@@ -120,7 +120,7 @@ func TestDurationsDistrubute(t *testing.T) {
 	d.Append(80)
 
 	{
-		h := d.Distrubute(4)
+		h := d.Distribute(4)
 		cmpDurations(t, h[0], Durations{list: []time.Duration{20, 20}})
 		cmpDurations(t, h[1], Durations{list: []time.Duration{40, 40}})
 		cmpDurations(t, h[2], Durations{list: []time.Duration{60, 60}})
@@ -128,7 +128,7 @@ func TestDurationsDistrubute(t *testing.T) {
 	}
 
 	{
-		h := d.Distrubute(2)
+		h := d.Distribute(2)
 		cmpDurations(t, h[0], Durations{list: []time.Duration{20, 20, 40, 40}})
 		cmpDurations(t, h[1], Durations{list: []time.Duration{60, 60, 80, 80}})
 	}

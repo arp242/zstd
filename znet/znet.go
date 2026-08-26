@@ -92,7 +92,7 @@ func RemovePort(host string) string {
 	return shost
 }
 
-// SafeDialer is only alllowed to connect to the listed networks and ports on
+// SafeDialer is only allowed to connect to the listed networks and ports on
 // non-private addresses.
 //
 // Any attempt to connect to e.g. "127.0.0.1" will return an error. This is

@@ -211,11 +211,11 @@ func (d Durations) Top(percent int) Durations {
 	return newd
 }
 
-// Distrubute the list of Durations in n blocks.
+// Distribute the list of Durations in n blocks.
 //
 // For example with Distribute(5) it returns 5 set of durations, from the fastest
 // 20% to the slowest 20%.
-func (d Durations) Distrubute(n int) []Durations {
+func (d Durations) Distribute(n int) []Durations {
 	var (
 		cpy   = d.copyAndSort()
 		bins  = make([]Durations, n)
