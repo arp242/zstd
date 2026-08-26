@@ -1,6 +1,11 @@
 [codespell]
 # Ref: https://github.com/codespell-project/codespell#using-a-config-file
-skip = .git,.gitignore,.gitattributes,.codespellrc
+skip = .git,.git-meta,.gitignore,.gitattributes,.codespellrc,go.sum,go.mod
 check-hidden = true
-# ignore-regex = 
-# ignore-words-list =
+# Ignore camelCase and PascalCase identifiers (common in Go code)
+ignore-regex = \b[a-z]+[A-Z]\w*\b|\b[A-Z][a-z]+[A-Z]\w*\b
+ignore-words-list =
+  # local variable naming: a-low, a-high, b-low, b-high bounds in diff.go
+  alo,
+  # intentional slang "oh noes" in docstring example code (ztest/ztest.go)
+  noes
