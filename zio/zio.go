@@ -143,7 +143,7 @@ func (w *NopWriter) Write(b []byte) (int, error) { return len(b), nil }
 // read completes. Any error encountered while writing is reported as a read
 // error.
 //
-// This is simular to [io.TeeReader], except that it supports multiple writers.
+// This is similar to [io.TeeReader], except that it supports multiple writers.
 func TeeReader(r io.Reader, w ...io.Writer) io.Reader {
 	return &teeReader{r, w}
 }

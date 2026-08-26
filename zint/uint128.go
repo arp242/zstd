@@ -32,7 +32,7 @@ func (i Uint128) IsZero() bool   { return i[0] == 0 && i[1] == 0 }
 
 // Format according to the given base.
 //
-// TODO: this is not really printin a number, but just printing the 2 numbers
+// TODO: this is not really printing a number, but just printing the 2 numbers
 // side-by-side, rather than actually adding up the bits.
 func (i Uint128) Format(base int) string {
 	return strconv.FormatUint(i[0], base) + "-" + strconv.FormatUint(i[1], base)
