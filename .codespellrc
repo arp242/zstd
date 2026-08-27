@@ -8,4 +8,7 @@ ignore-words-list =
   # local variable naming: a-low, a-high, b-low, b-high bounds in diff.go
   alo,
   # intentional slang "oh noes" in docstring example code (ztest/ztest.go)
-  noes
+  noes,
+  # historical misspelling: Distrubute kept as deprecated alias for
+  # Distribute in ztime/durations.go for API back-compat
+  distrubute

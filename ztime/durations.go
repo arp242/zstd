@@ -211,6 +211,12 @@ func (d Durations) Top(percent int) Durations {
 	return newd
 }
 
+// Distrubute is a deprecated alias for [Durations.Distribute].
+//
+// Deprecated: use [Durations.Distribute] instead. This alias will be removed
+// in a future release.
+func (d Durations) Distrubute(n int) []Durations { return d.Distribute(n) } // codespell:ignore distrubute
+
 // Distribute the list of Durations in n blocks.
 //
 // For example with Distribute(5) it returns 5 set of durations, from the fastest
