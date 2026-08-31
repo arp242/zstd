@@ -5,11 +5,13 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"hash"
 	"io"
 	"io/fs"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -22,24 +24,17 @@ import (
 // attempt to make the returned ReadClosers have identical error-matching
 // behavior.
 //
-// This is based on httputil.DumpRequest, see zio.DumpBody() for an example
-// usage.
-//
-// Copyright 2009 The Go Authors. All rights reserved. Use of this source code
-// is governed by a BSD-style license that can be found in the LICENSE file:
-// https://golang.org/LICENSE
-func DumpReader(b io.ReadCloser) (r1, r2 io.ReadCloser, err error) {
+// See [zio.DumpBody] for an example usage.
+func DumpReader(b io.ReadCloser) (io.ReadCloser, io.ReadCloser, error) {
 	if b == http.NoBody {
-		// No copying needed. Preserve the magic sentinel meaning of NoBody.
 		return http.NoBody, http.NoBody, nil
 	}
 
 	var buf bytes.Buffer
-	if _, err = buf.ReadFrom(b); err != nil {
+	if _, err := buf.ReadFrom(b); err != nil {
 		return nil, b, err
 	}
-
-	if err = b.Close(); err != nil {
+	if err := b.Close(); err != nil {
 		return nil, b, err
 	}
 
@@ -398,4 +393,62 @@ func (r *slowReader) Close() error {
 		return c.Close()
 	}
 	return nil
+}
+
+// ErrorReader read all data from r and returns err on io.EOF.
+func ErrorReader(r io.Reader, err error) io.Reader {
+	// Passing nil here is a bit silly, but would get stuck in infinite loop
+	// otherwise. So prevent that.
+	if err == nil {
+		err = io.EOF
+	}
+	return &errReader{r, err}
+}
+
+type errReader struct {
+	r   io.Reader
+	err error
+}
+
+func (r *errReader) Read(p []byte) (int, error) {
+	n, err := r.r.Read(p)
+	if err != nil && err != io.EOF {
+		return n, err
+	}
+	if err == io.EOF {
+		return 0, r.err
+	}
+	return n, err
+}
+
+// CopyReader copies up to limit bytes to a new reader. The "full" reader always
+// reads the full data.
+//
+// The reader may be nil or [http.NoBody], in which case both return values are
+// set to the same value.
+//
+// The copy is set to "«read error: %s»" and never returns any data if any error
+// occurs. The full reader will always return any data read before the error (if
+// any) and then returns the exact same error.
+//
+// This is intended to allow copying readers for debuggig or recording purposes,
+// but not using a large amount of memory and not affecting the behaviour of the
+// reader.
+func CopyReader(r io.ReadCloser, limit int64) (full, cp io.ReadCloser) {
+	if r == nil {
+		return nil, nil
+	}
+	if r == http.NoBody {
+		return http.NoBody, http.NoBody
+	}
+
+	d, err := io.ReadAll(io.LimitReader(r, limit))
+	if err != nil {
+		return io.NopCloser(ErrorReader(bytes.NewReader(d), err)),
+			io.NopCloser(strings.NewReader(fmt.Sprintf(`«read error: %s»`, err)))
+	}
+	if limit > int64(len(d)) {
+		return io.NopCloser(bytes.NewReader(d)), io.NopCloser(bytes.NewReader(d))
+	}
+	return PeekReader(r, d), io.NopCloser(bytes.NewReader(d))
 }

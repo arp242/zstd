@@ -458,3 +458,80 @@ func TestSlowReader(t *testing.T) {
 	// 	fmt.Println(n, err, string(buf))
 	// })
 }
+
+func TestErrorReader(t *testing.T) {
+	tests := []struct {
+		in  string
+		err error
+	}{
+		{"abc", errors.New("def")},
+		{"abc", nil},
+		{"abc", io.EOF},
+
+		{strings.Repeat("abc", 20), errors.New("def")},
+		{strings.Repeat("abc", 20), nil},
+		{strings.Repeat("abc", 20), io.EOF},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			r := ErrorReader(strings.NewReader(tt.in), tt.err)
+
+			var (
+				finalErr error
+				data     []byte
+				buf      = make([]byte, 8)
+			)
+			for {
+				n, err := r.Read(buf)
+				if n > 0 {
+					data = append(data, buf[:n]...)
+				}
+				if err != nil {
+					finalErr = err
+					break
+				}
+			}
+			if string(data) != tt.in {
+				t.Fatalf("data after read not equal\ninput: %q\nafter read: %q", tt.in, string(data))
+			}
+			if tt.err == nil {
+				tt.err = io.EOF
+			}
+			if finalErr != tt.err {
+				t.Fatal(finalErr)
+			}
+		})
+	}
+}
+
+func TestCopyReader(t *testing.T) {
+	tests := []struct {
+		in                 string
+		limit              int64
+		err                error
+		wantFull, wantCopy string
+	}{
+		{"abc", 128, nil, `abc <nil>`, `abc <nil>`},
+		{"A longer piece of text", 8, nil, `A longer piece of text <nil>`, `A longer <nil>`},
+		{"abc", 3, nil, `abc <nil>`, `abc <nil>`},
+		{"abc", 128, errors.New("def"), `abc def`, `«read error: def» <nil>`},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			full, cp := CopyReader(io.NopCloser(ErrorReader(strings.NewReader(tt.in), tt.err)), tt.limit)
+
+			dataFull, errFull := io.ReadAll(full)
+			dataCopy, errCopy := io.ReadAll(cp)
+			haveFull, haveCopy := fmt.Sprintf("%s %v", dataFull, errFull), fmt.Sprintf("%s %v", dataCopy, errCopy)
+
+			if haveFull != tt.wantFull {
+				t.Fatalf("full wrong\nhave: %s\nwant: %s", haveFull, tt.wantFull)
+			}
+			if haveCopy != tt.wantCopy {
+				t.Fatalf("copy wrong\nhave: %s\nwant: %s", haveCopy, tt.wantCopy)
+			}
+		})
+	}
+}
