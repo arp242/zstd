@@ -31,7 +31,8 @@
 package ztest
 
 import (
-	"encoding/json"
+	"encoding/json/jsontext"
+	"encoding/json/v2"
 	"fmt"
 	"regexp"
 	"strings"
@@ -562,5 +563,5 @@ func indentJSON(data []byte, v any, prefix, indent string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return json.MarshalIndent(v, prefix, indent)
+	return json.Marshal(v, jsontext.WithIndentPrefix(prefix), jsontext.WithIndent(indent))
 }
