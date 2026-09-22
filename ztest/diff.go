@@ -563,5 +563,5 @@ func indentJSON(data []byte, v any, prefix, indent string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return json.Marshal(v, jsontext.WithIndentPrefix(prefix), jsontext.WithIndent(indent))
+	return json.Marshal(v, jsontext.WithIndentPrefix(prefix), jsontext.WithIndent(indent), json.Deterministic(true))
 }
