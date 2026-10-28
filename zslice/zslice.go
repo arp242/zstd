@@ -92,7 +92,7 @@ func IsUniq[T cmp.Ordered](list []T) bool {
 	return len(list) == len(UniqSort(list))
 }
 
-// Remove all values from a list.
+// Remove all values from a slice.
 //
 // The return value indicates if this value was found at all.
 func Remove[T comparable](l *[]T, name T) bool {
