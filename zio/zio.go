@@ -11,6 +11,7 @@ import (
 	"io/fs"
 	"net/http"
 	"os"
+	"slices"
 	"strings"
 	"time"
 )
@@ -451,4 +452,48 @@ func CopyReader(r io.ReadCloser, limit int64) (full, cp io.ReadCloser) {
 		return io.NopCloser(bytes.NewReader(d)), io.NopCloser(bytes.NewReader(d))
 	}
 	return PeekReader(r, d), io.NopCloser(bytes.NewReader(d))
+}
+
+type skipBOM struct {
+	r       io.Reader
+	pastBOM bool
+}
+
+// SkipBOM reads over a UTF-8 byte order mark (U+FEFF) at the start of the
+// reader.
+func SkipBOM(r io.Reader) io.ReadCloser {
+	return &skipBOM{r, false}
+}
+
+func (r *skipBOM) Read(p []byte) (int, error) {
+	if r.pastBOM {
+		return r.r.Read(p)
+	}
+	if len(p) == 0 {
+		return 0, nil
+	}
+	// Would be nicer to keep a buffer, I guess, but it's pretty rare anyone
+	// uses such small buffers, and just erroring out keeps the code simpler.
+	if len(p) < 3 {
+		return 0, errors.New("zio.SkipBOM: buffer must be at least 3 bytes")
+	}
+
+	r.pastBOM = true
+	n, err := r.r.Read(p)
+	if err != nil {
+		return n, err
+	}
+	if n >= 3 && slices.Equal(p[:3], []byte{0xef, 0xbb, 0xbf}) {
+		copy(p, p[3:])
+		n -= 3
+	}
+	return n, nil
+}
+
+// Close the underlying reader if it implements a Close method.
+func (r *skipBOM) Close() error {
+	if c, ok := r.r.(io.Closer); ok {
+		return c.Close()
+	}
+	return nil
 }

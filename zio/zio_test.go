@@ -535,3 +535,28 @@ func TestCopyReader(t *testing.T) {
 		})
 	}
 }
+
+func TestSkipBOM(t *testing.T) {
+	tests := []struct {
+		in   string
+		want string
+	}{
+		{"hello", "hello"},
+		{"\uFEFFhello", "hello"},
+		{"\uFEFF\uFEFFhello", "\uFEFFhello"},
+		{"a\uFEFFhello", "a\uFEFFhello"},
+		{strings.Repeat("\uFEFFhello", 1024), "hello" + strings.Repeat("\uFEFFhello", 1023)},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			data, err := io.ReadAll(SkipBOM(strings.NewReader(tt.in)))
+			if err != nil {
+				t.Fatal(err)
+			}
+			if string(data) != tt.want {
+				t.Fatalf("\nhave: %q\nwant: %q", string(data), tt.want)
+			}
+		})
+	}
+}
